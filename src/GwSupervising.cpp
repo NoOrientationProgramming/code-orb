@@ -24,6 +24,7 @@
 */
 
 #include "GwSupervising.h"
+#include "SystemDebugging.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
@@ -40,6 +41,9 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+const uint16_t cPortStartDefault = 3000;
+const uint16_t cPortOffsetGwDbgSwt = 20;
+
 GwSupervising::GwSupervising()
 	: Processing("GwSupervising")
 	//, mStartMs(0)
@@ -54,6 +58,7 @@ Success GwSupervising::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	//Success success;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -62,6 +67,10 @@ Success GwSupervising::process()
 	case StStart:
 
 		procInfLog("Hello World");
+
+		ok = servicesStart();
+		if (!ok)
+			return procErrLog(-1, "could not start services");
 
 		mState = StMain;
 
@@ -77,6 +86,26 @@ Success GwSupervising::process()
 	}
 
 	return Pending;
+}
+
+bool GwSupervising::servicesStart()
+{
+	SystemDebugging *pDbg;
+
+	pDbg = SystemDebugging::create(this);
+	if (!pDbg)
+	{
+		procWrnLog("could not create process");
+		return false;
+	}
+
+	pDbg->listenLocalSet();
+	pDbg->portStartSet(cPortStartDefault - cPortOffsetGwDbgSwt);
+
+	pDbg->procTreeDisplaySet(false);
+	start(pDbg);
+
+	return true;
 }
 
 void GwSupervising::processInfo(char *pBuf, char *pBufEnd)

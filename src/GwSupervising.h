@@ -57,6 +57,8 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	bool servicesStart();
+
 	/* member variables */
 	//uint32_t mStartMs;
 
