@@ -33,7 +33,7 @@
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
 
-#if 1
+#if 0
 #define dGenProcStateString(s) #s,
 dProcessStateStr(ProcState);
 #endif
@@ -114,7 +114,9 @@ bool GwSupervising::servicesStart()
 
 void GwSupervising::processInfo(char *pBuf, char *pBufEnd)
 {
-#if 1
+	(void)pBuf;
+	(void)pBufEnd;
+#if 0
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
 }
