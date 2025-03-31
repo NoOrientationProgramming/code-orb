@@ -27,6 +27,7 @@
 #define GW_MSG_DISPATCHING_H
 
 #include "Processing.h"
+#include "TcpListening.h"
 
 class GwMsgDispatching : public Processing
 {
@@ -57,8 +58,15 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	bool listenersStart();
+
 	/* member variables */
 	//uint32_t mStartMs;
+	bool mListenLocal;
+	TcpListening *mpLstProc;
+	TcpListening *mpLstLog;
+	TcpListening *mpLstCmd;
+	uint16_t mPortStart;
 
 	/* static functions */
 

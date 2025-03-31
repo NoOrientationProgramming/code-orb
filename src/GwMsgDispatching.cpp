@@ -43,6 +43,11 @@ using namespace std;
 GwMsgDispatching::GwMsgDispatching()
 	: Processing("GwMsgDispatching")
 	//, mStartMs(0)
+	, mListenLocal(false)
+	, mpLstProc(NULL)
+	, mpLstLog(NULL)
+	, mpLstCmd(NULL)
+	, mPortStart(3000)
 {
 	mState = StStart;
 }
@@ -54,12 +59,17 @@ Success GwMsgDispatching::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	//Success success;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
 	switch (mState)
 	{
 	case StStart:
+
+		ok = listenersStart();
+		if (!ok)
+			return procErrLog(-1, "could not start listeners");
 
 		mState = StMain;
 
@@ -75,6 +85,39 @@ Success GwMsgDispatching::process()
 	}
 
 	return Pending;
+}
+
+bool GwMsgDispatching::listenersStart()
+{
+	// proc tree
+	mpLstProc = TcpListening::create();
+	if (!mpLstProc)
+		return procErrLog(-1, "could not create process");
+
+	mpLstProc->portSet(mPortStart, mListenLocal);
+
+	start(mpLstProc);
+#if CONFIG_PROC_HAVE_LOG
+	// log
+	mpLstLog = TcpListening::create();
+	if (!mpLstLog)
+		return procErrLog(-1, "could not create process");
+
+	mpLstLog->portSet(mPortStart + 2, mListenLocal);
+
+	start(mpLstLog);
+#endif
+	// command
+	mpLstCmd = TcpListening::create();
+	if (!mpLstCmd)
+		return procErrLog(-1, "could not create process");
+
+	mpLstCmd->portSet(mPortStart + 4, mListenLocal);
+	mpLstCmd->maxConnSet(4);
+
+	start(mpLstCmd);
+
+	return true;
 }
 
 void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
