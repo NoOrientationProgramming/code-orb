@@ -9,7 +9,5 @@ cd "${dRelHereToTarget}" && \
 ninja && \
 
 ./gw-dbg-swt \
-	--port-telnet 4000 \
-	--port-ssh 4001 \
 	$@
 
