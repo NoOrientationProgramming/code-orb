@@ -23,46 +23,30 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GW_MSG_DISPATCHING_H
-#define GW_MSG_DISPATCHING_H
+#ifndef REMOTE_COMMANDING_H
+#define REMOTE_COMMANDING_H
 
 #include "Processing.h"
-#include "TcpListening.h"
-#include "SingleWireControlling.h"
-#include "RemoteCommanding.h"
 
-enum RemotePeerType {
-	RemotePeerProc = 0,
-	RemotePeerLog,
-	RemotePeerCmd,
-};
-
-struct RemoteDebuggingPeer
-{
-	enum RemotePeerType type;
-	std::string typeDesc;
-	Processing *pProc;
-};
-
-class GwMsgDispatching : public Processing
+class RemoteCommanding : public Processing
 {
 
 public:
 
-	static GwMsgDispatching *create()
+	static RemoteCommanding *create()
 	{
-		return new dNoThrow GwMsgDispatching;
+		return new dNoThrow RemoteCommanding;
 	}
 
 protected:
 
-	GwMsgDispatching();
-	virtual ~GwMsgDispatching() {}
+	RemoteCommanding();
+	virtual ~RemoteCommanding() {}
 
 private:
 
-	GwMsgDispatching(const GwMsgDispatching &) = delete;
-	GwMsgDispatching &operator=(const GwMsgDispatching &) = delete;
+	RemoteCommanding(const RemoteCommanding &) = delete;
+	RemoteCommanding &operator=(const RemoteCommanding &) = delete;
 
 	/*
 	 * Naming of functions:  objectVerb()
@@ -73,17 +57,8 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	bool listenersStart();
-
 	/* member variables */
 	//uint32_t mStartMs;
-	uint16_t mPortStart;
-	bool mListenLocal;
-	TcpListening *mpLstProc;
-	TcpListening *mpLstLog;
-	TcpListening *mpLstCmd;
-	SingleWireControlling *mpCtrl;
-	std::list<struct RemoteDebuggingPeer> mListPeers;
 
 	/* static functions */
 
