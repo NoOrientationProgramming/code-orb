@@ -45,6 +45,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	//, mStartMs(0)
 	, mFdSocket(fd)
 	, mpTrans(NULL)
+	, mDone(false)
 {
 	mState = StStart;
 }
@@ -55,7 +56,7 @@ Success RemoteCommanding::process()
 {
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
-	//Success success;
+	Success success;
 #if 0
 	dStateTrace;
 #endif
@@ -78,6 +79,17 @@ Success RemoteCommanding::process()
 		break;
 	case StMain:
 
+		success = mpTrans->success();
+		if (success != Pending)
+			return success;
+
+		dataReceive();
+
+		if (!mDone)
+			break;
+
+		return Positive;
+
 		break;
 	case StNop:
 
@@ -87,6 +99,10 @@ Success RemoteCommanding::process()
 	}
 
 	return Pending;
+}
+
+void RemoteCommanding::dataReceive()
+{
 }
 
 void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)

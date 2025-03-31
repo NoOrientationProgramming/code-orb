@@ -59,10 +59,13 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	void dataReceive();
+
 	/* member variables */
 	//uint32_t mStartMs;
 	SOCKET mFdSocket;
 	TcpTransfering *mpTrans;
+	bool mDone;
 
 	/* static functions */
 
