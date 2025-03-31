@@ -18,6 +18,7 @@ srcs = [
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
+	'src/SingleWireControlling.cpp',
 ]
 
 # Arguments

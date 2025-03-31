@@ -23,32 +23,30 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GW_MSG_DISPATCHING_H
-#define GW_MSG_DISPATCHING_H
+#ifndef SINGLE_WIRE_CONTROLLING_H
+#define SINGLE_WIRE_CONTROLLING_H
 
 #include "Processing.h"
-#include "TcpListening.h"
-#include "SingleWireControlling.h"
 
-class GwMsgDispatching : public Processing
+class SingleWireControlling : public Processing
 {
 
 public:
 
-	static GwMsgDispatching *create()
+	static SingleWireControlling *create()
 	{
-		return new dNoThrow GwMsgDispatching;
+		return new dNoThrow SingleWireControlling;
 	}
 
 protected:
 
-	GwMsgDispatching();
-	virtual ~GwMsgDispatching() {}
+	SingleWireControlling();
+	virtual ~SingleWireControlling() {}
 
 private:
 
-	GwMsgDispatching(const GwMsgDispatching &) = delete;
-	GwMsgDispatching &operator=(const GwMsgDispatching &) = delete;
+	SingleWireControlling(const SingleWireControlling &) = delete;
+	SingleWireControlling &operator=(const SingleWireControlling &) = delete;
 
 	/*
 	 * Naming of functions:  objectVerb()
@@ -59,16 +57,8 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	bool listenersStart();
-
 	/* member variables */
 	//uint32_t mStartMs;
-	bool mListenLocal;
-	TcpListening *mpLstProc;
-	TcpListening *mpLstLog;
-	TcpListening *mpLstCmd;
-	uint16_t mPortStart;
-	SingleWireControlling *mpCtrl;
 
 	/* static functions */
 
