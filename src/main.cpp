@@ -24,15 +24,44 @@
 */
 
 #if defined(__unix__)
+#define GW_HAS_TCLAP	1
+#else
+#define GW_HAS_TCLAP	0
+#endif
+
+#if defined(__unix__)
 #include <signal.h>
 #endif
 #include <iostream>
+#if GW_HAS_TCLAP
+#include <tclap/CmdLine.h>
+#endif
 
+#if GW_HAS_TCLAP
+#include "TclapOutput.h"
+#endif
 #include "GwSupervising.h"
+#include "LibDspc.h"
+
+#include "env.h"
 
 using namespace std;
+#if GW_HAS_TCLAP
+using namespace TCLAP;
+#endif
 
+#if defined(__unix__)
+#define dDeviceUartDefault	"/dev/ttyACM0"
+#elif defined(_WIN32)
+#define dDeviceUartDefault	"COM1"
+#else
+#define dDeviceUartDefault	""
+#endif
+
+Environment env;
 GwSupervising *pApp = NULL;
+
+class AppHelpOutput : public TclapOutput {};
 
 /*
 Literature
@@ -60,8 +89,28 @@ void applicationCloseRequest(int signum)
 
 int main(int argc, char *argv[])
 {
-	(void)argc;
-	(void)argv;
+	int verbosity;
+
+	CmdLine cmd("Command description message", ' ', appVersion());
+
+	AppHelpOutput aho;
+	cmd.setOutput(&aho);
+
+	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 3, "int");
+	cmd.add(argVerbosity);
+	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
+	cmd.add(argCoreDump);
+
+	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault, false, dDeviceUartDefault, "string");
+	cmd.add(argDevUart);
+
+	cmd.parse(argc, argv);
+
+	verbosity = argVerbosity.getValue();
+	levelLogSet(verbosity);
+
+	env.coreDumps = argCoreDump.getValue();
+	env.deviceUart = argDevUart.getValue();
 
 #if defined(__unix__)
 	/* https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html */

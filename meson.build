@@ -1,6 +1,6 @@
 
 project(
-	'NOP - Gateway for SingleWireTransfering()',
+	'Gateway for SingleWireTransfering()',
 	'cpp',
 )
 
@@ -15,6 +15,8 @@ srcs = [
 	'ProcessingCore/SystemCommanding.cpp',
 	'ProcessingCore/TcpListening.cpp',
 	'ProcessingCore/TcpTransfering.cpp',
+	'ProcessingCommon/Res.cpp',
+	'ProcessingCommon/LibDspc.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
@@ -26,6 +28,8 @@ srcs = [
 # Arguments
 
 args = [
+	'-DdPackageName="' + meson.project_name() + '"',
+	'-DdAppName="gw-dbg-swt"',
 	'-DCONFIG_PROC_HAVE_LOG=1',
 ]
 
@@ -77,9 +81,9 @@ endif
 
 # Dependencies
 
-deps = [
-	dependency('threads'),
-]
+deps = []
+deps += dependency('threads')
+deps += dependency('tclap')
 
 if host_machine.system() == 'windows'
 	deps += cxx.find_library('ws2_32')
@@ -94,6 +98,7 @@ myApp = executable(
 	],
 	include_directories : include_directories([
 		'./ProcessingCore',
+		'./ProcessingCommon',
 		'./src',
 	]),
 	dependencies : [
