@@ -24,7 +24,7 @@ rectangle "Your Tools" as gTools {
 pTarget <--> pSwt : "COM1 or\n/dev/ttyACM0"
 
 pTcp ..> pTrans
-pTcp ..> pTrans2
+pTcp ..> pCmdRemote
 
 pSwt --> pTrans
 pSwt <--> pTrans2
