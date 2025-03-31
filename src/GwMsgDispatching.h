@@ -28,6 +28,7 @@
 
 #include "Processing.h"
 #include "TcpListening.h"
+#include "TcpTransfering.h"
 #include "SingleWireControlling.h"
 #include "RemoteCommanding.h"
 
@@ -74,6 +75,10 @@ private:
 	void processInfo(char *pBuf, char *pBufEnd);
 
 	bool listenersStart();
+	void peerListUpdate();
+	bool disconnectRequestedCheck(TcpTransfering *pTrans);
+	void peerCheck();
+	void peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc);
 
 	/* member variables */
 	//uint32_t mStartMs;

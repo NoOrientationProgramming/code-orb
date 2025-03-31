@@ -40,6 +40,11 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+typedef list<struct RemoteDebuggingPeer>::iterator PeerIter;
+
+const string cSeqCtrlC = "\xff\xf4\xff\xfd\x06";
+const size_t cLenSeqCtrlC = cSeqCtrlC.size();
+
 GwMsgDispatching::GwMsgDispatching()
 	: Processing("GwMsgDispatching")
 	//, mStartMs(0)
@@ -84,6 +89,8 @@ Success GwMsgDispatching::process()
 		break;
 	case StMain:
 
+		peerListUpdate();
+
 		break;
 	case StNop:
 
@@ -104,6 +111,7 @@ bool GwMsgDispatching::listenersStart()
 
 	mpLstProc->portSet(mPortStart, mListenLocal);
 
+	mpLstProc->procTreeDisplaySet(false);
 	start(mpLstProc);
 #if CONFIG_PROC_HAVE_LOG
 	// log
@@ -113,6 +121,7 @@ bool GwMsgDispatching::listenersStart()
 
 	mpLstLog->portSet(mPortStart + 2, mListenLocal);
 
+	mpLstLog->procTreeDisplaySet(false);
 	start(mpLstLog);
 #endif
 	// command
@@ -123,9 +132,141 @@ bool GwMsgDispatching::listenersStart()
 	mpLstCmd->portSet(mPortStart + 4, mListenLocal);
 	mpLstCmd->maxConnSet(4);
 
+	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
 
 	return true;
+}
+
+void GwMsgDispatching::peerListUpdate()
+{
+	peerCheck();
+	peerAdd(mpLstProc, RemotePeerProc, "process tree");
+#if CONFIG_PROC_HAVE_LOG
+	peerAdd(mpLstLog, RemotePeerLog, "log");
+#endif
+	peerAdd(mpLstCmd, RemotePeerCmd, "command");
+}
+
+bool GwMsgDispatching::disconnectRequestedCheck(TcpTransfering *pTrans)
+{
+	if (!pTrans)
+		return false;
+
+	char buf[31];
+	ssize_t lenReq, lenPlanned, lenDone;
+
+	lenReq = sizeof(buf) - 1;
+	lenPlanned = lenReq;
+
+	buf[0] = 0;
+	buf[lenReq] = 0;
+
+	lenDone = pTrans->read(buf, lenPlanned);
+	if (!lenDone)
+		return false;
+
+	if (lenDone < 0)
+		return true;
+
+	buf[lenDone] = 0;
+
+	if ((buf[0] == 0x03) || (buf[0] == 0x04))
+	{
+		procDbgLog("end of transmission");
+		return true;
+	}
+
+	if (!strncmp(buf, cSeqCtrlC.c_str(), cLenSeqCtrlC))
+	{
+		procDbgLog("transmission cancelled");
+		return true;
+	}
+
+	return false;
+}
+
+void GwMsgDispatching::peerCheck()
+{
+	PeerIter iter;
+	struct RemoteDebuggingPeer peer;
+	Processing *pProc;
+	bool disconnectReq, removeReq;
+
+	iter = mListPeers.begin();
+	while (iter != mListPeers.end())
+	{
+		peer = *iter;
+		pProc = peer.pProc;
+
+		if (peer.type == RemotePeerProc)
+			disconnectReq = disconnectRequestedCheck((TcpTransfering *)pProc);
+		else
+		if (peer.type == RemotePeerLog)
+		{
+			TcpTransfering *pTrans = (TcpTransfering *)pProc;
+			disconnectReq = disconnectRequestedCheck(pTrans);
+		}
+		else
+			disconnectReq = false;
+
+		removeReq = (pProc->success() != Pending) || disconnectReq;
+		if (!removeReq)
+		{
+			++iter;
+			continue;
+		}
+
+		procDbgLog("removing %s peer. process: %p", peer.typeDesc.c_str(), pProc);
+		repel(pProc);
+
+		iter = mListPeers.erase(iter);
+	}
+}
+
+void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc)
+{
+	PipeEntry<SOCKET> peerFd;
+	Processing *pProc = NULL;
+	struct RemoteDebuggingPeer peer;
+
+	while (1)
+	{
+		if (pListener->ppPeerFd.get(peerFd) < 1)
+			break;
+
+		if (peerType == RemotePeerCmd)
+		{
+			pProc = RemoteCommanding::create(peerFd.particle);
+			if (!pProc)
+			{
+				procErrLog(-1, "could not create process");
+				continue;
+			}
+
+			whenFinishedRepel(start(pProc));
+
+			continue;
+		}
+
+		pProc = TcpTransfering::create(peerFd.particle);
+		if (!pProc)
+		{
+			procErrLog(-1, "could not create process");
+			continue;
+		}
+
+		pProc->procTreeDisplaySet(false);
+		start(pProc);
+
+		procDbgLog("adding %s peer. process: %p", pTypeDesc, pProc);
+
+		peer.type = peerType;
+		peer.typeDesc = pTypeDesc;
+		peer.pProc = pProc;
+
+		mListPeers.push_back(peer);
+	}
 }
 
 void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
@@ -133,6 +274,7 @@ void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
+	dInfo("Number of peers\t\t%zu", mListPeers.size());
 }
 
 /* static functions */

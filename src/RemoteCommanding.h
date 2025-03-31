@@ -27,24 +27,26 @@
 #define REMOTE_COMMANDING_H
 
 #include "Processing.h"
+#include "TcpTransfering.h"
 
 class RemoteCommanding : public Processing
 {
 
 public:
 
-	static RemoteCommanding *create()
+	static RemoteCommanding *create(SOCKET fd)
 	{
-		return new dNoThrow RemoteCommanding;
+		return new dNoThrow RemoteCommanding(fd);
 	}
 
 protected:
 
-	RemoteCommanding();
+	RemoteCommanding(SOCKET fd);
 	virtual ~RemoteCommanding() {}
 
 private:
 
+	RemoteCommanding() = delete;
 	RemoteCommanding(const RemoteCommanding &) = delete;
 	RemoteCommanding &operator=(const RemoteCommanding &) = delete;
 
@@ -59,6 +61,8 @@ private:
 
 	/* member variables */
 	//uint32_t mStartMs;
+	SOCKET mFdSocket;
+	TcpTransfering *mpTrans;
 
 	/* static functions */
 

@@ -40,9 +40,11 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
-RemoteCommanding::RemoteCommanding()
+RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
 	//, mStartMs(0)
+	, mFdSocket(fd)
+	, mpTrans(NULL)
 {
 	mState = StStart;
 }
@@ -60,6 +62,16 @@ Success RemoteCommanding::process()
 	switch (mState)
 	{
 	case StStart:
+
+		if (mFdSocket == INVALID_SOCKET)
+			return procErrLog(-1, "socket file descriptor not set");
+
+		mpTrans = TcpTransfering::create(mFdSocket);
+		if (!mpTrans)
+			return procErrLog(-1, "could not create process");
+
+		mpTrans->procTreeDisplaySet(false);
+		start(mpTrans);
 
 		mState = StMain;
 
