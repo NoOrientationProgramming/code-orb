@@ -16,6 +16,7 @@ srcs = [
 	'ProcessingCore/TcpListening.cpp',
 	'ProcessingCore/TcpTransfering.cpp',
 	'ProcessingCommon/Res.cpp',
+	'ProcessingCommon/LibTime.cpp',
 	'ProcessingCommon/LibDspc.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',

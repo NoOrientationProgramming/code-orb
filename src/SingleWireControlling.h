@@ -27,6 +27,7 @@
 #define SINGLE_WIRE_CONTROLLING_H
 
 #include "Processing.h"
+#include "LibUart.h"
 
 class SingleWireControlling : public Processing
 {
@@ -57,10 +58,16 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	void cmdSend(const std::string &cmd);
+	void dataRequest();
+
 	/* member variables */
-	//uint32_t mStartMs;
+	uint32_t mStartMs;
+	uint32_t mStateRet;
+	RefDeviceUart mRefUart;
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
+	char mBufRcv[13];
 
 	/* static functions */
 

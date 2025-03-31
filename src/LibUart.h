@@ -26,11 +26,24 @@
 #ifndef LIB_UART_H
 #define LIB_UART_H
 
+#include <cinttypes>
 #include <string>
 
 #include "Processing.h"
 
-Success devUartInit(const std::string &deviceUart);
+#if defined(__unix__)
+typedef int RefDeviceUart;
+#define RefDeviceUartInvalid -1
+#endif
+
+Success devUartInit(const std::string &deviceUart, RefDeviceUart &refUart);
+void devUartDeInit(RefDeviceUart &refUart);
+
+ssize_t uartSend(RefDeviceUart refUart, const void *pData, size_t lenReq);
+ssize_t uartSend(RefDeviceUart refUart, const std::string &str);
+ssize_t uartSend(RefDeviceUart refUart, uint8_t ch);
+
+ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq);
 
 #endif
 

@@ -23,15 +23,112 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if defined(__unix__)
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+#endif
+
 #include "LibUart.h"
 
 using namespace std;
 
-Success devUartInit(const string &deviceUart)
+/*
+ * Literature
+ * - https://man7.org/linux/man-pages/man3/tcgetattr.3p.html
+ * - https://man7.org/linux/man-pages/man2/write.2.html
+ * - https://man7.org/linux/man-pages/man2/read.2.html
+ */
+Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 {
 #if defined(__unix__)
+	refUart = open(deviceUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+	if (refUart < 0)
+		return Pending; // no error!
+
+	struct termios toOld, toNew;
+	Success success;
+	int res;
+
+	res = tcgetattr(refUart, &toOld);
+	if (res < 0)
+	{
+		success = errLog(-1, "could not get terminal options");
+		goto errInit;
+	}
+
+	toNew = toOld;
+
+	// Disable CR to NL translation
+	toNew.c_iflag &= ~ICRNL;
+
+	// Disable NL to CR translation
+	toNew.c_oflag &= ~ONLCR;
+
+	// Disable echo and canonical mode
+	toNew.c_lflag &= ~(ECHO | ICANON);
+
+	// Clear baud rate and set extended baud rate
+	toNew.c_cflag &= ~CBAUD;
+	toNew.c_cflag |= CBAUDEX;
+
+	// Set baud rate to 115200
+	cfsetispeed(&toNew, B115200);
+	cfsetospeed(&toNew, B115200);
+
+	res = tcsetattr(refUart, TCSANOW, &toNew);
+	if (res < 0)
+	{
+		(void)tcsetattr(refUart, TCSANOW, &toOld); // Restore old settings on failure
+
+		success = errLog(-1, "could not get terminal options");
+		goto errInit;
+	}
+#else
 	(void)deviceUart;
+	(void)refUart;
 #endif
 	return Positive;
+
+errInit:
+#if defined(__unix__)
+	close(refUart);
+#endif
+	return success;
+}
+
+void devUartDeInit(RefDeviceUart &refUart)
+{
+#if defined(__unix__)
+	close(refUart);
+#endif
+	refUart = RefDeviceUartInvalid;
+}
+
+ssize_t uartSend(RefDeviceUart refUart, const void *pData, size_t lenReq)
+{
+	ssize_t lenDone;
+#if defined(__unix__)
+	lenDone = write(refUart, pData, lenReq);
+#else
+	(void)pData;
+	(void)lenReq;
+#endif
+	return lenDone;
+}
+
+ssize_t uartSend(RefDeviceUart refUart, const string &str)
+{
+	return uartSend(refUart, str.data(), str.size());
+}
+
+ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
+{
+	return uartSend(refUart, &ch, sizeof(ch));
+}
+
+ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
+{
+	return read(refUart, pBuf, lenReq);
 }
 
