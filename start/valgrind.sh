@@ -15,7 +15,7 @@ valgrind \
 	--leak-check=full \
 	--show-leak-kinds=all \
 	--suppressions=${dRelTargetToTool}/valgrind_suppressions.txt \
-./tgs \
+./gw-dbg-swt \
 	--port-telnet 4000 \
 	--port-ssh 4001 \
 	$@

@@ -8,7 +8,7 @@ dRelHereToTarget="$(realpath --relative-to=$dHere $dTarget)"
 cd "${dRelHereToTarget}" && \
 ninja && \
 
-./tgs \
+./gw-dbg-swt \
 	--port-telnet 4000 \
 	--port-ssh 4001 \
 	$@

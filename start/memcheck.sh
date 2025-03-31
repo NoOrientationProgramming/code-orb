@@ -11,7 +11,7 @@ ninja && \
 valgrind \
 	--tool=memcheck \
 	--track-origins=yes \
-./tgs \
+./gw-dbg-swt \
 	--port-telnet 4000 \
 	--port-ssh 4001 \
 	$@
