@@ -1,0 +1,10 @@
+
+{
+	CryptoPP Singletons
+	Memcheck:Leak
+	match-leak-kinds: reachable
+	...
+	fun:*CryptoPP*Singleton*
+	...
+}
+
