@@ -1,2 +1,11 @@
-# gw-dbg-swt
-Gateway for debugging with SingleWireTransfering()
+
+Gateway for SingleWireTransfering()
+
+## Targets
+
+- Linux
+- Windows
+- MacOSX
+- FreeBSD
+- Raspberry Pi
+
