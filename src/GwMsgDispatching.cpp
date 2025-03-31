@@ -23,54 +23,66 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GW_SUPERVISING_H
-#define GW_SUPERVISING_H
-
-#include "Processing.h"
 #include "GwMsgDispatching.h"
 
-class GwSupervising : public Processing
+#define dForEach_ProcState(gen) \
+		gen(StStart) \
+		gen(StMain) \
+		gen(StNop) \
+
+#define dGenProcStateEnum(s) s,
+dProcessStateEnum(ProcState);
+
+#if 1
+#define dGenProcStateString(s) #s,
+dProcessStateStr(ProcState);
+#endif
+
+using namespace std;
+
+GwMsgDispatching::GwMsgDispatching()
+	: Processing("GwMsgDispatching")
+	//, mStartMs(0)
 {
+	mState = StStart;
+}
 
-public:
+/* member functions */
 
-	static GwSupervising *create()
+Success GwMsgDispatching::process()
+{
+	//uint32_t curTimeMs = millis();
+	//uint32_t diffMs = curTimeMs - mStartMs;
+	//Success success;
+#if 0
+	dStateTrace;
+#endif
+	switch (mState)
 	{
-		return new dNoThrow GwSupervising;
+	case StStart:
+
+		mState = StMain;
+
+		break;
+	case StMain:
+
+		break;
+	case StNop:
+
+		break;
+	default:
+		break;
 	}
 
-protected:
+	return Pending;
+}
 
-	GwSupervising();
-	virtual ~GwSupervising() {}
-
-private:
-
-	GwSupervising(const GwSupervising &) = delete;
-	GwSupervising &operator=(const GwSupervising &) = delete;
-
-	/*
-	 * Naming of functions:  objectVerb()
-	 * Example:              peerAdd()
-	 */
-
-	/* member functions */
-	Success process();
-	void processInfo(char *pBuf, char *pBufEnd);
-
-	bool servicesStart();
-
-	/* member variables */
-	//uint32_t mStartMs;
-	GwMsgDispatching *mpApp;
-
-	/* static functions */
-
-	/* static variables */
-
-	/* constants */
-
-};
-
+void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
+{
+#if 1
+	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
+}
+
+/* static functions */
 

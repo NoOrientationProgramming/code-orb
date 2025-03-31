@@ -23,31 +23,30 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GW_SUPERVISING_H
-#define GW_SUPERVISING_H
+#ifndef GW_MSG_DISPATCHING_H
+#define GW_MSG_DISPATCHING_H
 
 #include "Processing.h"
-#include "GwMsgDispatching.h"
 
-class GwSupervising : public Processing
+class GwMsgDispatching : public Processing
 {
 
 public:
 
-	static GwSupervising *create()
+	static GwMsgDispatching *create()
 	{
-		return new dNoThrow GwSupervising;
+		return new dNoThrow GwMsgDispatching;
 	}
 
 protected:
 
-	GwSupervising();
-	virtual ~GwSupervising() {}
+	GwMsgDispatching();
+	virtual ~GwMsgDispatching() {}
 
 private:
 
-	GwSupervising(const GwSupervising &) = delete;
-	GwSupervising &operator=(const GwSupervising &) = delete;
+	GwMsgDispatching(const GwMsgDispatching &) = delete;
+	GwMsgDispatching &operator=(const GwMsgDispatching &) = delete;
 
 	/*
 	 * Naming of functions:  objectVerb()
@@ -58,11 +57,8 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	bool servicesStart();
-
 	/* member variables */
 	//uint32_t mStartMs;
-	GwMsgDispatching *mpApp;
 
 	/* static functions */
 

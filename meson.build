@@ -17,6 +17,7 @@ srcs = [
 	'ProcessingCore/TcpTransfering.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
+	'src/GwMsgDispatching.cpp',
 ]
 
 # Arguments

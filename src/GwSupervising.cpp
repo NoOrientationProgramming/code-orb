@@ -47,6 +47,7 @@ const uint16_t cPortOffsetGwDbgSwt = 20;
 GwSupervising::GwSupervising()
 	: Processing("GwSupervising")
 	//, mStartMs(0)
+	, mpApp(NULL)
 {
 	mState = StStart;
 }
@@ -104,6 +105,15 @@ bool GwSupervising::servicesStart()
 
 	pDbg->procTreeDisplaySet(false);
 	start(pDbg);
+
+	mpApp = GwMsgDispatching::create();
+	if (!mpApp)
+	{
+		procWrnLog("could not create process");
+		return false;
+	}
+
+	start(mpApp);
 
 	return true;
 }
