@@ -61,6 +61,8 @@ Success GwSupervising::process()
 	{
 	case StStart:
 
+		procInfLog("Hello World");
+
 		mState = StMain;
 
 		break;
