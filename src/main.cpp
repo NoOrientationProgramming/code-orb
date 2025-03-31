@@ -61,7 +61,9 @@ using namespace TCLAP;
 Environment env;
 GwSupervising *pApp = NULL;
 
+#if GW_HAS_TCLAP
 class AppHelpOutput : public TclapOutput {};
+#endif
 
 /*
 Literature
@@ -89,6 +91,10 @@ void applicationCloseRequest(int signum)
 
 int main(int argc, char *argv[])
 {
+	env.coreDumps = false;
+	env.deviceUart = dDeviceUartDefault;
+
+#if GW_HAS_TCLAP
 	int verbosity;
 
 	CmdLine cmd("Command description message", ' ', appVersion());
@@ -111,6 +117,7 @@ int main(int argc, char *argv[])
 
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
+#endif
 
 #if defined(__unix__)
 	/* https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html */
