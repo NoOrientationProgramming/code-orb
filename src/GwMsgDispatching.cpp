@@ -81,9 +81,11 @@ Success GwMsgDispatching::process()
 		mpCtrl = SingleWireControlling::create();
 		if (!mpCtrl)
 			return procErrLog(-1, "could not create process");
-
+#if 1
 		start(mpCtrl);
-
+#else
+		start(mpCtrl, DrivenByNewInternalDriver);
+#endif
 		mState = StMain;
 
 		break;
