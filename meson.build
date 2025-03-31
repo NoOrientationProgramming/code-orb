@@ -20,6 +20,7 @@ srcs = [
 	'src/GwMsgDispatching.cpp',
 	'src/SingleWireControlling.cpp',
 	'src/RemoteCommanding.cpp',
+	'src/LibUart.cpp',
 ]
 
 # Arguments
