@@ -66,8 +66,6 @@ Success GwSupervising::process()
 	{
 	case StStart:
 
-		procInfLog("Hello World");
-
 		ok = servicesStart();
 		if (!ok)
 			return procErrLog(-1, "could not start services");
