@@ -59,6 +59,8 @@ private:
 
 	/* member variables */
 	//uint32_t mStartMs;
+	bool mDevUartIsOnline;
+	bool mTargetIsOnline;
 
 	/* static functions */
 

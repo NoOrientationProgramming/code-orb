@@ -27,4 +27,11 @@
 
 using namespace std;
 
+Success devUartInit(const string &deviceUart)
+{
+#if defined(__unix__)
+	(void)deviceUart;
+#endif
+	return Positive;
+}
 

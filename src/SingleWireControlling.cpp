@@ -24,11 +24,15 @@
 */
 
 #include "SingleWireControlling.h"
+#include "LibUart.h"
+
+#include "env.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
+		gen(StFirstInit) \
+		gen(StDevUartInit) \
 		gen(StMain) \
-		gen(StNop) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -43,6 +47,8 @@ using namespace std;
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
 	//, mStartMs(0)
+	, mDevUartIsOnline(false)
+	, mTargetIsOnline(false)
 {
 	mState = StStart;
 }
@@ -53,7 +59,7 @@ Success SingleWireControlling::process()
 {
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
-	//Success success;
+	Success success;
 #if 0
 	dStateTrace;
 #endif
@@ -61,13 +67,30 @@ Success SingleWireControlling::process()
 	{
 	case StStart:
 
+		mState = StFirstInit;
+
+		break;
+	case StFirstInit:
+
+		mDevUartIsOnline = false;
+		mTargetIsOnline = false;
+
+		mState = StDevUartInit;
+
+		break;
+	case StDevUartInit:
+
+		success = devUartInit(env.deviceUart);
+		if (success == Pending)
+			break;
+
+		if (success != Positive)
+			return procErrLog(-1, "could not initalize UART device");
+
 		mState = StMain;
 
 		break;
 	case StMain:
-
-		break;
-	case StNop:
 
 		break;
 	default:
@@ -82,6 +105,10 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
+	dInfo("UART: %s\t%sline\n",
+			env.deviceUart.c_str(),
+			mDevUartIsOnline ? "On" : "Off");
+	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
 }
 
 /* static functions */

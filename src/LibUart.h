@@ -26,7 +26,11 @@
 #ifndef LIB_UART_H
 #define LIB_UART_H
 
+#include <string>
 
+#include "Processing.h"
+
+Success devUartInit(const std::string &deviceUart);
 
 #endif
 
