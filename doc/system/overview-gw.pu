@@ -3,15 +3,15 @@
 
 ' skinparam linetype ortho
 
-frame "Target" as pTarget
+component "Target" as pTarget
 
 frame "SingleWireTransfering()\nGateway" as pGw {
 
-  frame "SingleWireControlling()" as pSwt
-  frame "TcpListening()" as pTcp
+  frame "<<SingleWireControlling()>>" as pSwt
+  frame "<<TcpListening()>>" as pTcp
   frame "TcpTransfering()" as pTrans
   frame "RemoteCommanding()" as pCmdRemote {
-    frame "TcpTransfering()" as pTrans2
+    frame "<<TcpTransfering()>>" as pTrans2
   }
 }
 
