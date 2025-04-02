@@ -105,13 +105,13 @@ void devUartDeInit(RefDeviceUart &refUart)
 	refUart = RefDeviceUartInvalid;
 }
 
-ssize_t uartSend(RefDeviceUart refUart, const void *pData, size_t lenReq)
+ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 {
 	ssize_t lenDone;
 #if defined(__unix__)
-	lenDone = write(refUart, pData, lenReq);
+	lenDone = write(refUart, pBuf, lenReq);
 #else
-	(void)pData;
+	(void)pBuf;
 	(void)lenReq;
 #endif
 	return lenDone;
