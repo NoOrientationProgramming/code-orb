@@ -26,8 +26,17 @@
 #ifndef SINGLE_WIRE_CONTROLLING_H
 #define SINGLE_WIRE_CONTROLLING_H
 
+#include <string>
+#include <map>
+
 #include "Processing.h"
 #include "LibUart.h"
+
+struct SingleWireResponse
+{
+	char idContent;
+	std::string content;
+};
 
 class SingleWireControlling : public Processing
 {
@@ -60,6 +69,9 @@ private:
 
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
+	bool dataConsume();
+	void fragmentAppend(const char *pBuf, size_t len);
+	void fragmentFinish(const char *pBuf, size_t len);
 
 	/* member variables */
 	uint32_t mStartMs;
@@ -68,6 +80,10 @@ private:
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
 	char mBufRcv[13];
+	ssize_t mLenDone;
+	std::map<int, std::string> mFragments;
+	char mContentCurrent;
+	SingleWireResponse mResp;
 
 	/* static functions */
 

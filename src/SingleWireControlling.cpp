@@ -48,26 +48,33 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
-enum SwtFlowControlBytes
+enum SwtFlowDirection
 {
 	FlowCtrlToTarget = 0xF0,
 	FlowTargetToCtrl
 };
 
-enum SwtContentIdInBytes
+enum SwtContentId
 {
-	ContentInNone = 0x00,
-	ContentInLog = 0xC0,
-	ContentInCmd,
-	ContentInProc,
+	ContentNone = 0x00,
+	ContentLog = 0xC0,
+	ContentCmd,
+	ContentProc,
 };
 
-enum SwtContentIdOutBytes
+enum SwtContentIdOut
 {
 	ContentOutCmd = 0xC0,
 };
 
+enum SwtContentEnd
+{
+	ContentEnd = 0x00,
+	ContentCut = 0x17,
+};
+
 #define dTimeoutTargetInitMs	500
+const size_t cSizeFragmentMax = 4095;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
@@ -76,7 +83,13 @@ SingleWireControlling::SingleWireControlling()
 	, mRefUart(RefDeviceUartInvalid)
 	, mDevUartIsOnline(false)
 	, mTargetIsOnline(false)
+	, mLenDone(0)
+	, mFragments()
+	, mContentCurrent(ContentNone)
 {
+	mResp.idContent = ContentNone;
+	mResp.content = "";
+
 	mState = StStart;
 }
 
@@ -87,7 +100,7 @@ Success SingleWireControlling::process()
 	uint32_t curTimeMs = millis();
 	uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
-	ssize_t lenDone;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -134,8 +147,8 @@ Success SingleWireControlling::process()
 		break;
 	case StTargetInitDoneWait:
 
-		lenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
-		if (lenDone < 0)
+		mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
+		if (mLenDone < 0)
 		{
 			mState = StUartInit;
 			break;
@@ -147,10 +160,11 @@ Success SingleWireControlling::process()
 			break;
 		}
 
-		if (!lenDone)
+		ok = dataConsume();
+		if (!ok)
 			break;
 
-		hexDump(mBufRcv, lenDone);
+		hexDump(mBufRcv, mLenDone);
 
 		mTargetIsOnline = true;
 
@@ -185,6 +199,74 @@ void SingleWireControlling::cmdSend(const string &cmd)
 void SingleWireControlling::dataRequest()
 {
 	uartSend(mRefUart, FlowTargetToCtrl);
+}
+
+bool SingleWireControlling::dataConsume()
+{
+	if (!mLenDone)
+		return false;
+
+	const char *pBuf = mBufRcv;
+	const char *pEnd = pBuf + mLenDone;
+
+	if (*pBuf == ContentNone)
+		return false;
+
+	if (mContentCurrent == ContentNone)
+	{
+		mContentCurrent = *pBuf;
+
+		++pBuf;
+		--mLenDone;
+	}
+
+	if (*pEnd == ContentEnd)
+	{
+		fragmentFinish(pBuf, mLenDone);
+		return true;
+	}
+
+	fragmentAppend(pBuf, mLenDone);
+
+	return false;
+}
+
+void SingleWireControlling::fragmentAppend(const char *pBuf, size_t len)
+{
+	bool fragmentFound =
+			mFragments.find(mContentCurrent) != mFragments.end();
+
+	if (!fragmentFound)
+	{
+		mFragments[mContentCurrent] = string(pBuf, len);
+		return;
+	}
+
+	string &str = mFragments[mContentCurrent];
+
+	if (str.size() > cSizeFragmentMax)
+		return;
+
+	mFragments[mContentCurrent] += string(pBuf, len);
+}
+
+void SingleWireControlling::fragmentFinish(const char *pBuf, size_t len)
+{
+	bool fragmentFound =
+			mFragments.find(mContentCurrent) != mFragments.end();
+
+	mResp.idContent = mContentCurrent;
+	mResp.content = "";
+
+	if (fragmentFound)
+	{
+		mResp.content = mFragments[mContentCurrent];
+		mFragments.erase(mContentCurrent);
+	};
+
+	mResp.content += string(pBuf, len);
+
+	mContentCurrent = ContentNone;
 }
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
