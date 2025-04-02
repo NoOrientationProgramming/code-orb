@@ -209,10 +209,7 @@ bool SingleWireControlling::dataConsume()
 	const char *pBuf = mBufRcv;
 	const char *pEnd = pBuf + mLenDone;
 
-	if (*pBuf < ContentLog || *pBuf > ContentProc)
-		return false;
-
-	if (mContentCurrent == ContentNone)
+	if (*pBuf >= ContentLog && *pBuf <= ContentProc)
 	{
 		mContentCurrent = *pBuf;
 
