@@ -1,0 +1,25 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+database "Input Set R" as sIn
+database "State" as sState
+
+database "Error\n- Protocol\n- NoTarget\n- NoUart" as sErr
+database "Pending" as sPending
+database "Positive" as sPositive
+
+frame "dataReceive()" as pRecv
+
+sIn --> pRecv
+sState <-> pRecv
+
+pRecv --> sErr
+pRecv --> sPending
+pRecv --> sPositive
+
+footer **dataReceive()** - Interface\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
