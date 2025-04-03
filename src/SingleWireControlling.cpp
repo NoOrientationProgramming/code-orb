@@ -73,7 +73,7 @@ enum SwtContentEnd
 	ContentCut = 0x17,
 };
 
-#define dTimeoutTargetInitMs	500
+#define dTimeoutTargetInitMs	50
 const size_t cSizeFragmentMax = 4095;
 
 SingleWireControlling::SingleWireControlling()
@@ -83,6 +83,7 @@ SingleWireControlling::SingleWireControlling()
 	, mRefUart(RefDeviceUartInvalid)
 	, mDevUartIsOnline(false)
 	, mTargetIsOnline(false)
+	, mpBuf(NULL)
 	, mLenDone(0)
 	, mFragments()
 	, mContentCurrent(ContentNone)
@@ -97,10 +98,9 @@ SingleWireControlling::SingleWireControlling()
 
 Success SingleWireControlling::process()
 {
-	uint32_t curTimeMs = millis();
-	uint32_t diffMs = curTimeMs - mStartMs;
+	//uint32_t curTimeMs = millis();
+	//uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
-	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -141,28 +141,26 @@ Success SingleWireControlling::process()
 		cmdSend("aaaaa");
 		dataRequest();
 
-		mStartMs = curTimeMs;
 		mState = StTargetInitDoneWait;
 
 		break;
 	case StTargetInitDoneWait:
 
-		mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
-		if (mLenDone < 0)
+		success = dataReceive();
+		if (success == Pending)
+			break;
+
+		if (success == SwtErrRcvNoUart)
 		{
 			mState = StUartInit;
 			break;
 		}
 
-		if (diffMs > dTimeoutTargetInitMs)
+		if (success == SwtErrRcvNoTarget)
 		{
 			mState = StTargetInit;
 			break;
 		}
-
-		ok = dataConsume();
-		if (!ok)
-			break;
 
 		hexDump(mBufRcv, mLenDone);
 
@@ -194,21 +192,54 @@ void SingleWireControlling::cmdSend(const string &cmd)
 	uartSend(mRefUart, ContentOutCmd);
 	uartSend(mRefUart, cmd);
 	uartSend(mRefUart, 0x00);
+
+	mStartMs = millis();
 }
 
 void SingleWireControlling::dataRequest()
 {
 	uartSend(mRefUart, FlowTargetToCtrl);
+	mStartMs = millis();
 }
 
-bool SingleWireControlling::dataConsume()
+Success SingleWireControlling::dataReceive()
 {
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs = curTimeMs - mStartMs;
+
+	if (diffMs > dTimeoutTargetInitMs)
+		return -SwtErrRcvNoTarget;
+
+	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
 	if (!mLenDone)
-		return false;
+		return Pending;
 
-	const char *pBuf = mBufRcv;
-	const char *pEnd = pBuf + mLenDone;
+	if (mLenDone < 0)
+		return -SwtErrRcvNoUart;
 
+	mpBuf = mBufRcv;
+
+	Success success;
+
+	for (; mLenDone; --mLenDone, ++mpBuf)
+	{
+		success = byteProcess(*mpBuf);
+		if (success == Pending)
+			continue;
+
+		if (success != Positive)
+			return -SwtErrRcvProtocol;
+
+		return Positive;
+	}
+
+	return Pending;
+}
+
+Success SingleWireControlling::byteProcess(char ch)
+{
+	(void)ch;
+#if 0
 	if (*pBuf >= ContentLog && *pBuf <= ContentProc)
 	{
 		mContentCurrent = *pBuf;
@@ -220,12 +251,12 @@ bool SingleWireControlling::dataConsume()
 	if (*pEnd == ContentEnd)
 	{
 		fragmentFinish(pBuf, mLenDone);
-		return true;
+		return Positive;
 	}
 
 	fragmentAppend(pBuf, mLenDone);
-
-	return false;
+#endif
+	return Pending;
 }
 
 void SingleWireControlling::fragmentAppend(const char *pBuf, size_t len)

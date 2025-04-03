@@ -38,6 +38,13 @@ struct SingleWireResponse
 	std::string content;
 };
 
+enum SwtErrRcv
+{
+	SwtErrRcvProtocol = 1,
+	SwtErrRcvNoTarget,
+	SwtErrRcvNoUart,
+};
+
 class SingleWireControlling : public Processing
 {
 
@@ -69,7 +76,8 @@ private:
 
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
-	bool dataConsume();
+	Success dataReceive();
+	Success byteProcess(char ch);
 	void fragmentAppend(const char *pBuf, size_t len);
 	void fragmentFinish(const char *pBuf, size_t len);
 
@@ -80,6 +88,7 @@ private:
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
 	char mBufRcv[13];
+	char *mpBuf;
 	ssize_t mLenDone;
 	std::map<int, std::string> mFragments;
 	char mContentCurrent;
