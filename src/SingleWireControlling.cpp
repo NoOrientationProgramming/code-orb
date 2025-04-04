@@ -418,8 +418,8 @@ void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEn
 	}
 
 	string str = string(pArgs, strlen(pArgs));
-	vector<char> vData;
 	vector<char>::iterator iter;
+	vector<char> vData;
 
 	vData = toHex(str);
 	str = "";
