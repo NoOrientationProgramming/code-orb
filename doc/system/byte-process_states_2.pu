@@ -7,7 +7,7 @@ database "Input Set R" as sIn
 database "Positive" as sPos
 database "Error" as sErrorOut
 
-frame "dataReceive()" as pRcv {
+frame "byteProcess()" as pRcv {
 
   database "Main" as sMain
 

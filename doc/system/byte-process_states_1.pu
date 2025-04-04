@@ -3,7 +3,7 @@
 
 ' skinparam linetype ortho
 
-frame "dataReceive()" as pRcv {
+frame "byteProcess()" as pRcv {
 
   database "Main" as sMain
 
