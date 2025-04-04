@@ -70,14 +70,14 @@ enum SwtFlowDirection
 enum SwtContentId
 {
 	ContentNone = 0x00,
-	ContentLog = 0x40,
+	ContentLog = 0xA0,
 	ContentCmd,
 	ContentProc,
 };
 
 enum SwtContentIdOut
 {
-	ContentOutCmd = 0x80,
+	ContentOutCmd = 0x90,
 };
 
 enum SwtContentEnd
