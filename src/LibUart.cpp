@@ -120,6 +120,9 @@ void devUartDeInit(RefDeviceUart &refUart)
 
 ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 {
+	if (!lenReq)
+		return -1;
+
 	if (uartVirtual)
 	{
 		if (!uartVirtualMounted)
@@ -154,6 +157,9 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 {
+	if (!lenReq)
+		return -1;
+
 	if (uartVirtual)
 	{
 		if (!uartVirtualMounted)
