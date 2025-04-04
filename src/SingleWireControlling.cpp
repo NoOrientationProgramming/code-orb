@@ -422,10 +422,13 @@ void SingleWireControlling::cmdUartRcvData(char *pArgs, char *pBuf, char *pBufEn
 	vector<char>::iterator iter;
 
 	vData = toHex(str);
+	str = "";
 
 	iter = vData.begin();
 	for (; iter != vData.end(); ++iter)
-		uartSend(RefDeviceUartInvalid, *iter);
+		str.push_back(*iter);
+
+	uartSend(RefDeviceUartInvalid, str);
 
 	dInfo("Data received");
 }
