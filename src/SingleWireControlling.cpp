@@ -294,7 +294,9 @@ Success SingleWireControlling::byteProcess(char ch)
 	{
 	case StSwtMain:
 
-		mStateSwt = StSwtDataReceive;
+		procInfLog("Received byte: 0x%02X '%c'", (uint8_t)ch, ch);
+
+		//mStateSwt = StSwtDataReceive;
 
 		break;
 	case StSwtDataReceive:
