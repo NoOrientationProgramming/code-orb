@@ -45,5 +45,8 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch);
 
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq);
 
+void uartVirtualSet(uint8_t enabled);
+void uartVirtualMountedSet(uint8_t mounted);
+
 #endif
 

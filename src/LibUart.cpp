@@ -33,6 +33,13 @@
 
 using namespace std;
 
+static uint8_t uartVirtual = 0;
+static uint8_t uartVirtualMounted = 0;
+
+static uint8_t bufVirtual[31];
+static uint8_t *pBufVirt = bufVirtual;
+static size_t lenWritten = 0;
+
 /*
  * Literature
  * - https://man7.org/linux/man-pages/man3/tcgetattr.3p.html
@@ -41,6 +48,9 @@ using namespace std;
  */
 Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 {
+	if (uartVirtual)
+		return uartVirtualMounted ? Positive : Pending;
+
 #if defined(__unix__)
 	refUart = open(deviceUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (refUart < 0)
@@ -81,7 +91,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	{
 		(void)tcsetattr(refUart, TCSANOW, &toOld); // Restore old settings on failure
 
-		success = errLog(-1, "could not get terminal options");
+		success = errLog(-1, "could not set terminal options");
 		goto errInit;
 	}
 #else
@@ -99,6 +109,9 @@ errInit:
 
 void devUartDeInit(RefDeviceUart &refUart)
 {
+	if (refUart == RefDeviceUartInvalid)
+		return;
+
 #if defined(__unix__)
 	close(refUart);
 #endif
@@ -107,14 +120,26 @@ void devUartDeInit(RefDeviceUart &refUart)
 
 ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 {
-	ssize_t lenDone;
+	if (uartVirtual)
+	{
+		if (!uartVirtualMounted)
+			return -1;
+
+		lenWritten = PMIN(lenReq, sizeof(bufVirtual));
+		pBufVirt = bufVirtual;
+
+		memcpy(pBufVirt, pBuf, lenWritten);
+
+		return lenWritten;
+	}
+
 #if defined(__unix__)
-	lenDone = write(refUart, pBuf, lenReq);
+	lenWritten = write(refUart, pBuf, lenReq);
 #else
 	(void)pBuf;
 	(void)lenReq;
 #endif
-	return lenDone;
+	return lenWritten;
 }
 
 ssize_t uartSend(RefDeviceUart refUart, const string &str)
@@ -129,6 +154,32 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 {
+	if (uartVirtual)
+	{
+		if (!uartVirtualMounted)
+			return -1;
+
+		size_t lenRead;
+
+		lenRead = PMIN(lenReq, lenWritten);
+		memcpy(pBuf, pBufVirt, lenRead);
+
+		lenWritten -= lenRead;
+		pBufVirt += lenRead;
+
+		return lenRead;
+	}
+
 	return read(refUart, pBuf, lenReq);
+}
+
+void uartVirtualSet(uint8_t enabled)
+{
+	uartVirtual = enabled;
+}
+
+void uartVirtualMountedSet(uint8_t mounted)
+{
+	uartVirtualMounted = mounted;
 }
 
