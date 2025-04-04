@@ -3,21 +3,22 @@
 
 hide time-axis
 
-binary "Request To Send" as rts
 concise "UART TX\nData from\nController (GW)" as ctrl
 concise "UART RX\nData from\nTarget" as tar
 
 @0
-rts is 1
+ctrl is {-}
+tar is {-}
+
+@+60
 ctrl is {-}
 tar is {-}
 
 @+20
-rts is 0
-ctrl is "F0"
+ctrl is "F1"
 
 @+20
-ctrl is "C0"
+ctrl is "80"
 
 @+20
 ctrl is "Command"
@@ -26,17 +27,14 @@ ctrl is "Command"
 ctrl is "00"
 
 @+20
-rts is 1
 ctrl is {-}
 
 @+40
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
-tar is "C1"
+tar is "41"
 
 @+20
 tar is "Command Response"
@@ -48,11 +46,9 @@ tar is "00"
 tar is {-}
 
 @+40
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
 tar is "00"
 

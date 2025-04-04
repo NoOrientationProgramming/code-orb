@@ -3,23 +3,23 @@
 
 hide time-axis
 
-binary "Request To Send" as rts
 concise "UART TX\nData from\nController (GW)" as ctrl
 concise "UART RX\nData from\nTarget" as tar
 
 @0
-rts is 1
+ctrl is {-}
+tar is {-}
+
+@+60
 ctrl is {-}
 tar is {-}
 
 @+20
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
-tar is "C2"
+tar is "42"
 
 @+20
 tar is "Process Tree 1/2" #cyan
@@ -31,13 +31,11 @@ tar is "17"
 tar is {-}
 
 @+40
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
-tar is "C0"
+tar is "40"
 
 @+20
 tar is "Log Entry" #lightgreen
@@ -49,13 +47,11 @@ tar is "00"
 tar is {-}
 
 @+40
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
-tar is "C2"
+tar is "42"
 
 @+20
 tar is "Process Tree 2/2" #cyan
@@ -67,11 +63,9 @@ tar is "00"
 tar is {-}
 
 @+40
-rts is 0
-ctrl is "F1"
+ctrl is "F2"
 
 @+20
-rts is 1
 ctrl is {-}
 
 footer **SingleWireControling()** Target to Controller - Mixed Content\n(C) DSP-Crowd Electronics GmbH
