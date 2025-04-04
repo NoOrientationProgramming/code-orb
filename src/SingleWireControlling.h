@@ -82,6 +82,7 @@ private:
 	void fragmentFinish(const char *pBuf, size_t len);
 
 	/* member variables */
+	uint32_t mStateSwt;
 	uint32_t mStartMs;
 	uint32_t mStateRet;
 	RefDeviceUart mRefUart;

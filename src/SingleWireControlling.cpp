@@ -46,6 +46,18 @@ dProcessStateEnum(ProcState);
 dProcessStateStr(ProcState);
 #endif
 
+#define dForEach_SwtState(gen) \
+		gen(StSwtMain) \
+		gen(StSwtDataReceive) \
+
+#define dGenSwtStateEnum(s) s,
+dProcessStateEnum(SwtState);
+
+#if 1
+#define dGenSwtStateString(s) #s,
+dProcessStateStr(SwtState);
+#endif
+
 using namespace std;
 
 enum SwtFlowDirection
@@ -78,6 +90,7 @@ const size_t cSizeFragmentMax = 4095;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
+	, mStateSwt(StSwtMain)
 	, mStartMs(0)
 	, mStateRet(StStart)
 	, mRefUart(RefDeviceUartInvalid)
@@ -206,20 +219,10 @@ Success SingleWireControlling::dataReceive()
 {
 	uint32_t curTimeMs = millis();
 	uint32_t diffMs = curTimeMs - mStartMs;
-
-	if (diffMs > dTimeoutTargetInitMs)
-		return -SwtErrRcvNoTarget;
-
-	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
-	if (!mLenDone)
-		return Pending;
-
-	if (mLenDone < 0)
-		return -SwtErrRcvNoUart;
-
-	mpBuf = mBufRcv;
-
 	Success success;
+
+	if (mLenDone)
+		mStartMs = millis();
 
 	for (; mLenDone; --mLenDone, ++mpBuf)
 	{
@@ -233,29 +236,57 @@ Success SingleWireControlling::dataReceive()
 		return Positive;
 	}
 
+	if (diffMs > dTimeoutTargetInitMs)
+		return -SwtErrRcvNoTarget;
+
+	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
+	if (!mLenDone)
+		return Pending;
+
+	if (mLenDone < 0)
+		return -SwtErrRcvNoUart;
+
+	mpBuf = mBufRcv;
+
+	mStartMs = millis();
+
 	return Pending;
 }
 
 Success SingleWireControlling::byteProcess(char ch)
 {
 	(void)ch;
+
+	switch (mStateSwt)
+	{
+	case StSwtMain:
+
+		mStateSwt = StSwtDataReceive;
+
+		break;
+	case StSwtDataReceive:
 #if 0
-	if (*pBuf >= ContentLog && *pBuf <= ContentProc)
-	{
-		mContentCurrent = *pBuf;
+		if (*pBuf >= ContentLog && *pBuf <= ContentProc)
+		{
+			mContentCurrent = *pBuf;
 
-		++pBuf;
-		--mLenDone;
-	}
+			++pBuf;
+			--mLenDone;
+		}
 
-	if (*pEnd == ContentEnd)
-	{
-		fragmentFinish(pBuf, mLenDone);
-		return Positive;
-	}
+		if (*pEnd == ContentEnd)
+		{
+			fragmentFinish(pBuf, mLenDone);
+			return Positive;
+		}
 
-	fragmentAppend(pBuf, mLenDone);
+		fragmentAppend(pBuf, mLenDone);
 #endif
+		break;
+	default:
+		break;
+	}
+
 	return Pending;
 }
 
@@ -301,6 +332,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 {
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
+	dInfo("State SWT\t\t\t%s\n", SwtStateString[mStateSwt]);
 #endif
 	dInfo("UART: %s\t%sline\n",
 			env.deviceUart.c_str(),
