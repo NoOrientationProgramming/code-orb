@@ -40,9 +40,9 @@ struct SingleWireResponse
 
 enum SwtErrRcv
 {
-	SwtErrRcvProtocol = 1,
+	SwtErrRcvNoUart = -3,
 	SwtErrRcvNoTarget,
-	SwtErrRcvNoUart,
+	SwtErrRcvProtocol,
 };
 
 class SingleWireControlling : public Processing

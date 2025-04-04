@@ -261,23 +261,23 @@ Success SingleWireControlling::dataReceive()
 			continue;
 
 		if (success != Positive)
-			return -SwtErrRcvProtocol;
+			return SwtErrRcvProtocol;
 
 		return Positive;
 	}
 
 	if (!uartVirtual && diffMs > dTimeoutTargetInitMs)
-		return -SwtErrRcvNoTarget;
+		return SwtErrRcvNoTarget;
 
 	if (uartVirtual && uartVirtualTimeout)
-		return -SwtErrRcvNoTarget;
+		return SwtErrRcvNoTarget;
 
 	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
 	if (!mLenDone)
 		return Pending;
 
 	if (mLenDone < 0)
-		return -SwtErrRcvNoUart;
+		return SwtErrRcvNoUart;
 
 	mpBuf = mBufRcv;
 
