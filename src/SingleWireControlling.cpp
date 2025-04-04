@@ -251,10 +251,10 @@ Success SingleWireControlling::dataReceive()
 	uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
 
-	if (mLenDone)
+	if (mLenDone > 0)
 		mStartMs = millis();
 
-	for (; mLenDone; --mLenDone, ++mpBuf)
+	for (; mLenDone > 0; --mLenDone, ++mpBuf)
 	{
 		success = byteProcess(*mpBuf);
 		if (success == Pending)
