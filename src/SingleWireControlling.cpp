@@ -24,6 +24,7 @@
 */
 
 #include "SingleWireControlling.h"
+#include "SystemDebugging.h"
 #include "LibTime.h"
 #include "LibDspc.h"
 
@@ -88,6 +89,10 @@ enum SwtContentEnd
 #define dTimeoutTargetInitMs	50
 const size_t cSizeFragmentMax = 4095;
 
+static uint8_t uartVirtual = 0;
+static uint8_t uartVirtualMounted = 0;
+static uint8_t uartVirtualTimeout = 0;
+
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
 	, mStateSwt(StSwtMain)
@@ -120,6 +125,31 @@ Success SingleWireControlling::process()
 	switch (mState)
 	{
 	case StStart:
+
+		cmdReg("uartVirtToggle",
+			cmdUartVirtToggle,
+			"", "Enable/Disable virtual UART",
+			"Virtual UART");
+
+		cmdReg("mountedToggle",
+			cmdUartVirtMountedToggle,
+			"m", "Mount/Unmount virtual UART",
+			"Virtual UART");
+
+		cmdReg("timeoutToggle",
+			cmdUartVirtTimeoutToggle,
+			"t", "Enable/Disable virtual UART timeout",
+			"Virtual UART");
+
+		cmdReg("rcvData",
+			cmdUartRcvData,
+			"d", "Receive byte stream",
+			"Virtual UART");
+
+		cmdReg("rcvStr",
+			cmdUartRcvStr,
+			"s", "Receive string",
+			"Virtual UART");
 
 		mState = StUartInit;
 
@@ -236,7 +266,10 @@ Success SingleWireControlling::dataReceive()
 		return Positive;
 	}
 
-	if (diffMs > dTimeoutTargetInitMs)
+	if (!uartVirtual && diffMs > dTimeoutTargetInitMs)
+		return -SwtErrRcvNoTarget;
+
+	if (uartVirtual && uartVirtualTimeout)
 		return -SwtErrRcvNoTarget;
 
 	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
@@ -332,8 +365,11 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 {
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
+#endif
+#if 1
 	dInfo("State SWT\t\t\t%s\n", SwtStateString[mStateSwt]);
 #endif
+	dInfo("Virtual UART\t\t%s\n", uartVirtual ? "Enabled" : "Disabled");
 	dInfo("UART: %s\t%sline\n",
 			env.deviceUart.c_str(),
 			mDevUartIsOnline ? "On" : "Off");
@@ -341,4 +377,66 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 }
 
 /* static functions */
+
+void SingleWireControlling::cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+
+	uartVirtual ^= 1;
+	uartVirtualSet(uartVirtual);
+
+	dInfo("Virtual UART %sabled", uartVirtual ? "en" : "dis");
+}
+
+void SingleWireControlling::cmdUartVirtMountedToggle(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+
+	uartVirtualMounted ^= 1;
+	uartVirtualMountedSet(uartVirtualMounted);
+
+	dInfo("Virtual UART %smounted", uartVirtualMounted ? "" : "un");
+}
+
+void SingleWireControlling::cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+
+	uartVirtualTimeout ^= 1;
+
+	dInfo("Virtual UART timeout %s", uartVirtualTimeout ? "set" : "cleared");
+}
+
+void SingleWireControlling::cmdUartRcvData(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	if (!pArgs)
+	{
+		dInfo("No data given");
+		return;
+	}
+
+	string str = string(pArgs, strlen(pArgs));
+	vector<char> vData;
+	vector<char>::iterator iter;
+
+	vData = toHex(str);
+
+	iter = vData.begin();
+	for (; iter != vData.end(); ++iter)
+		uartSend(RefDeviceUartInvalid, *iter);
+
+	dInfo("Data received");
+}
+
+void SingleWireControlling::cmdUartRcvStr(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	if (!pArgs)
+	{
+		dInfo("No string given");
+		return;
+	}
+
+	uartSend(RefDeviceUartInvalid, pArgs, strlen(pArgs));
+	dInfo("String received");
+}
 
