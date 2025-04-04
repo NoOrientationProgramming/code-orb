@@ -18,7 +18,7 @@ tar is {-}
 ctrl is "F1"
 
 @+20
-ctrl is "80"
+ctrl is "90"
 
 @+20
 ctrl is "Command"
@@ -34,7 +34,7 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "41"
+tar is "A1"
 
 @+20
 tar is "Command Response"
