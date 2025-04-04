@@ -1,0 +1,43 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+database "Input Set R" as sIn
+database "Positive" as sPos
+database "Error" as sErrorOut
+
+frame "dataReceive()" as pRcv {
+
+  database "Main" as sMain
+
+  database "Data\nreceive" as sRcv
+  database "Save" as sSave
+  database "Fragment" as sFrag
+  database "Error" as sError
+}
+
+sIn -> sMain
+
+sMain --> sMain
+
+sFrag --> sMain
+sFrag <-- sRcv : 17
+
+sMain -> sRcv : "\t40, 41, 42"
+
+sMain <-- sSave
+sRcv --> sSave : 00
+sRcv --> sRcv : P
+
+sSave --> sPos
+
+sMain <--> sError
+sRcv --> sError
+
+sError --> sErrorOut
+
+footer **dataReceive()** - States\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+

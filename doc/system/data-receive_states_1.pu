@@ -1,0 +1,56 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+frame "dataReceive()" as pRcv {
+
+  database "Main" as sMain
+
+  database "Log Entry\nreceive" as sLog
+  database "Command Response\nreceive" as sCmd
+  database "Process Tree\nreceive" as sProc
+
+  database "Save" as sLogSave
+  database "Fragment\nsave" as sLogFrag
+
+  database "Save" as sCmdSave
+  database "Fragment\nsave" as sCmdFrag
+
+  database "Save" as sProcSave
+  database "Fragment\nsave" as sProcFrag
+}
+
+sMain -u-> sMain
+
+sMain -u-> sLog : 40
+sMain <-u- sLog
+
+sMain -d-> sCmd : 41
+sMain <-d- sCmd
+
+sMain -u-> sProc : 42
+sMain <-u- sProc
+
+sLog -r-> sLogSave : 00
+sLog -d-> sLogFrag : 17
+
+sCmd -l-> sCmdSave : 00
+sCmd -r-> sCmdFrag : 17
+
+sProc -l-> sProcSave : 00
+sProc -d-> sProcFrag : 17
+
+sLogSave -d-> sMain
+sProcSave -d-> sMain
+
+sLogFrag -r-> sMain
+sProcFrag -l-> sMain
+
+sMain <-d- sCmdSave
+sMain <-d- sCmdFrag
+
+footer **dataReceive()** - States\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
