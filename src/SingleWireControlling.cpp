@@ -50,21 +50,21 @@ using namespace std;
 
 enum SwtFlowDirection
 {
-	FlowCtrlToTarget = 0xF0,
+	FlowCtrlToTarget = 0xF1,
 	FlowTargetToCtrl
 };
 
 enum SwtContentId
 {
 	ContentNone = 0x00,
-	ContentLog = 0xC0,
+	ContentLog = 0x40,
 	ContentCmd,
 	ContentProc,
 };
 
 enum SwtContentIdOut
 {
-	ContentOutCmd = 0xC0,
+	ContentOutCmd = 0x80,
 };
 
 enum SwtContentEnd
