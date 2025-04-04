@@ -141,13 +141,13 @@ Success SingleWireControlling::process()
 			"t", "Enable/Disable virtual UART timeout",
 			"Virtual UART");
 
-		cmdReg("rcvData",
-			cmdUartRcvData,
+		cmdReg("dataRcv",
+			cmdUartDataRcv,
 			"d", "Receive byte stream",
 			"Virtual UART");
 
-		cmdReg("rcvStr",
-			cmdUartRcvStr,
+		cmdReg("strRcv",
+			cmdUartStrRcv,
 			"s", "Receive string",
 			"Virtual UART");
 
@@ -409,7 +409,7 @@ void SingleWireControlling::cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, ch
 	dInfo("Virtual UART timeout %s", uartVirtualTimeout ? "set" : "cleared");
 }
 
-void SingleWireControlling::cmdUartRcvData(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (!pArgs)
 	{
@@ -433,7 +433,7 @@ void SingleWireControlling::cmdUartRcvData(char *pArgs, char *pBuf, char *pBufEn
 	dInfo("Data received");
 }
 
-void SingleWireControlling::cmdUartRcvStr(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireControlling::cmdUartStrRcv(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (!pArgs)
 	{
