@@ -417,6 +417,11 @@ void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEn
 	}
 
 	string str = string(pArgs, strlen(pArgs));
+
+	if (str == "log")  str = "A0";
+	if (str == "cmd")  str = "A1";
+	if (str == "proc") str = "A2";
+
 	vector<char>::iterator iter;
 	vector<char> vData;
 
