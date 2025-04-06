@@ -19,12 +19,28 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "A2"
+tar is "A1"
 
 @+20
 tar is "Process Tree 1/2" #cyan
 
 @+80
+tar is "0F"
+
+@+20
+tar is {-}
+
+@+40
+ctrl is "F2"
+
+@+20
+ctrl is {-}
+tar is "A2"
+
+@+20
+tar is "Log Entry" #lightgreen
+
+@+60
 tar is "17"
 
 @+20
@@ -35,29 +51,13 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "A0"
-
-@+20
-tar is "Log Entry" #lightgreen
-
-@+60
-tar is "00"
-
-@+20
-tar is {-}
-
-@+40
-ctrl is "F2"
-
-@+20
-ctrl is {-}
-tar is "A2"
+tar is "A1"
 
 @+20
 tar is "Process Tree 2/2" #cyan
 
 @+80
-tar is "00"
+tar is "17"
 
 @+20
 tar is {-}

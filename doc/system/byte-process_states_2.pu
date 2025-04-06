@@ -22,12 +22,12 @@ sIn -> sMain
 sMain --> sMain
 
 sFrag --> sMain
-sFrag <-- sRcv : 17
+sFrag <-- sRcv : 0F
 
-sMain -> sRcv : "\t40, 41, 42"
+sMain -> sRcv : "\tA1, A2, A3"
 
 sMain <-- sSave
-sRcv --> sSave : 00
+sRcv --> sSave : 17
 sRcv --> sRcv : P
 
 sSave --> sPos

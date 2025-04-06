@@ -19,7 +19,7 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "00"
+tar is "A0"
 
 @+20
 tar is {-}
@@ -29,7 +29,7 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "00"
+tar is "A0"
 
 @+20
 tar is {-}

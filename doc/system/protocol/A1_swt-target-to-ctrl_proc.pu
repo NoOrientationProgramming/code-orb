@@ -19,13 +19,13 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "A0"
+tar is "A1"
 
 @+20
-tar is "Log Entry"
+tar is "Process Tree"
 
 @+80
-tar is "00"
+tar is "17"
 
 @+20
 tar is {-}
@@ -36,7 +36,7 @@ ctrl is "F2"
 @+20
 ctrl is {-}
 
-footer **SingleWireControling()** Target to Controller - Log Entry\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireControling()** Target to Controller - Process Tree\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

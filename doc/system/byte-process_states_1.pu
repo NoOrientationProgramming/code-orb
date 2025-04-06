@@ -7,9 +7,9 @@ frame "byteProcess()" as pRcv {
 
   database "Main" as sMain
 
-  database "Log Entry\nreceive" as sLog
-  database "Command Response\nreceive" as sCmd
   database "Process Tree\nreceive" as sProc
+  database "Command Response\nreceive" as sCmd
+  database "Log Entry\nreceive" as sLog
 
   database "Save" as sLogSave
   database "Fragment\nsave" as sLogFrag
@@ -23,23 +23,23 @@ frame "byteProcess()" as pRcv {
 
 sMain -u-> sMain
 
-sMain -u-> sLog : 40
-sMain <-u- sLog
-
-sMain -d-> sCmd : 41
-sMain <-d- sCmd
-
-sMain -u-> sProc : 42
+sMain -u-> sProc : A1
 sMain <-u- sProc
 
-sLog -r-> sLogSave : 00
-sLog -d-> sLogFrag : 17
+sMain -u-> sLog : A2
+sMain <-u- sLog
 
-sCmd -l-> sCmdSave : 00
-sCmd -r-> sCmdFrag : 17
+sMain -d-> sCmd : A3
+sMain <-d- sCmd
 
-sProc -l-> sProcSave : 00
-sProc -d-> sProcFrag : 17
+sProc -r-> sLogSave : 17
+sProc -d-> sLogFrag : 0F
+
+sCmd -l-> sCmdSave : 17
+sCmd -r-> sCmdFrag : 0F
+
+sLog -l-> sProcSave : 17
+sLog -d-> sProcFrag : 0F
 
 sLogSave -d-> sMain
 sProcSave -d-> sMain

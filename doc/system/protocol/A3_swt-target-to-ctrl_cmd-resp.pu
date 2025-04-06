@@ -19,13 +19,13 @@ ctrl is "F2"
 
 @+20
 ctrl is {-}
-tar is "A1"
+tar is "A3"
 
 @+20
 tar is "Command Response"
 
 @+80
-tar is "00"
+tar is "17"
 
 @+20
 tar is {-}
