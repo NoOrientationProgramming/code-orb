@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
 	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
 	cmd.add(argCoreDump);
 
-	SwitchArg argNoAuto("", "no-auto", "Disable automatic control", false);
-	cmd.add(argNoAuto);
+	SwitchArg argCtrlManual("", "ctrl-manual", "Use manual control (automatic control disabled)", false);
+	cmd.add(argCtrlManual);
 	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault, false, dDeviceUartDefault, "string");
 	cmd.add(argDevUart);
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 	env.verbosity = argVerbosity.getValue();
 	levelLogSet(env.verbosity);
 
-	env.noAuto = argNoAuto.getValue();
+	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
 #endif

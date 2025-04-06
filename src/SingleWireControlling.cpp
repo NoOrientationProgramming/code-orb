@@ -123,53 +123,16 @@ Success SingleWireControlling::process()
 	{
 	case StStart:
 
-		if (env.noAuto)
-		{
-			cmdReg("dataUartSend",
-				cmdDataUartSend,
-				"", "Send byte stream",
-				"UART");
-
-			cmdReg("strUartSend",
-				cmdStrUartSend,
-				"", "Send string",
-				"UART");
-
-			cmdReg("dataUartRead",
-				cmdDataUartRead,
-				"", "Read data",
-				"UART");
-		}
-
-		cmdReg("modeUartVirtSet",
-			cmdModeUartVirtSet,
-			"", "Mode: uart, swart (default)",
-			"Virtual UART");
-
-		cmdReg("uartVirtToggle",
-			cmdUartVirtToggle,
-			"", "Enable/Disable virtual UART",
-			"Virtual UART");
-
-		cmdReg("mountedToggle",
-			cmdMountedUartVirtToggle,
-			"m", "Mount/Unmount virtual UART",
-			"Virtual UART");
-
-		cmdReg("timeoutToggle",
-			cmdTimeoutUartVirtToggle,
-			"t", "Enable/Disable virtual UART timeout",
-			"Virtual UART");
-
-		cmdReg("dataUartRcv",
-			cmdDataUartRcv,
-			"", "Receive byte stream",
-			"Virtual UART");
-
-		cmdReg("strUartRcv",
-			cmdStrUartRcv,
-			"", "Receive string",
-			"Virtual UART");
+		cmdReg("ctrlManualToggle", cmdCtrlManualToggle,      "",  "Toggle manual control",               "Manual Control");
+		cmdReg("dataUartSend",     cmdDataUartSend,          "",  "Send byte stream",                    "Manual Control");
+		cmdReg("strUartSend",      cmdStrUartSend,           "",  "Send string",                         "Manual Control");
+		cmdReg("dataUartRead",     cmdDataUartRead,          "",  "Read data",                           "Manual Control");
+		cmdReg("modeUartVirtSet",  cmdModeUartVirtSet,       "",  "Mode: uart, swart (default)",         "Virtual UART");
+		cmdReg("uartVirtToggle",   cmdUartVirtToggle,        "",  "Enable/Disable virtual UART",         "Virtual UART");
+		cmdReg("mountedToggle",    cmdMountedUartVirtToggle, "m", "Mount/Unmount virtual UART",          "Virtual UART");
+		cmdReg("timeoutToggle",    cmdTimeoutUartVirtToggle, "t", "Enable/Disable virtual UART timeout", "Virtual UART");
+		cmdReg("dataUartRcv",      cmdDataUartRcv,           "",  "Receive byte stream",                 "Virtual UART");
+		cmdReg("strUartRcv",       cmdStrUartRcv,            "",  "Receive string",                      "Virtual UART");
 
 		mState = StUartInit;
 
@@ -394,7 +357,7 @@ void SingleWireControlling::fragmentFinish(const char *pBuf, size_t len)
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 {
-	dInfo("Automatic\t\t\t%sabled\n", env.noAuto ? "Dis" : "En");
+	dInfo("Manual control\t\t%sabled\n", env.ctrlManual ? "En" : "Dis");
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
@@ -411,21 +374,47 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
+void SingleWireControlling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+
+	env.ctrlManual ^= 1;
+	dInfo("Manual control %sabled", env.ctrlManual ? "en" : "dis");
+}
+
 void SingleWireControlling::cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
+	if (!env.ctrlManual)
+	{
+		dInfo("Manual control disabled");
+		return;
+	}
+
 	dataUartSend(pArgs, pBuf, pBufEnd, uartSend);
 }
 
 void SingleWireControlling::cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
+	if (!env.ctrlManual)
+	{
+		dInfo("Manual control disabled");
+		return;
+	}
+
 	strUartSend(pArgs, pBuf, pBufEnd, uartSend);
 }
 
 void SingleWireControlling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
-	(void)pBuf;
-	(void)pBufEnd;
+
+	if (!env.ctrlManual)
+	{
+		dInfo("Manual control disabled");
+		return;
+	}
+
+	// TODO: Implement cmdDataUartRead()
 }
 
 void SingleWireControlling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)

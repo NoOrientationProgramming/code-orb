@@ -26,7 +26,7 @@ struct Environment
 {
 	int verbosity;
 	bool coreDumps;
-	bool noAuto;
+	uint8_t ctrlManual;
 	std::string deviceUart;
 };
 

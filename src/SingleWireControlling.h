@@ -98,6 +98,9 @@ private:
 	SingleWireResponse mResp;
 
 	/* static functions */
+
+	// Manual Control
+	static void cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEnd);
