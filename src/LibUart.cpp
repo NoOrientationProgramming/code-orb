@@ -33,7 +33,7 @@
 
 using namespace std;
 
-uint8_t uartVirtualMode = 0;
+uint8_t uartVirtualMode = 0; // swart
 uint8_t uartVirtual = 0;
 uint8_t uartVirtualMounted = 0;
 
@@ -132,7 +132,7 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 		size_t lenAttemted = PMIN(lenReq, sizeof(bufVirtual));
 		*bufVirtual = 0;
 
-		if (uartVirtualMode) // uart TX not connected to RX
+		if (uartVirtualMode) // mode = uart: TX not connected to RX
 			return lenAttemted;
 
 		lenWritten = lenAttemted;
