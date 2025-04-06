@@ -25,6 +25,8 @@ Gateway for SingleWireTransfering()
 
 ### Overview of the Debugging Gateway
 
+This repository provides the `SingleWireTransfering() Gateway` highlighted in green.
+
 <p align="center">
   <kbd>
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/overview-gw.svg" style="width: 500px; max-width:100%"/>
