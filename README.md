@@ -40,3 +40,11 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in gr
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/structure-dbg-internal.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
+
+### Communication Example between Controller and Target
+
+<p align="center">
+  <kbd>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/protocol/B1_swt-ctrl-to-target_cmd_cmd-resp.svg" style="width: 300px; max-width:100%"/>
+  </kbd>
+</p>
