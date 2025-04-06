@@ -95,8 +95,6 @@ int main(int argc, char *argv[])
 	env.deviceUart = dDeviceUartDefault;
 
 #if GW_HAS_TCLAP
-	int verbosity;
-
 	CmdLine cmd("Command description message", ' ', appVersion());
 
 	AppHelpOutput aho;
@@ -107,14 +105,17 @@ int main(int argc, char *argv[])
 	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
 	cmd.add(argCoreDump);
 
+	SwitchArg argNoAuto("", "no-auto", "Disable automatic control", false);
+	cmd.add(argNoAuto);
 	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault, false, dDeviceUartDefault, "string");
 	cmd.add(argDevUart);
 
 	cmd.parse(argc, argv);
 
-	verbosity = argVerbosity.getValue();
-	levelLogSet(verbosity);
+	env.verbosity = argVerbosity.getValue();
+	levelLogSet(env.verbosity);
 
+	env.noAuto = argNoAuto.getValue();
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
 #endif
