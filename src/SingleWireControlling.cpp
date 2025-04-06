@@ -123,6 +123,24 @@ Success SingleWireControlling::process()
 	{
 	case StStart:
 
+		if (env.noAuto)
+		{
+			cmdReg("uartDataSend",
+				cmdUartDataSend,
+				"", "Send byte stream",
+				"UART");
+
+			cmdReg("uartStrSend",
+				cmdUartStrSend,
+				"", "Send string",
+				"UART");
+
+			cmdReg("uartRead",
+				cmdUartRead,
+				"", "Read data",
+				"UART");
+		}
+
 		cmdReg("uartVirtMode",
 			cmdUartVirtMode,
 			"", "Mode: uart, swart (default)",
@@ -143,13 +161,13 @@ Success SingleWireControlling::process()
 			"t", "Enable/Disable virtual UART timeout",
 			"Virtual UART");
 
-		cmdReg("dataRcv",
-			cmdUartDataRcv,
+		cmdReg("dataVirtRcv",
+			cmdUartVirtDataRcv,
 			"", "Receive byte stream",
 			"Virtual UART");
 
-		cmdReg("strRcv",
-			cmdUartStrRcv,
+		cmdReg("strVirtRcv",
+			cmdUartVirtStrRcv,
 			"", "Receive string",
 			"Virtual UART");
 
@@ -235,7 +253,7 @@ void SingleWireControlling::cmdSend(const string &cmd)
 {
 	uartSend(mRefUart, FlowCtrlToTarget);
 	uartSend(mRefUart, ContentOutCmd);
-	uartSend(mRefUart, cmd);
+	uartSend(mRefUart, cmd.data(), cmd.size());
 	uartSend(mRefUart, 0x00);
 
 	mStartMs = millis();
@@ -382,6 +400,23 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
+void SingleWireControlling::cmdUartDataSend(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	uartDataSend(pArgs, pBuf, pBufEnd, uartSend);
+}
+
+void SingleWireControlling::cmdUartStrSend(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	uartStrSend(pArgs, pBuf, pBufEnd, uartSend);
+}
+
+void SingleWireControlling::cmdUartRead(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+	(void)pBuf;
+	(void)pBufEnd;
+}
+
 void SingleWireControlling::cmdUartVirtMode(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (pArgs && *pArgs == 'u')
@@ -416,7 +451,17 @@ void SingleWireControlling::cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, ch
 	dInfo("Virtual UART timeout %s", uartVirtualTimeout ? "set" : "cleared");
 }
 
-void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireControlling::cmdUartVirtDataRcv(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	uartDataSend(pArgs, pBuf, pBufEnd, uartVirtRcv);
+}
+
+void SingleWireControlling::cmdUartVirtStrRcv(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	uartStrSend(pArgs, pBuf, pBufEnd, uartVirtRcv);
+}
+
+void SingleWireControlling::uartDataSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
 {
 	if (!pArgs)
 	{
@@ -432,12 +477,12 @@ void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEn
 	if (str == "cmd")  str = "A3";
 
 	vector<char> vData = toHex(str);
-	uartVirtRcv(vData.data(), vData.size());
+	pFctSend(RefDeviceUartInvalid, vData.data(), vData.size());
 
 	dInfo("Data received");
 }
 
-void SingleWireControlling::cmdUartStrRcv(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireControlling::uartStrSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
 {
 	if (!pArgs)
 	{
@@ -445,7 +490,7 @@ void SingleWireControlling::cmdUartStrRcv(char *pArgs, char *pBuf, char *pBufEnd
 		return;
 	}
 
-	uartVirtRcv(pArgs, strlen(pArgs));
+	pFctSend(RefDeviceUartInvalid, pArgs, strlen(pArgs));
 	dInfo("String received");
 }
 

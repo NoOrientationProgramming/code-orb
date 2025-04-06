@@ -155,11 +155,6 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 	return lenWritten;
 }
 
-ssize_t uartSend(RefDeviceUart refUart, const string &str)
-{
-	return uartSend(refUart, str.data(), str.size());
-}
-
 ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 {
 	return uartSend(refUart, &ch, sizeof(ch));
@@ -195,8 +190,10 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 	return read(refUart, pBuf, lenReq);
 }
 
-ssize_t uartVirtRcv(void *pBuf, size_t lenReq)
+ssize_t uartVirtRcv(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 {
+	(void)refUart;
+
 	if (!uartVirtual)
 		return -1;
 

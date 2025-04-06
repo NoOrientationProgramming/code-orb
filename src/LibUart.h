@@ -44,10 +44,9 @@ Success devUartInit(const std::string &deviceUart, RefDeviceUart &refUart);
 void devUartDeInit(RefDeviceUart &refUart);
 
 ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
-ssize_t uartSend(RefDeviceUart refUart, const std::string &str);
 ssize_t uartSend(RefDeviceUart refUart, uint8_t ch);
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq);
-ssize_t uartVirtRcv(void *pBuf, size_t lenReq);
+ssize_t uartVirtRcv(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
 
 #endif
 

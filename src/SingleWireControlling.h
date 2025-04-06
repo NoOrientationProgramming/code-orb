@@ -45,6 +45,8 @@ enum SwtErrRcv
 	SwtErrRcvProtocol,
 };
 
+typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
+
 class SingleWireControlling : public Processing
 {
 
@@ -95,12 +97,19 @@ private:
 	SingleWireResponse mResp;
 
 	/* static functions */
+	static void cmdUartDataSend(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdUartStrSend(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdUartRead(char *pArgs, char *pBuf, char *pBufEnd);
+
 	static void cmdUartVirtMode(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtMountedToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartStrRcv(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdUartVirtDataRcv(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdUartVirtStrRcv(char *pArgs, char *pBuf, char *pBufEnd);
+
+	static void uartDataSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
+	static void uartStrSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
 
 	/* static variables */
 
