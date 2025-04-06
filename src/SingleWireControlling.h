@@ -34,7 +34,7 @@
 
 struct SingleWireResponse
 {
-	char idContent;
+	uint8_t idContent;
 	std::string content;
 };
 
@@ -93,7 +93,7 @@ private:
 	char *mpBuf;
 	ssize_t mLenDone;
 	std::map<int, std::string> mFragments;
-	char mContentCurrent;
+	uint8_t mContentCurrent;
 	SingleWireResponse mResp;
 
 	/* static functions */
