@@ -17,7 +17,7 @@ Gateway for SingleWireTransfering()
 
 ### Overall Debugging Structure
 
-This repository provides the `SingleWireTransfering() Gateway` highlighted in green. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well.
+This repository provides the `SingleWireTransfering() Gateway` highlighted in green. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
 
 <p align="center">
   <kbd>
