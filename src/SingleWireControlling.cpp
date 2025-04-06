@@ -67,23 +67,23 @@ enum SwtFlowDirection
 	FlowTargetToCtrl
 };
 
-enum SwtContentId
-{
-	ContentNone = 0x00,
-	ContentLog = 0xA0,
-	ContentCmd,
-	ContentProc,
-};
-
 enum SwtContentIdOut
 {
 	ContentOutCmd = 0x90,
 };
 
+enum SwtContentId
+{
+	ContentNone = 0xA0,
+	ContentProc,
+	ContentLog,
+	ContentCmd,
+};
+
 enum SwtContentEnd
 {
-	ContentEnd = 0x00,
-	ContentCut = 0x17,
+	ContentCut = 0x0F,
+	ContentEnd = 0x17,
 };
 
 #define dTimeoutTargetInitMs	50
