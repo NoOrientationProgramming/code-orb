@@ -139,6 +139,9 @@ Success SingleWireControlling::process()
 		break;
 	case StUartInit:
 
+		if (mRefUart != RefDeviceUartInvalid)
+			devUartDeInit(mRefUart);
+
 		mDevUartIsOnline = false;
 
 		mState = StDevUartInit;
