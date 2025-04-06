@@ -97,19 +97,19 @@ private:
 	SingleWireResponse mResp;
 
 	/* static functions */
-	static void cmdUartDataSend(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartStrSend(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartRead(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEnd);
 
-	static void cmdUartVirtMode(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartVirtMountedToggle(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartVirtDataRcv(char *pArgs, char *pBuf, char *pBufEnd);
-	static void cmdUartVirtStrRcv(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdMountedUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdTimeoutUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdDataUartRcv(char *pArgs, char *pBuf, char *pBufEnd);
+	static void cmdStrUartRcv(char *pArgs, char *pBuf, char *pBufEnd);
 
-	static void uartDataSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
-	static void uartStrSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
+	static void dataUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
+	static void strUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
 
 	/* static variables */
 
