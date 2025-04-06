@@ -1,3 +1,4 @@
+![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/gw-dbg-swt?style=plastic)
 
 Gateway for SingleWireTransfering()
 
@@ -37,7 +38,7 @@ TODO: Screenshot
 
 ### Overall Debugging Structure
 
-This repository provides the `SingleWireTransfering() Gateway` highlighted in green. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
+This repository provides the `SingleWireTransfering() Gateway` highlighted in orange. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
 
 <p align="center">
   <kbd>
