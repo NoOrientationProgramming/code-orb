@@ -17,15 +17,15 @@ Gateway for SingleWireTransfering()
 
 ### Overall Debugging Structure
 
+This repository provides the `SingleWireTransfering() Gateway` highlighted in green.
+
 <p align="center">
   <kbd>
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/stm32-uart_3.svg" style="width: 500px; max-width:100%"/>
   </kbd>
 </p>
 
-### Overview of the Debugging Gateway
-
-This repository provides the `SingleWireTransfering() Gateway` highlighted in green.
+### Overview of the Gateway
 
 <p align="center">
   <kbd>
