@@ -161,12 +161,12 @@ Success SingleWireControlling::process()
 			"t", "Enable/Disable virtual UART timeout",
 			"Virtual UART");
 
-		cmdReg("dataVirtRcv",
+		cmdReg("virtDataRcv",
 			cmdUartVirtDataRcv,
 			"", "Receive byte stream",
 			"Virtual UART");
 
-		cmdReg("strVirtRcv",
+		cmdReg("virtStrRcv",
 			cmdUartVirtStrRcv,
 			"", "Receive string",
 			"Virtual UART");
