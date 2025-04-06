@@ -474,10 +474,11 @@ void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd,
 
 	string str = string(pArgs, strlen(pArgs));
 
-	if (str == "none") str = "A0";
-	if (str == "proc") str = "A1";
-	if (str == "log")  str = "A2";
-	if (str == "cmd")  str = "A3";
+	if (str == "cmdOut")  str = "90";
+	if (str == "none")    str = "A0";
+	if (str == "proc")    str = "A1";
+	if (str == "log")     str = "A2";
+	if (str == "cmd")     str = "A3";
 
 	vector<char> vData = toHex(str);
 	pFctSend(RefDeviceUartInvalid, vData.data(), vData.size());
