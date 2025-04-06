@@ -1,0 +1,65 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+frame "SingleWireTransfering()" as pSwt
+
+component "Line\nController to\nTarget" as pLineCtt
+component "Line\nTarget to\nController" as pLineTtc
+
+frame "SingleWireControlling()\nGateway" as pGw {
+
+	rectangle "Controlling()" as pCtrl {
+
+		frame "Automatic" as pAuto
+		frame "Manual" as pManual
+	}
+
+	rectangle "Transfering()" as pTrans {
+
+		frame "rcv()" as pRcv
+		frame "send()" as pSend
+		frame "read()" as pRead
+	}
+
+	rectangle "Buffers" as sBuf {
+
+		database "Transmit" as sBufUartTmit
+		database "Receive" as sBufUartRcv
+		database "Virtual" as sBufVirt {
+			database "TX" as sTx
+			database "RX" as sRx
+		}
+
+		sTx .> sRx
+	}
+
+	pAuto -> pSend
+	pAuto <- pRead
+
+	pManual -> pSend
+	pManual --> pRcv
+	pManual <- pRead
+
+	pSend --> sBufUartTmit
+	pSend --> sTx
+
+	pRcv --> sRx
+
+	pRead <-- sRx
+	pRead <-- sBufUartRcv
+}
+
+sBufUartTmit --> pLineCtt
+sBufUartRcv <-- pLineTtc
+
+pLineTtc <.> pLineCtt
+
+pLineCtt --> pSwt
+pLineTtc <-- pSwt
+
+footer **SingleWireControlling()** - Internal control & debug structure\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
