@@ -32,6 +32,7 @@ args = [
 	'-DdPackageName="' + meson.project_name() + '"',
 	'-DdAppName="gw-dbg-swt"',
 	'-DCONFIG_PROC_HAVE_LOG=1',
+	'-DCONFIG_CMD_SIZE_BUFFER_OUT=2048',
 ]
 
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
