@@ -33,12 +33,13 @@
 
 using namespace std;
 
-static uint8_t uartVirtual = 0;
-static uint8_t uartVirtualMounted = 0;
+uint8_t uartVirtualMode = 0;
+uint8_t uartVirtual = 0;
+uint8_t uartVirtualMounted = 0;
 
 static uint8_t bufVirtual[31];
-static uint8_t *pBufVirt = bufVirtual;
 static size_t lenWritten = 0;
+static uint8_t *pBufVirt = bufVirtual;
 
 /*
  * Literature
@@ -128,13 +129,22 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 		if (!uartVirtualMounted)
 			return -1;
 
-		lenWritten = PMIN(lenReq, sizeof(bufVirtual));
+		size_t lenAttemted = PMIN(lenReq, sizeof(bufVirtual));
+		*bufVirtual = 0;
+
+		if (uartVirtualMode) // uart TX not connected to RX
+			return lenAttemted;
+
+		lenWritten = lenAttemted;
 		pBufVirt = bufVirtual;
 
 		memcpy(pBufVirt, pBuf, lenWritten);
 
 		return lenWritten;
 	}
+
+	if (refUart == RefDeviceUartInvalid)
+		return -1;
 
 #if defined(__unix__)
 	lenWritten = write(refUart, pBuf, lenReq);
@@ -168,6 +178,9 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 		size_t lenRead;
 
 		lenRead = PMIN(lenReq, lenWritten);
+		if (!lenRead)
+			return 0;
+
 		memcpy(pBuf, pBufVirt, lenRead);
 
 		lenWritten -= lenRead;
@@ -176,16 +189,22 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 		return lenRead;
 	}
 
+	if (refUart == RefDeviceUartInvalid)
+		return -1;
+
 	return read(refUart, pBuf, lenReq);
 }
 
-void uartVirtualSet(uint8_t enabled)
+ssize_t uartVirtRcv(void *pBuf, size_t lenReq)
 {
-	uartVirtual = enabled;
-}
+	if (!uartVirtual)
+		return -1;
 
-void uartVirtualMountedSet(uint8_t mounted)
-{
-	uartVirtualMounted = mounted;
+	lenWritten = PMIN(lenReq, sizeof(bufVirtual));
+	pBufVirt = bufVirtual;
+
+	memcpy(pBufVirt, pBuf, lenWritten);
+
+	return lenWritten;
 }
 

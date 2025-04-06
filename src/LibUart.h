@@ -36,17 +36,18 @@ typedef int RefDeviceUart;
 #define RefDeviceUartInvalid -1
 #endif
 
+extern uint8_t uartVirtualMode;
+extern uint8_t uartVirtual;
+extern uint8_t uartVirtualMounted;
+
 Success devUartInit(const std::string &deviceUart, RefDeviceUart &refUart);
 void devUartDeInit(RefDeviceUart &refUart);
 
 ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
 ssize_t uartSend(RefDeviceUart refUart, const std::string &str);
 ssize_t uartSend(RefDeviceUart refUart, uint8_t ch);
-
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq);
-
-void uartVirtualSet(uint8_t enabled);
-void uartVirtualMountedSet(uint8_t mounted);
+ssize_t uartVirtRcv(void *pBuf, size_t lenReq);
 
 #endif
 
