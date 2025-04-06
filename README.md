@@ -21,7 +21,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in gr
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/stm32-uart_3.svg" style="width: 500px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -29,7 +29,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in gr
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/overview-gw.svg" style="width: 500px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/overview-gw.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -37,6 +37,6 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in gr
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/structure-dbg-internal.svg" style="width: 500px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/structure-dbg-internal.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
