@@ -95,6 +95,7 @@ private:
 	SingleWireResponse mResp;
 
 	/* static functions */
+	static void cmdUartVirtMode(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtMountedToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, char *pBufEnd);

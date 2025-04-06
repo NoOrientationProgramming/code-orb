@@ -89,8 +89,6 @@ enum SwtContentEnd
 #define dTimeoutTargetInitMs	50
 const size_t cSizeFragmentMax = 4095;
 
-static uint8_t uartVirtual = 0;
-static uint8_t uartVirtualMounted = 0;
 static uint8_t uartVirtualTimeout = 0;
 
 SingleWireControlling::SingleWireControlling()
@@ -125,6 +123,11 @@ Success SingleWireControlling::process()
 	{
 	case StStart:
 
+		cmdReg("uartVirtMode",
+			cmdUartVirtMode,
+			"", "Mode: uart, swart (default)",
+			"Virtual UART");
+
 		cmdReg("uartVirtToggle",
 			cmdUartVirtToggle,
 			"", "Enable/Disable virtual UART",
@@ -142,12 +145,12 @@ Success SingleWireControlling::process()
 
 		cmdReg("dataRcv",
 			cmdUartDataRcv,
-			"d", "Receive byte stream",
+			"", "Receive byte stream",
 			"Virtual UART");
 
 		cmdReg("strRcv",
 			cmdUartStrRcv,
-			"s", "Receive string",
+			"", "Receive string",
 			"Virtual UART");
 
 		mState = StUartInit;
@@ -379,13 +382,21 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
+void SingleWireControlling::cmdUartVirtMode(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	if (pArgs && *pArgs == 'u')
+		uartVirtualMode = 1;
+	else
+		uartVirtualMode = 0;
+
+	dInfo("Virtual UART mode: %s", uartVirtualMode ? "uart" : "swart");
+}
+
 void SingleWireControlling::cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
 	uartVirtual ^= 1;
-	uartVirtualSet(uartVirtual);
-
 	dInfo("Virtual UART %sabled", uartVirtual ? "en" : "dis");
 }
 
@@ -394,8 +405,6 @@ void SingleWireControlling::cmdUartVirtMountedToggle(char *pArgs, char *pBuf, ch
 	(void)pArgs;
 
 	uartVirtualMounted ^= 1;
-	uartVirtualMountedSet(uartVirtualMounted);
-
 	dInfo("Virtual UART %smounted", uartVirtualMounted ? "" : "un");
 }
 
@@ -404,7 +413,6 @@ void SingleWireControlling::cmdUartVirtTimeoutToggle(char *pArgs, char *pBuf, ch
 	(void)pArgs;
 
 	uartVirtualTimeout ^= 1;
-
 	dInfo("Virtual UART timeout %s", uartVirtualTimeout ? "set" : "cleared");
 }
 
@@ -418,21 +426,13 @@ void SingleWireControlling::cmdUartDataRcv(char *pArgs, char *pBuf, char *pBufEn
 
 	string str = string(pArgs, strlen(pArgs));
 
-	if (str == "log")  str = "A0";
-	if (str == "cmd")  str = "A1";
-	if (str == "proc") str = "A2";
+	if (str == "none") str = "A0";
+	if (str == "proc") str = "A1";
+	if (str == "log")  str = "A2";
+	if (str == "cmd")  str = "A3";
 
-	vector<char>::iterator iter;
-	vector<char> vData;
-
-	vData = toHex(str);
-	str = "";
-
-	iter = vData.begin();
-	for (; iter != vData.end(); ++iter)
-		str.push_back(*iter);
-
-	uartSend(RefDeviceUartInvalid, str);
+	vector<char> vData = toHex(str);
+	uartVirtRcv(vData.data(), vData.size());
 
 	dInfo("Data received");
 }
@@ -445,7 +445,7 @@ void SingleWireControlling::cmdUartStrRcv(char *pArgs, char *pBuf, char *pBufEnd
 		return;
 	}
 
-	uartSend(RefDeviceUartInvalid, pArgs, strlen(pArgs));
+	uartVirtRcv(pArgs, strlen(pArgs));
 	dInfo("String received");
 }
 
