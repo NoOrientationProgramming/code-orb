@@ -8,7 +8,7 @@ frame "SingleWireTransfering()" as pSwt
 component "Line\nController to\nTarget" as pLineCtt
 component "Line\nTarget to\nController" as pLineTtc
 
-frame "SingleWireControlling()\nGateway" as pGw {
+frame "SingleWireControlling()" as pGw {
 
 	rectangle "Controlling()" as pCtrl {
 

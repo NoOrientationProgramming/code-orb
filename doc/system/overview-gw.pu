@@ -3,35 +3,39 @@
 
 ' skinparam linetype ortho
 
-component "Target" as pTarget
+rectangle "Your Tools" as gTools {
+
+	frame "Process Tree" as pTree
+	frame "Log" as pLog
+	frame "Command" as pCmd
+}
 
 frame "SingleWireTransfering()\nGateway" as pGw {
 
-  frame "<<SingleWireControlling()>>" as pSwt
-  frame "<<TcpListening()>>" as pTcp
-  frame "TcpTransfering()" as pTrans
-  frame "RemoteCommanding()" as pCmdRemote {
-    frame "<<TcpTransfering()>>" as pTrans2
-  }
+	frame "<<SingleWireControlling()>>" as pSwc
+	frame "<<TcpListening()>>" as pTcp
+	frame "TcpTransfering()" as pTrans
+	frame "RemoteCommanding()" as pCmdRemote {
+		frame "<<TcpTransfering()>>" as pTrans2
+	}
 }
 
-rectangle "Your Tools" as gTools {
-  frame "Process Tree" as pTree
-  frame "Log" as pLog
-  frame "Command" as pCmd
+component "Target" as pTarget {
+
+	frame "<<SingleWireTransfering()>>" as pSwt
 }
 
-pTarget <--> pSwt : "COM1 or\n/dev/ttyACM0"
+pTree <-- pTrans
+pLog <-- pTrans
+pCmd <--> pTrans2 : "TCP/IP"
 
-pTcp ..> pTrans
-pTcp ..> pCmdRemote
+pTrans <-- pSwc
+pTrans2 <--> pSwc
 
-pSwt --> pTrans
-pSwt <--> pTrans2
+pTrans <.. pTcp
+pCmdRemote <.. pTcp
 
-pTrans --> pTree
-pTrans --> pLog
-pTrans2 <--> pCmd : "TCP/IP"
+pSwc <--> pSwt : "COM1 or\n/dev/ttyACM0"
 
 footer **Processing()** - Gateway overview\n(C) DSP-Crowd Electronics GmbH
 
