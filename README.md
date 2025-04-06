@@ -1,6 +1,26 @@
 
 Gateway for SingleWireTransfering()
 
+## What You Get
+
+- Full control over your target
+- Using three channels
+  - Process Tree
+  - Log
+  - Command Interface
+
+### Process Tree
+
+TODO: Screenshot
+
+### Log
+
+TODO: Screenshot
+
+### Command Interface
+
+TODO: Screenshot
+
 ## Status
 
 - Pre alpha
