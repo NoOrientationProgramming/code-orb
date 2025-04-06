@@ -345,6 +345,15 @@ Success SingleWireControlling::byteProcess(char ch)
 	return Pending;
 }
 
+Success SingleWireControlling::shutdown()
+{
+
+	if (mRefUart != RefDeviceUartInvalid)
+		devUartDeInit(mRefUart);
+
+	return Positive;
+}
+
 void SingleWireControlling::fragmentAppend(const char *pBuf, size_t len)
 {
 	bool fragmentFound =

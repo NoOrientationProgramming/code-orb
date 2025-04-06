@@ -74,6 +74,7 @@ private:
 
 	/* member functions */
 	Success process();
+	Success shutdown();
 	void processInfo(char *pBuf, char *pBufEnd);
 
 	void cmdSend(const std::string &cmd);
