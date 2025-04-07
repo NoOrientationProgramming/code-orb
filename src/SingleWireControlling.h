@@ -30,6 +30,7 @@
 #include <map>
 
 #include "Processing.h"
+#include "Pipe.h"
 #include "LibUart.h"
 
 struct SingleWireResponse
@@ -56,6 +57,14 @@ public:
 	{
 		return new dNoThrow SingleWireControlling;
 	}
+
+	bool mDevUartIsOnline;
+	bool mTargetIsOnline;
+
+	bool contentProcChanged();
+	std::string mContentProc;
+
+	Pipe<std::string> ppEntriesLog;
 
 protected:
 
@@ -89,14 +98,13 @@ private:
 	uint32_t mStateSwt;
 	uint32_t mStartMs;
 	RefDeviceUart mRefUart;
-	bool mDevUartIsOnline;
-	bool mTargetIsOnline;
 	char mBufRcv[13];
 	char *mpBuf;
 	ssize_t mLenDone;
 	std::map<int, std::string> mFragments;
 	uint8_t mContentCurrent;
 	SingleWireResponse mResp;
+	bool mContentProcChanged;
 
 	/* static functions */
 

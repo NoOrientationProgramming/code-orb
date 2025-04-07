@@ -37,7 +37,8 @@
 		gen(StTargetInit) \
 		gen(StTargetInitDoneWait) \
 		gen(StNextFlowDetermine) \
-		gen(StContentReceive) \
+		gen(StContentReceiveWait) \
+		gen(StCtrlManual) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -86,23 +87,29 @@ enum SwtContentEnd
 	ContentEnd = 0x17,
 };
 
-#define dTimeoutTargetInitMs	50
+#define dTimeoutTargetInitMs	1500
 const size_t cSizeFragmentMax = 4095;
-const uint8_t cEscapeByteString = 0x1B;
+const uint8_t cKeyEscape = 0x1B;
+const uint8_t cKeyTab = '\t';
+const uint8_t cKeyCr = '\r';
+const uint8_t cKeyLf = '\n';
 
 static uint8_t uartVirtualTimeout = 0;
+RefDeviceUart refUart;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
+	, mDevUartIsOnline(false)
+	, mTargetIsOnline(false)
+	, mContentProc("")
 	, mStateSwt(StSwtContentRcvWait)
 	, mStartMs(0)
 	, mRefUart(RefDeviceUartInvalid)
-	, mDevUartIsOnline(false)
-	, mTargetIsOnline(false)
 	, mpBuf(NULL)
 	, mLenDone(0)
 	, mFragments()
 	, mContentCurrent(ContentNone)
+	, mContentProcChanged(false)
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -141,9 +148,13 @@ Success SingleWireControlling::process()
 	case StUartInit:
 
 		if (mRefUart != RefDeviceUartInvalid)
+		{
 			devUartDeInit(mRefUart);
+			refUart = mRefUart;
+		}
 
 		mDevUartIsOnline = false;
+		mTargetIsOnline = false;
 
 		mState = StDevUartInit;
 
@@ -160,6 +171,7 @@ Success SingleWireControlling::process()
 		// clear UART device buffer?
 
 		mDevUartIsOnline = true;
+		refUart = mRefUart;
 
 		mState = StTargetInit;
 
@@ -168,9 +180,15 @@ Success SingleWireControlling::process()
 
 		mTargetIsOnline = false;
 
-		cmdSend("aaaaa");
-		dataRequest();
+		if (env.ctrlManual)
+		{
+			mState = StCtrlManual;
+			break;
+		}
 
+		cmdSend("aaaaa");
+
+		dataRequest();
 		mState = StTargetInitDoneWait;
 
 		break;
@@ -199,7 +217,7 @@ Success SingleWireControlling::process()
 		if (mResp.idContent != ContentCmd)
 			break;
 
-		if (mResp.content != "Debug 1")
+		if (mResp.content != "Debug mode 1")
 			break;
 
 		mTargetIsOnline = true;
@@ -209,12 +227,64 @@ Success SingleWireControlling::process()
 		break;
 	case StNextFlowDetermine:
 
+		if (env.ctrlManual)
+		{
+			mState = StCtrlManual;
+			break;
+		}
+
 		// flow determine
-#if 0
+
 		dataRequest();
-#endif
+		mState = StContentReceiveWait;
+
 		break;
-	case StContentReceive:
+	case StContentReceiveWait:
+
+		success = dataReceive();
+		if (success == Pending)
+			break;
+
+		if (success == SwtErrRcvNoUart)
+		{
+			mState = StUartInit;
+			break;
+		}
+
+		if (success == SwtErrRcvNoTarget)
+		{
+			mState = StTargetInit;
+			break;
+		}
+#if 0
+		procWrnLog("content received: %02X > '%s'",
+						mResp.idContent,
+						mResp.content.c_str());
+#endif
+		if (mResp.idContent == ContentProc)
+		{
+			mContentProc = mResp.content;
+			mContentProcChanged = true;
+
+			mState = StNextFlowDetermine;
+			break;
+		}
+
+		if (mResp.idContent == ContentLog)
+		{
+			ppEntriesLog.commit(mResp.content);
+			mState = StNextFlowDetermine;
+			break;
+		}
+
+		break;
+	case StCtrlManual:
+
+		if (!env.ctrlManual)
+		{
+			mState = StTargetInit;
+			break;
+		}
 
 		break;
 	default:
@@ -224,12 +294,20 @@ Success SingleWireControlling::process()
 	return Pending;
 }
 
+bool SingleWireControlling::contentProcChanged()
+{
+	bool tmp = mContentProcChanged;
+	mContentProcChanged = false;
+	return tmp;
+}
+
 void SingleWireControlling::cmdSend(const string &cmd)
 {
 	uartSend(mRefUart, FlowCtrlToTarget);
 	uartSend(mRefUart, ContentOutCmd);
 	uartSend(mRefUart, cmd.data(), cmd.size());
 	uartSend(mRefUart, 0x00);
+	uartSend(mRefUart, ContentEnd);
 
 	mStartMs = millis();
 }
@@ -260,18 +338,26 @@ Success SingleWireControlling::dataReceive()
 			return Positive;
 	}
 
-	if (!uartVirtual && diffMs > dTimeoutTargetInitMs)
-		return SwtErrRcvNoTarget;
+	if ((!uartVirtual && diffMs > dTimeoutTargetInitMs) ||
+		(uartVirtual && uartVirtualTimeout))
+	{
+		mFragments.clear();
+		mStateSwt = StSwtContentRcvWait;
 
-	if (uartVirtual && uartVirtualTimeout)
 		return SwtErrRcvNoTarget;
+	}
 
 	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
 	if (!mLenDone)
 		return Pending;
 
 	if (mLenDone < 0)
+	{
+		mFragments.clear();
+		mStateSwt = StSwtContentRcvWait;
+
 		return SwtErrRcvNoUart;
+	}
 
 	mpBuf = mBufRcv;
 
@@ -282,7 +368,7 @@ Success SingleWireControlling::dataReceive()
 
 Success SingleWireControlling::byteProcess(uint8_t ch)
 {
-	procInfLog("Received byte: 0x%02X '%c'", ch, ch);
+	//procInfLog("Received byte: 0x%02X '%c'", ch, ch);
 
 	switch (mStateSwt)
 	{
@@ -308,17 +394,27 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 		{
 			fragmentFinish(mContentCurrent);
 			mStateSwt = StSwtContentRcvWait;
+
 			return Positive;
 		}
 
-		if (!isprint(ch) && ch != cEscapeByteString)
+		if (!ch)
+			break;
+
+		if (isprint(ch) ||
+			ch == cKeyEscape ||
+			ch == cKeyTab ||
+			ch == cKeyCr ||
+			ch == cKeyLf)
 		{
-			fragmentDelete(mContentCurrent);
-			mStateSwt = StSwtContentRcvWait;
-			return SwtErrRcvProtocol;
+			fragmentAppend(mContentCurrent, ch);
+			break;
 		}
 
-		fragmentAppend(mContentCurrent, ch);
+		fragmentDelete(mContentCurrent);
+		mStateSwt = StSwtContentRcvWait;
+
+		return SwtErrRcvProtocol;
 
 		break;
 	default:
@@ -332,7 +428,10 @@ Success SingleWireControlling::shutdown()
 {
 
 	if (mRefUart != RefDeviceUartInvalid)
+	{
 		devUartDeInit(mRefUart);
+		refUart = mRefUart;
+	}
 
 	return Positive;
 }
@@ -400,7 +499,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			env.deviceUart.c_str(),
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
-
+#if 0
 	dInfo("Fragments\n");
 
 	if (!mFragments.size())
@@ -414,6 +513,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 	iter = mFragments.begin();
 	for (; iter != mFragments.end(); ++iter)
 		dInfo("  %02X > '%s'\n", iter->first, iter->second.c_str());
+#endif
 }
 
 /* static functions */
@@ -458,7 +558,26 @@ void SingleWireControlling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufE
 		return;
 	}
 
-	// TODO: Implement cmdDataUartRead()
+	ssize_t lenDone;
+	char buf[55];
+
+	lenDone = uartRead(refUart, buf, sizeof(buf));
+	if (!lenDone)
+	{
+		dInfo("No data");
+		return;
+	}
+
+	if (lenDone < 0)
+	{
+		dInfo("Error receiving data: %zu", lenDone);
+		return;
+	}
+
+	ssize_t lenMax = 32;
+	ssize_t lenReq = PMIN(lenMax, lenDone);
+
+	hexDumpPrint(pBuf, pBufEnd, buf, lenReq, NULL, 8);
 }
 
 void SingleWireControlling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)
@@ -515,18 +634,23 @@ void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd,
 
 	string str = string(pArgs, strlen(pArgs));
 
-	if (str == "cmdOut")  str = "90";
-	if (str == "none")    str = "A0";
-	if (str == "proc")    str = "A1";
-	if (str == "log")     str = "A2";
-	if (str == "cmd")     str = "A3";
-	if (str == "cut")     str = "0F";
-	if (str == "end")     str = "17";
+	if (str == "flowOut")  str = "F1";
+	if (str == "flowIn")   str = "F2";
+	if (str == "cmdOut")   str = "90";
+	if (str == "none")     str = "A0";
+	if (str == "proc")     str = "A1";
+	if (str == "log")      str = "A2";
+	if (str == "cmd")      str = "A3";
+	if (str == "cut")      str = "0F";
+	if (str == "end")      str = "17";
+	if (str == "tab")      str = "09";
+	if (str == "cr")       str = "0D";
+	if (str == "lf")       str = "0A";
 
 	vector<char> vData = toHex(str);
-	pFctSend(RefDeviceUartInvalid, vData.data(), vData.size());
+	pFctSend(refUart, vData.data(), vData.size());
 
-	dInfo("Data received");
+	dInfo("Data moved");
 }
 
 void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
@@ -537,7 +661,7 @@ void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, 
 		return;
 	}
 
-	pFctSend(RefDeviceUartInvalid, pArgs, strlen(pArgs));
-	dInfo("String received");
+	pFctSend(refUart, pArgs, strlen(pArgs));
+	dInfo("String moved");
 }
 

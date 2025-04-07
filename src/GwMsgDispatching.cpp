@@ -25,6 +25,8 @@
 
 #include "GwMsgDispatching.h"
 
+#include "env.h"
+
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
 		gen(StMain) \
@@ -40,6 +42,14 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+#define dColorGreen "\033[38;5;46m"
+#define dColorOrange "\033[38;5;220m"
+#define dColorRed "\033[38;5;196m"
+#define dColorClear "\033[0m"
+
+#define dOnline  dColorGreen  "Online " dColorClear
+#define dOffline dColorOrange "Offline" dColorClear
+
 typedef list<struct RemoteDebuggingPeer>::iterator PeerIter;
 
 const string cSeqCtrlC = "\xff\xf4\xff\xfd\x06";
@@ -54,6 +64,9 @@ GwMsgDispatching::GwMsgDispatching()
 	, mpLstLog(NULL)
 	, mpLstCmd(NULL)
 	, mpCtrl(NULL)
+	, mCursorHidden(false)
+	, mDevUartIsOnline(true)
+	, mTargetIsOnline(false)
 	, mListPeers()
 {
 	mState = StStart;
@@ -86,12 +99,25 @@ Success GwMsgDispatching::process()
 #else
 		start(mpCtrl, DrivenByNewInternalDriver);
 #endif
+		if (!env.verbosity)
+		{
+			fprintf(stdout, "\033[?25l");
+			fflush(stdout);
+			mCursorHidden = true;
+
+			stateOnlineCheckAndPrint();
+		}
+
 		mState = StMain;
 
 		break;
 	case StMain:
 
+		if (!env.verbosity)
+			stateOnlineCheckAndPrint();
+
 		peerListUpdate();
+		contentDistribute();
 
 		break;
 	case StNop:
@@ -102,6 +128,34 @@ Success GwMsgDispatching::process()
 	}
 
 	return Pending;
+}
+
+Success GwMsgDispatching::shutdown()
+{
+	if (mCursorHidden)
+	{
+		fprintf(stdout, "\033[?25h");
+		fflush(stdout);
+		mCursorHidden = false;
+	}
+
+	return Positive;
+}
+
+void GwMsgDispatching::stateOnlineCheckAndPrint()
+{
+	if (mpCtrl->mDevUartIsOnline == mDevUartIsOnline &&
+			mpCtrl->mTargetIsOnline == mTargetIsOnline)
+		return;
+
+	mDevUartIsOnline = mpCtrl->mDevUartIsOnline;
+	mTargetIsOnline = mpCtrl->mTargetIsOnline;
+
+	fprintf(stdout, "\rUART [ %s ], Target [ %s ]",
+		mDevUartIsOnline ? dOnline : dOffline,
+		mTargetIsOnline ? dOnline : dOffline);
+
+	fflush(stdout);
 }
 
 bool GwMsgDispatching::listenersStart()
@@ -148,6 +202,46 @@ void GwMsgDispatching::peerListUpdate()
 	peerAdd(mpLstLog, RemotePeerLog, "log");
 #endif
 	peerAdd(mpLstCmd, RemotePeerCmd, "command");
+}
+
+void GwMsgDispatching::contentDistribute()
+{
+	// proc tree
+	if (mpCtrl->contentProcChanged())
+	{
+		string str("\033[2J\033[H");
+		str += mpCtrl->mContentProc;
+
+		contentSend(str, RemotePeerProc);
+	}
+
+	// log
+	PipeEntry<string> entryLog;
+
+	while (1)
+	{
+		if (mpCtrl->ppEntriesLog.get(entryLog) < 1)
+			break;
+
+		contentSend(entryLog.particle, RemotePeerLog);
+	}
+}
+
+void GwMsgDispatching::contentSend(const string &str, RemotePeerType typePeer)
+{
+	PeerIter iter;
+	TcpTransfering *pTrans;
+
+	iter = mListPeers.begin();
+	for (; iter != mListPeers.end(); ++iter)
+	{
+		if (iter->type != typePeer)
+			continue;
+
+		pTrans = (TcpTransfering *)iter->pProc;
+
+		pTrans->send(str.data(), str.size());
+	}
 }
 
 bool GwMsgDispatching::disconnectRequestedCheck(TcpTransfering *pTrans)

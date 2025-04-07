@@ -30,6 +30,7 @@
 #endif
 
 #include "LibUart.h"
+#include "LibFilesys.h"
 
 using namespace std;
 
@@ -160,6 +161,15 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 	return uartSend(refUart, &ch, sizeof(ch));
 }
 
+static int errGet()
+{
+#ifdef _WIN32
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
+}
+
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 {
 	if (!lenReq)
@@ -187,7 +197,30 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 	if (refUart == RefDeviceUartInvalid)
 		return -1;
 
-	return read(refUart, pBuf, lenReq);
+	ssize_t lenRead = read(refUart, pBuf, lenReq);
+#if defined(__unix__)
+	if (!lenRead)
+		return -2;
+#endif
+	if (lenRead < 0)
+	{
+		int numErr = errGet();
+#ifdef _WIN32
+		if (numErr == WSAEWOULDBLOCK || numErr == WSAEINPROGRESS)
+			return 0; // std case and ok
+
+		if (numErr == WSAECONNRESET)
+			return -2;
+#else
+		if (numErr == EWOULDBLOCK || numErr == EINPROGRESS || numErr == EAGAIN)
+			return 0; // std case and ok
+
+		if (numErr == ECONNRESET)
+			return -2;
+#endif
+	}
+
+	return lenRead;
 }
 
 ssize_t uartVirtRcv(RefDeviceUart refUart, const void *pBuf, size_t lenReq)

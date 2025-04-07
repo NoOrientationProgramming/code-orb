@@ -40,7 +40,7 @@ enum RemotePeerType {
 
 struct RemoteDebuggingPeer
 {
-	enum RemotePeerType type;
+	RemotePeerType type;
 	std::string typeDesc;
 	Processing *pProc;
 };
@@ -72,10 +72,14 @@ private:
 
 	/* member functions */
 	Success process();
+	Success shutdown();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	void stateOnlineCheckAndPrint();
 	bool listenersStart();
 	void peerListUpdate();
+	void contentDistribute();
+	void contentSend(const std::string &str, RemotePeerType typePeer);
 	bool disconnectRequestedCheck(TcpTransfering *pTrans);
 	void peerCheck();
 	void peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc);
@@ -88,6 +92,9 @@ private:
 	TcpListening *mpLstLog;
 	TcpListening *mpLstCmd;
 	SingleWireControlling *mpCtrl;
+	bool mCursorHidden;
+	bool mDevUartIsOnline;
+	bool mTargetIsOnline;
 	std::list<struct RemoteDebuggingPeer> mListPeers;
 
 	/* static functions */
