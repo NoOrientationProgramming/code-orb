@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	AppHelpOutput aho;
 	cmd.setOutput(&aho);
 
-	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 3, "int");
+	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 0, "int");
 	cmd.add(argVerbosity);
 	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
 	cmd.add(argCoreDump);
