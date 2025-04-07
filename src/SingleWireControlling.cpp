@@ -48,7 +48,7 @@ dProcessStateStr(ProcState);
 #endif
 
 #define dForEach_SwtState(gen) \
-		gen(StSwtMain) \
+		gen(StSwtContentRcvWait) \
 		gen(StSwtDataReceive) \
 
 #define dGenSwtStateEnum(s) s,
@@ -88,12 +88,13 @@ enum SwtContentEnd
 
 #define dTimeoutTargetInitMs	50
 const size_t cSizeFragmentMax = 4095;
+const uint8_t cEscapeByteString = 0x1B;
 
 static uint8_t uartVirtualTimeout = 0;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
-	, mStateSwt(StSwtMain)
+	, mStateSwt(StSwtContentRcvWait)
 	, mStartMs(0)
 	, mRefUart(RefDeviceUartInvalid)
 	, mDevUartIsOnline(false)
@@ -190,8 +191,16 @@ Success SingleWireControlling::process()
 			mState = StTargetInit;
 			break;
 		}
+#if 0
+		procWrnLog("content received: %02X > '%s'",
+						mResp.idContent,
+						mResp.content.c_str());
+#endif
+		if (mResp.idContent != ContentCmd)
+			break;
 
-		hexDump(mBufRcv, mLenDone);
+		if (mResp.content != "Debug 1")
+			break;
 
 		mTargetIsOnline = true;
 
@@ -233,23 +242,22 @@ void SingleWireControlling::dataRequest()
 
 Success SingleWireControlling::dataReceive()
 {
+	if (mLenDone > 0)
+		mStartMs = millis();
+
 	uint32_t curTimeMs = millis();
 	uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
 
-	if (mLenDone > 0)
-		mStartMs = millis();
-
-	for (; mLenDone > 0; --mLenDone, ++mpBuf)
+	while (mLenDone > 0)
 	{
-		success = byteProcess(*mpBuf);
-		if (success == Pending)
-			continue;
+		success = byteProcess((uint8_t)*mpBuf);
 
-		if (success != Positive)
-			return SwtErrRcvProtocol;
+		++mpBuf;
+		--mLenDone;
 
-		return Positive;
+		if (success == Positive)
+			return Positive;
 	}
 
 	if (!uartVirtual && diffMs > dTimeoutTargetInitMs)
@@ -272,37 +280,46 @@ Success SingleWireControlling::dataReceive()
 	return Pending;
 }
 
-Success SingleWireControlling::byteProcess(char ch)
+Success SingleWireControlling::byteProcess(uint8_t ch)
 {
-	(void)ch;
+	procInfLog("Received byte: 0x%02X '%c'", ch, ch);
 
 	switch (mStateSwt)
 	{
-	case StSwtMain:
+	case StSwtContentRcvWait:
 
-		procInfLog("Received byte: 0x%02X '%c'", (uint8_t)ch, ch);
+		if (ch < ContentProc || ch > ContentCmd)
+			break;
 
-		//mStateSwt = StSwtDataReceive;
+		mContentCurrent = ch;
+
+		mStateSwt = StSwtDataReceive;
 
 		break;
 	case StSwtDataReceive:
-#if 0
-		if (*pBuf >= ContentLog && *pBuf <= ContentProc)
-		{
-			mContentCurrent = *pBuf;
 
-			++pBuf;
-			--mLenDone;
+		if (ch == ContentCut)
+		{
+			mStateSwt = StSwtContentRcvWait;
+			break;
 		}
 
-		if (*pEnd == ContentEnd)
+		if (ch == ContentEnd)
 		{
-			fragmentFinish(pBuf, mLenDone);
+			fragmentFinish(mContentCurrent);
+			mStateSwt = StSwtContentRcvWait;
 			return Positive;
 		}
 
-		fragmentAppend(pBuf, mLenDone);
-#endif
+		if (!isprint(ch) && ch != cEscapeByteString)
+		{
+			fragmentDelete(mContentCurrent);
+			mStateSwt = StSwtContentRcvWait;
+			return SwtErrRcvProtocol;
+		}
+
+		fragmentAppend(mContentCurrent, ch);
+
 		break;
 	default:
 		break;
@@ -320,42 +337,52 @@ Success SingleWireControlling::shutdown()
 	return Positive;
 }
 
-void SingleWireControlling::fragmentAppend(const char *pBuf, size_t len)
+void SingleWireControlling::fragmentAppend(uint8_t idContent, uint8_t ch)
 {
+	if (!ch)
+		return;
+
 	bool fragmentFound =
-			mFragments.find(mContentCurrent) != mFragments.end();
+			mFragments.find(idContent) != mFragments.end();
 
 	if (!fragmentFound)
 	{
-		mFragments[mContentCurrent] = string(pBuf, len);
+		mFragments[idContent] = string(1, ch);
 		return;
 	}
 
-	string &str = mFragments[mContentCurrent];
+	string &str = mFragments[idContent];
 
 	if (str.size() > cSizeFragmentMax)
 		return;
 
-	mFragments[mContentCurrent] += string(pBuf, len);
+	mFragments[idContent] += string(1, ch);
 }
 
-void SingleWireControlling::fragmentFinish(const char *pBuf, size_t len)
+void SingleWireControlling::fragmentFinish(uint8_t idContent)
 {
 	bool fragmentFound =
-			mFragments.find(mContentCurrent) != mFragments.end();
+			mFragments.find(idContent) != mFragments.end();
 
-	mResp.idContent = mContentCurrent;
-	mResp.content = "";
+	if (!fragmentFound)
+		return;
 
-	if (fragmentFound)
-	{
-		mResp.content = mFragments[mContentCurrent];
-		mFragments.erase(mContentCurrent);
-	};
+	mResp.idContent = idContent;
+	mResp.content = mFragments[idContent];
 
-	mResp.content += string(pBuf, len);
-
+	mFragments.erase(idContent);
 	mContentCurrent = ContentNone;
+}
+
+void SingleWireControlling::fragmentDelete(uint8_t idContent)
+{
+	bool fragmentFound =
+			mFragments.find(idContent) != mFragments.end();
+
+	if (!fragmentFound)
+		return;
+
+	mFragments.erase(idContent);
 }
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
@@ -373,6 +400,20 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			env.deviceUart.c_str(),
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
+
+	dInfo("Fragments\n");
+
+	if (!mFragments.size())
+	{
+		dInfo("  None\n");
+		return;
+	}
+
+	map<int, string>::iterator iter;
+
+	iter = mFragments.begin();
+	for (; iter != mFragments.end(); ++iter)
+		dInfo("  %02X > '%s'\n", iter->first, iter->second.c_str());
 }
 
 /* static functions */
@@ -479,6 +520,8 @@ void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd,
 	if (str == "proc")    str = "A1";
 	if (str == "log")     str = "A2";
 	if (str == "cmd")     str = "A3";
+	if (str == "cut")     str = "0F";
+	if (str == "end")     str = "17";
 
 	vector<char> vData = toHex(str);
 	pFctSend(RefDeviceUartInvalid, vData.data(), vData.size());

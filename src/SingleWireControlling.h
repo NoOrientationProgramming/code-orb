@@ -80,9 +80,10 @@ private:
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
 	Success dataReceive();
-	Success byteProcess(char ch);
-	void fragmentAppend(const char *pBuf, size_t len);
-	void fragmentFinish(const char *pBuf, size_t len);
+	Success byteProcess(uint8_t ch);
+	void fragmentAppend(uint8_t idContent, uint8_t ch);
+	void fragmentFinish(uint8_t idContent);
+	void fragmentDelete(uint8_t idContent);
 
 	/* member variables */
 	uint32_t mStateSwt;
