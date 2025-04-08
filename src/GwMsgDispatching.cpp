@@ -50,6 +50,10 @@ using namespace std;
 #define dOnline  dColorGreen  "Online" dColorClear
 #define dOffline dColorOrange "Offline" dColorClear
 
+#define dCursorHide "\033[?25l"
+#define dCursorShow "\033[?25h"
+#define dScreenClear "\033[2J\033[H"
+
 typedef list<struct RemoteDebuggingPeer>::iterator PeerIter;
 
 const string cSeqCtrlC = "\xff\xf4\xff\xfd\x06";
@@ -101,7 +105,7 @@ Success GwMsgDispatching::process()
 #endif
 		if (!env.verbosity)
 		{
-			fprintf(stdout, "\033[?25l");
+			fprintf(stdout, dCursorHide);
 			fflush(stdout);
 			mCursorHidden = true;
 
@@ -134,7 +138,7 @@ Success GwMsgDispatching::shutdown()
 {
 	if (mCursorHidden)
 	{
-		fprintf(stdout, "\033[?25h");
+		fprintf(stdout, dCursorShow);
 		fflush(stdout);
 		mCursorHidden = false;
 	}
@@ -209,9 +213,8 @@ void GwMsgDispatching::contentDistribute()
 	// proc tree
 	if (mpCtrl->contentProcChanged())
 	{
-		string str("\033[2J\033[H");
+		string str(dScreenClear);
 		str += mpCtrl->mContentProc;
-
 		contentSend(str, RemotePeerProc);
 	}
 
@@ -359,9 +362,8 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 
 		if (peerType == RemotePeerProc)
 		{
-			string str("\033[2J\033[H");
+			string str(dScreenClear);
 			str += mpCtrl->mContentProc;
-
 			pTrans->send(str.data(), str.size());
 		}
 
