@@ -1,4 +1,4 @@
-![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/gw-dbg-swt?style=plastic)
+![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/codeorb?style=plastic)
 
 In microcontroller programming, simple log outputs are usually the only feedback available.
 With [Processing()](https://github.com/NoOrientationProgramming/ProcessingCore), you get two additional features: a task viewer and a command interface.
@@ -16,7 +16,7 @@ The task viewer provides a detailed insight into the entire system, whereas the 
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/screenshots/Screenshot%20from%202025-04-08%2022-40-02.png" style="width: 700px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/codeorb/main/doc/screenshots/Screenshot%20from%202025-04-08%2022-40-02.png" style="width: 700px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -48,7 +48,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in or
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/codeorb/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -56,7 +56,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in or
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/overview-gw.svg" style="width: 300px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/codeorb/main/doc/system/overview-gw.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -64,7 +64,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in or
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/structure-dbg-internal.svg" style="width: 300px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/codeorb/main/doc/system/structure-dbg-internal.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
 
@@ -72,6 +72,6 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in or
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/gw-dbg-swt/main/doc/system/protocol/B1_swt-ctrl-to-target_cmd_cmd-resp.svg" style="width: 800px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/codeorb/main/doc/system/protocol/B1_swt-ctrl-to-target_cmd_cmd-resp.svg" style="width: 800px; max-width:100%"/>
   </kbd>
 </p>
