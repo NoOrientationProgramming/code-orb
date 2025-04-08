@@ -89,7 +89,7 @@ private:
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
 	Success dataReceive();
-	Success byteProcess(uint8_t ch);
+	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void fragmentAppend(uint8_t idContent, uint8_t ch);
 	void fragmentFinish(uint8_t idContent);
 	void fragmentDelete(uint8_t idContent);
@@ -105,8 +105,8 @@ private:
 	uint8_t mContentCurrent;
 	SingleWireResponse mResp;
 	bool mContentProcChanged;
-	bool mProcBytesSkip;
 	size_t mCntBytesRcvd;
+	uint32_t mLastProcTreeRcvdMs;
 
 	/* static functions */
 

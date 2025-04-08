@@ -87,7 +87,7 @@ enum SwtContentEnd
 	ContentEnd = 0x17,
 };
 
-#define dTimeoutTargetInitMs	50
+#define dTimeoutTargetInitMs	90
 const size_t cSizeFragmentMax = 4095;
 const uint8_t cKeyEscape = 0x1B;
 const uint8_t cKeyTab = '\t';
@@ -110,8 +110,8 @@ SingleWireControlling::SingleWireControlling()
 	, mFragments()
 	, mContentCurrent(ContentNone)
 	, mContentProcChanged(false)
-	, mProcBytesSkip(false)
 	, mCntBytesRcvd(0)
+	, mLastProcTreeRcvdMs(0)
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -263,21 +263,17 @@ Success SingleWireControlling::process()
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
-		if (mResp.idContent == ContentProc)
+		if (mResp.idContent == ContentProc &&
+				mContentProc != mResp.content)
 		{
 			mContentProc = mResp.content;
 			mContentProcChanged = true;
-
-			mState = StNextFlowDetermine;
-			break;
 		}
 
 		if (mResp.idContent == ContentLog)
-		{
 			ppEntriesLog.commit(mResp.content);
-			mState = StNextFlowDetermine;
-			break;
-		}
+
+		mState = StNextFlowDetermine;
 
 		break;
 	case StCtrlManual:
@@ -331,7 +327,7 @@ Success SingleWireControlling::dataReceive()
 
 	while (mLenDone > 0)
 	{
-		success = byteProcess((uint8_t)*mpBuf);
+		success = byteProcess((uint8_t)*mpBuf, curTimeMs);
 
 		++mpBuf;
 		--mLenDone;
@@ -368,8 +364,10 @@ Success SingleWireControlling::dataReceive()
 	return Pending;
 }
 
-Success SingleWireControlling::byteProcess(uint8_t ch)
+Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 {
+	uint32_t diffMs = curTimeMs - mLastProcTreeRcvdMs;
+
 	//procInfLog("Received byte: 0x%02X '%c'", ch, ch);
 
 	++mCntBytesRcvd;
@@ -381,9 +379,13 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 		if (ch < ContentProc || ch > ContentCmd)
 			break;
 
-		// TODO: Flow control for Process Tree
+		if (ch == ContentProc)
+		{
+			if (diffMs < env.rateRefreshMs)
+				break;
 
-		mProcBytesSkip = false;
+			mLastProcTreeRcvdMs = curTimeMs;
+		}
 
 		mContentCurrent = ch;
 
@@ -405,9 +407,6 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 
 			return Positive;
 		}
-
-		if (mProcBytesSkip)
-			break;
 
 		if (!ch)
 			break;
