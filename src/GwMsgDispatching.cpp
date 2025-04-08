@@ -370,7 +370,8 @@ void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
-	dInfo("Number of peers\t\t%zu", mListPeers.size());
+	dInfo("Number of peers\t\t%zu\n", mListPeers.size());
+	dInfo("Refresh rate\t\t%u [ms]\n", env.rateRefreshMs);
 }
 
 /* static functions */
