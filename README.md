@@ -1,5 +1,11 @@
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic)
 
+<p align="center">
+  <kbd>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/src/codeorb.png" style="width: 700px; max-width:100%"/>
+  </kbd>
+</p>
+
 In microcontroller programming, simple log outputs are usually the only feedback available.
 With [Processing()](https://github.com/NoOrientationProgramming/ProcessingCore), you get two additional features: a task viewer and a command interface.
 The task viewer provides a detailed insight into the entire system, whereas the command interface gives full control over the microcontroller.
