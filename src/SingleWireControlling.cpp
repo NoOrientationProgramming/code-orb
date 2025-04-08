@@ -110,6 +110,7 @@ SingleWireControlling::SingleWireControlling()
 	, mFragments()
 	, mContentCurrent(ContentNone)
 	, mContentProcChanged(false)
+	, mProcBytesSkip(false)
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -379,6 +380,8 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 
 		// TODO: Flow control for Process Tree
 
+		mProcBytesSkip = false;
+
 		mContentCurrent = ch;
 
 		mStateSwt = StSwtDataReceive;
@@ -399,6 +402,9 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 
 			return Positive;
 		}
+
+		if (mProcBytesSkip)
+			break;
 
 		if (!ch)
 			break;

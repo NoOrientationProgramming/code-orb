@@ -105,6 +105,7 @@ private:
 	uint8_t mContentCurrent;
 	SingleWireResponse mResp;
 	bool mContentProcChanged;
+	bool mProcBytesSkip;
 
 	/* static functions */
 
