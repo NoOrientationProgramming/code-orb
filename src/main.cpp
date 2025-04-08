@@ -94,6 +94,8 @@ void applicationCloseRequest(int signum)
 
 int main(int argc, char *argv[])
 {
+	int res;
+
 	env.coreDumps = false;
 	env.deviceUart = dDeviceUartDefault;
 
@@ -124,9 +126,11 @@ int main(int argc, char *argv[])
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
 
-	env.rateRefreshMs = argRateRefreshMs.getValue();
-	if (env.rateRefreshMs < 0 || env.rateRefreshMs > cRateRefreshMaxMs)
-		env.rateRefreshMs = cRateRefreshDefaultMs;
+	env.rateRefreshMs = cRateRefreshDefaultMs;
+
+	res = argRateRefreshMs.getValue();
+	if (res > 0 && res <= cRateRefreshMaxMs)
+		env.rateRefreshMs = res;
 #endif
 
 #if defined(__unix__)
@@ -145,10 +149,10 @@ int main(int argc, char *argv[])
 
 	while (1)
 	{
-		for (int i = 0; i < 7; ++i)
+		for (int i = 0; i < 3; ++i)
 			pApp->treeTick();
 
-		this_thread::sleep_for(chrono::milliseconds(20));
+		this_thread::sleep_for(chrono::milliseconds(10));
 
 		if (pApp->progress())
 			continue;
