@@ -17,7 +17,8 @@ The task viewer provides a detailed insight into the entire system, whereas the 
 ## What You Get
 
 - Full control over your target
-- Using three channels
+- Crystal-clear insight into your system
+- Through three dedicated channels
   - Process Tree
   - Log
   - Command Interface
