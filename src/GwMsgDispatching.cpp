@@ -47,7 +47,7 @@ using namespace std;
 #define dColorRed "\033[38;5;196m"
 #define dColorClear "\033[0m"
 
-#define dOnline  dColorGreen  "Online " dColorClear
+#define dOnline  dColorGreen  "Online" dColorClear
 #define dOffline dColorOrange "Offline" dColorClear
 
 typedef list<struct RemoteDebuggingPeer>::iterator PeerIter;
@@ -151,7 +151,7 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 	mDevUartIsOnline = mpCtrl->mDevUartIsOnline;
 	mTargetIsOnline = mpCtrl->mTargetIsOnline;
 
-	fprintf(stdout, "\rUART [ %s ], Target [ %s ]",
+	fprintf(stdout, "\rUART [ %s ] - Target [ %s ]  ",
 		mDevUartIsOnline ? dOnline : dOffline,
 		mTargetIsOnline ? dOnline : dOffline);
 
