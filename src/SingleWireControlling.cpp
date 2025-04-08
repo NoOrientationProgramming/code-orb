@@ -87,7 +87,7 @@ enum SwtContentEnd
 	ContentEnd = 0x17,
 };
 
-#define dTimeoutTargetInitMs	1500
+#define dTimeoutTargetInitMs	50
 const size_t cSizeFragmentMax = 4095;
 const uint8_t cKeyEscape = 0x1B;
 const uint8_t cKeyTab = '\t';
