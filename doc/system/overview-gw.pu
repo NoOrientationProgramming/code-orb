@@ -10,7 +10,7 @@ rectangle "Your Tools" as gTools {
 	frame "Command" as pCmd
 }
 
-frame "SingleWireTransfering()\nGateway" as pGw {
+frame "CodeOrb" as pGw {
 
 	frame "<<SingleWireControlling()>>" as pSwc
 	frame "<<TcpListening()>>" as pTcp

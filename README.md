@@ -44,7 +44,7 @@ TODO: Screenshot
 
 ### Overall Debugging Structure
 
-This repository provides the `SingleWireTransfering() Gateway` highlighted in orange. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
+This repository provides `CodeOrb` the microcontroller debugger highlighted in orange. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
 
 <p align="center">
   <kbd>
@@ -52,7 +52,7 @@ This repository provides the `SingleWireTransfering() Gateway` highlighted in or
   </kbd>
 </p>
 
-### Overview of the Gateway
+### Overview of CodeOrb
 
 <p align="center">
   <kbd>

@@ -17,7 +17,7 @@ component PC as pPc {
 		' frame "Custom\nChannels" as pCustom
 	}
 
-	frame "SingleWireTransfering()\nGateway" as pGw #orange
+	frame "CodeOrb" as pGw #orange
 	frame "STMicroelectronics\nSoftware" as pStSw
 
 	frame "ST-Link Driver" as pDrv
