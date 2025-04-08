@@ -28,6 +28,7 @@ struct Environment
 	bool coreDumps;
 	uint8_t ctrlManual;
 	std::string deviceUart;
+	int rateRefreshMs;
 };
 
 extern Environment env;

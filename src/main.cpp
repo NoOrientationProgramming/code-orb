@@ -58,6 +58,9 @@ using namespace TCLAP;
 #define dDeviceUartDefault	""
 #endif
 
+const int cRateRefreshDefaultMs = 500;
+const int cRateRefreshMaxMs = 20000;
+
 Environment env;
 GwSupervising *pApp = NULL;
 
@@ -109,6 +112,8 @@ int main(int argc, char *argv[])
 	cmd.add(argCtrlManual);
 	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault, false, dDeviceUartDefault, "string");
 	cmd.add(argDevUart);
+	ValueArg<int> argRateRefreshMs("", "refresh-rate", "Refresh rate of process tree", false, cRateRefreshDefaultMs, "uint");
+	cmd.add(argRateRefreshMs);
 
 	cmd.parse(argc, argv);
 
@@ -118,6 +123,10 @@ int main(int argc, char *argv[])
 	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
+
+	env.rateRefreshMs = argRateRefreshMs.getValue();
+	if (env.rateRefreshMs < 0 || env.rateRefreshMs > cRateRefreshMaxMs)
+		env.rateRefreshMs = cRateRefreshDefaultMs;
 #endif
 
 #if defined(__unix__)
