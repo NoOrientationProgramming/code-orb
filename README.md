@@ -1,6 +1,8 @@
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/gw-dbg-swt?style=plastic)
 
-Gateway for SingleWireTransfering()
+In microcontroller programming, simple log outputs are usually the only feedback available.
+With [Processing()](https://github.com/NoOrientationProgramming/ProcessingCore), you get two additional features: a task viewer and a command interface.
+The task viewer provides a detailed insight into the entire system, whereas the command interface gives full control over the microcontroller.
 
 ## What You Get
 
