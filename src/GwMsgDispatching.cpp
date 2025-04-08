@@ -323,7 +323,7 @@ void GwMsgDispatching::peerCheck()
 void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc)
 {
 	PipeEntry<SOCKET> peerFd;
-	Processing *pProc = NULL;
+	TcpTransfering *pTrans;
 	struct RemoteDebuggingPeer peer;
 
 	while (1)
@@ -333,33 +333,43 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 
 		if (peerType == RemotePeerCmd)
 		{
-			pProc = RemoteCommanding::create(peerFd.particle);
-			if (!pProc)
+			RemoteCommanding *pCmd;
+
+			pCmd = RemoteCommanding::create(peerFd.particle);
+			if (!pCmd)
 			{
 				procErrLog(-1, "could not create process");
 				continue;
 			}
 
-			whenFinishedRepel(start(pProc));
+			whenFinishedRepel(start(pCmd));
 
 			continue;
 		}
 
-		pProc = TcpTransfering::create(peerFd.particle);
-		if (!pProc)
+		pTrans = TcpTransfering::create(peerFd.particle);
+		if (!pTrans)
 		{
 			procErrLog(-1, "could not create process");
 			continue;
 		}
 
-		pProc->procTreeDisplaySet(false);
-		start(pProc);
+		pTrans->procTreeDisplaySet(false);
+		start(pTrans);
 
-		procDbgLog("adding %s peer. process: %p", pTypeDesc, pProc);
+		if (peerType == RemotePeerProc)
+		{
+			string str("\033[2J\033[H");
+			str += mpCtrl->mContentProc;
+
+			pTrans->send(str.data(), str.size());
+		}
+
+		procDbgLog("adding %s peer. process: %p", pTypeDesc, pTrans);
 
 		peer.type = peerType;
 		peer.typeDesc = pTypeDesc;
-		peer.pProc = pProc;
+		peer.pProc = pTrans;
 
 		mListPeers.push_back(peer);
 	}
