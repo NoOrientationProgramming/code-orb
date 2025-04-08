@@ -6,8 +6,11 @@
   </kbd>
 </p>
 
-In microcontroller programming, simple log outputs are usually the only feedback available.
-With [Processing()](https://github.com/NoOrientationProgramming/ProcessingCore), you get two additional features: a task viewer and a command interface.
+## The Microcontroller Debugger
+
+When working with small targets, simple log outputs are often the only feedback available.
+With CodeOrb and [Processing()](https://github.com/NoOrientationProgramming/ProcessingCore) on the target,
+you get two additional features: a task viewer and a command interface.
 The task viewer provides a detailed insight into the entire system, whereas the command interface gives full control over the microcontroller.
 
 ## What You Get
