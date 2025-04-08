@@ -1,6 +1,6 @@
 
 project(
-	'Gateway for SingleWireTransfering()',
+	'CodeOrb - Microcontroller Debugging',
 	'cpp',
 )
 
@@ -30,7 +30,7 @@ srcs = [
 
 args = [
 	'-DdPackageName="' + meson.project_name() + '"',
-	'-DdAppName="gw-dbg-swt"',
+	'-DdAppName="CodeOrb"',
 	'-DCONFIG_PROC_HAVE_LOG=1',
 	'-DCONFIG_CMD_SIZE_BUFFER_OUT=2048',
 ]
@@ -94,7 +94,7 @@ endif
 # Application
 
 myApp = executable(
-	'gw-dbg-swt',
+	'codeorb',
 	[
 		srcs,
 	],
