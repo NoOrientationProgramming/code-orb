@@ -11,6 +11,6 @@ ninja && \
 
 valgrind \
 	--tool=massif \
-./gw-dbg-swt \
+./codeorb \
 	$@
 

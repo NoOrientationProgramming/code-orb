@@ -11,6 +11,6 @@ ninja && \
 valgrind \
 	--tool=memcheck \
 	--track-origins=yes \
-./gw-dbg-swt \
+./codeorb \
 	$@
 

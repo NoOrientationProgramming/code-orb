@@ -15,6 +15,6 @@ valgrind \
 	--leak-check=full \
 	--show-leak-kinds=all \
 	--suppressions=${dRelTargetToTool}/valgrind_suppressions.txt \
-./gw-dbg-swt \
+./codeorb \
 	$@
 

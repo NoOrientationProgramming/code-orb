@@ -11,6 +11,6 @@ ninja && \
 
 valgrind \
 	--tool=callgrind \
-./gw-dbg-swt \
+./codeorb \
 	--verbosity 0
 

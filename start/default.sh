@@ -8,6 +8,6 @@ dRelHereToTarget="$(realpath --relative-to=$dHere $dTarget)"
 cd "${dRelHereToTarget}" && \
 ninja && \
 
-./gw-dbg-swt \
+./codeorb \
 	$@
 
