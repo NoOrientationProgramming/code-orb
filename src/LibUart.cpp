@@ -30,7 +30,6 @@
 #endif
 
 #include "LibUart.h"
-#include "LibFilesys.h"
 
 using namespace std;
 
