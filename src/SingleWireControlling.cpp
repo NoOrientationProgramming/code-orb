@@ -111,6 +111,7 @@ SingleWireControlling::SingleWireControlling()
 	, mContentCurrent(ContentNone)
 	, mContentProcChanged(false)
 	, mProcBytesSkip(false)
+	, mCntBytesRcvd(0)
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -371,6 +372,8 @@ Success SingleWireControlling::byteProcess(uint8_t ch)
 {
 	//procInfLog("Received byte: 0x%02X '%c'", ch, ch);
 
+	++mCntBytesRcvd;
+
 	switch (mStateSwt)
 	{
 	case StSwtContentRcvWait:
@@ -507,6 +510,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			env.deviceUart.c_str(),
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
+	dInfo("Bytes received\t\t%zu\n", mCntBytesRcvd);
 #if 0
 	dInfo("Fragments\n");
 

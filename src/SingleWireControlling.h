@@ -106,6 +106,7 @@ private:
 	SingleWireResponse mResp;
 	bool mContentProcChanged;
 	bool mProcBytesSkip;
+	size_t mCntBytesRcvd;
 
 	/* static functions */
 
