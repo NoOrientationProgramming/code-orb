@@ -46,7 +46,7 @@ TODO: Screenshot
 
 - Pre alpha
 
-## Targets
+## Running On
 
 - Linux
 - Windows
