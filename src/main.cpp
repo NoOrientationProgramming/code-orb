@@ -59,6 +59,7 @@ using namespace TCLAP;
 #endif
 
 const int cRateRefreshDefaultMs = 500;
+const int cRateRefreshMinMs = 10;
 const int cRateRefreshMaxMs = 20000;
 
 Environment env;
@@ -96,8 +97,12 @@ int main(int argc, char *argv[])
 {
 	int res;
 
+	env.verbosity = 0;
 	env.coreDumps = false;
+
+	env.ctrlManual = 0;
 	env.deviceUart = dDeviceUartDefault;
+	env.rateRefreshMs = cRateRefreshDefaultMs;
 
 #if GW_HAS_TCLAP
 	CmdLine cmd("Command description message", ' ', appVersion());
@@ -126,10 +131,9 @@ int main(int argc, char *argv[])
 	env.coreDumps = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
 
-	env.rateRefreshMs = cRateRefreshDefaultMs;
-
 	res = argRateRefreshMs.getValue();
-	if (res > 0 && res <= cRateRefreshMaxMs)
+	if (res > cRateRefreshMinMs &&
+			res <= cRateRefreshMaxMs)
 		env.rateRefreshMs = res;
 #endif
 
