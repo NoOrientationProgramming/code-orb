@@ -103,6 +103,14 @@ Success GwMsgDispatching::process()
 #else
 		start(mpCtrl, DrivenByNewInternalDriver);
 #endif
+
+		fprintf(stdout, "CodeOrb-25.04-1\n");
+		fprintf(stdout, "Using device %s\n", env.deviceUart.c_str());
+		fprintf(stdout, "Listening on ports: 2000, 2002, 2004, 3000, 3002, 3004\n");
+
+		if (env.ctrlManual)
+			fprintf(stdout, "Manual control enabled\n");
+
 		if (!env.verbosity)
 		{
 			fprintf(stdout, dCursorHide);
