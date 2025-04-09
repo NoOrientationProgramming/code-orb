@@ -26,6 +26,8 @@
 #include "GwSupervising.h"
 #include "SystemDebugging.h"
 
+#include "env.h"
+
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
 		gen(StMain) \
@@ -39,9 +41,6 @@ dProcessStateStr(ProcState);
 #endif
 
 using namespace std;
-
-const uint16_t cPortStartDefault = 3000;
-const uint16_t cPortOffsetGwDbgSwt = 20;
 
 GwSupervising::GwSupervising()
 	: Processing("GwSupervising")
@@ -95,7 +94,7 @@ bool GwSupervising::servicesStart()
 	}
 
 	pDbg->listenLocalSet();
-	pDbg->portStartSet(cPortStartDefault - cPortOffsetGwDbgSwt);
+	pDbg->portStartSet(env.startPortsOrb);
 
 	pDbg->procTreeDisplaySet(false);
 	start(pDbg);
