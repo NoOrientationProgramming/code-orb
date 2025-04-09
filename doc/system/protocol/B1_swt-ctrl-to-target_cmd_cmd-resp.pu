@@ -50,7 +50,7 @@ ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "A0"
+tar is "15"
 
 @+20
 tar is {-}
