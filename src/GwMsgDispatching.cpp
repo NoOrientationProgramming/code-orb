@@ -83,7 +83,6 @@ Success GwMsgDispatching::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	//Success success;
-	uint16_t p;
 	bool ok;
 #if 0
 	dStateTrace;
@@ -91,6 +90,8 @@ Success GwMsgDispatching::process()
 	switch (mState)
 	{
 	case StStart:
+
+		mPortStart = env.startPortsTarget;
 
 		ok = listenersStart();
 		if (!ok)
@@ -107,9 +108,10 @@ Success GwMsgDispatching::process()
 		fprintf(stdout, "CodeOrb-25.04-1\n");
 		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
 
-		p = env.startPortsTarget;
 		fprintf(stdout, "Listening on: %u, %u, %u\n",
-								p, p + 2, p + 4);
+								mPortStart,
+								mPortStart + 2,
+								mPortStart + 4);
 
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");
