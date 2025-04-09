@@ -83,6 +83,7 @@ Success GwMsgDispatching::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	//Success success;
+	uint16_t p;
 	bool ok;
 #if 0
 	dStateTrace;
@@ -103,10 +104,12 @@ Success GwMsgDispatching::process()
 #else
 		start(mpCtrl, DrivenByNewInternalDriver);
 #endif
-
 		fprintf(stdout, "CodeOrb-25.04-1\n");
-		fprintf(stdout, "Using device %s\n", env.deviceUart.c_str());
-		fprintf(stdout, "Listening on ports: 2000, 2002, 2004, 3000, 3002, 3004\n");
+		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
+
+		p = env.startPortsTarget;
+		fprintf(stdout, "Listening on: %u, %u, %u\n",
+								p, p + 2, p + 4);
 
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");

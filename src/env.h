@@ -29,6 +29,8 @@ struct Environment
 	uint8_t ctrlManual;
 	std::string deviceUart;
 	uint32_t rateRefreshMs;
+	uint16_t startPortsOrb;
+	uint16_t startPortsTarget;
 };
 
 extern Environment env;

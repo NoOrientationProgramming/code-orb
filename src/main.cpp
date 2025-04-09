@@ -61,6 +61,9 @@ using namespace TCLAP;
 const int cRateRefreshDefaultMs = 500;
 const int cRateRefreshMinMs = 10;
 const int cRateRefreshMaxMs = 20000;
+#define dStartPortsOrbDefault "2000"
+#define dStartPortsTargetDefault "3000"
+const int cPortMax = 64000;
 
 Environment env;
 GwSupervising *pApp = NULL;
@@ -104,27 +107,42 @@ int main(int argc, char *argv[])
 	env.deviceUart = dDeviceUartDefault;
 	env.rateRefreshMs = cRateRefreshDefaultMs;
 
+	env.startPortsOrb = stoi(dStartPortsOrbDefault);
+	env.startPortsTarget = stoi(dStartPortsTargetDefault);
+
 #if GW_HAS_TCLAP
 	CmdLine cmd("Command description message", ' ', appVersion());
 
 	AppHelpOutput aho;
 	cmd.setOutput(&aho);
 
-	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 0, "int");
+	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 0, "uint8");
 	cmd.add(argVerbosity);
 	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
 	cmd.add(argCoreDump);
 
 	SwitchArg argCtrlManual("", "ctrl-manual", "Use manual control (automatic control disabled)", false);
 	cmd.add(argCtrlManual);
-	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault, false, dDeviceUartDefault, "string");
+	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault,
+								false, env.deviceUart, "string");
 	cmd.add(argDevUart);
-	ValueArg<int> argRateRefreshMs("", "refresh-rate", "Refresh rate of process tree", false, cRateRefreshDefaultMs, "uint");
+	ValueArg<int> argRateRefreshMs("", "refresh-rate", "Refresh rate of process tree in [ms]",
+								false, env.rateRefreshMs, "uint16");
 	cmd.add(argRateRefreshMs);
+
+	ValueArg<int> argStartPortOrb("", "start-ports-orb", "Start of 3-port interface for CodeOrb. Default: " dStartPortsOrbDefault,
+								false, env.startPortsOrb, "uint16");
+	cmd.add(argStartPortOrb);
+	ValueArg<int> argStartPortTarget("", "start-ports-target", "Start of 3-port interface for the target. Default: " dStartPortsTargetDefault,
+								false, env.startPortsTarget, "uint16");
+	cmd.add(argStartPortTarget);
 
 	cmd.parse(argc, argv);
 
-	env.verbosity = argVerbosity.getValue();
+	res = argVerbosity.getValue();
+	if (res > 0 && res < 6)
+		env.verbosity = res;
+
 	levelLogSet(env.verbosity);
 
 	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
@@ -135,6 +153,14 @@ int main(int argc, char *argv[])
 	if (res > cRateRefreshMinMs &&
 			res <= cRateRefreshMaxMs)
 		env.rateRefreshMs = res;
+
+	res = argStartPortOrb.getValue();
+	if (res > 0 && res <= cPortMax)
+		env.startPortsOrb = res;
+
+	res = argStartPortTarget.getValue();
+	if (res > 0 && res <= cPortMax)
+		env.startPortsTarget = res;
 #endif
 
 #if defined(__unix__)
