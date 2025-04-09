@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < 3; ++i)
 			pApp->treeTick();
 
-		this_thread::sleep_for(chrono::milliseconds(10));
+		this_thread::sleep_for(chrono::milliseconds(15));
 
 		if (pApp->progress())
 			continue;
