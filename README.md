@@ -5,7 +5,7 @@
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/src/codeorb.png" style="width: 700px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/codeorb.png" style="width: 700px; max-width:100%"/>
   </kbd>
 </p>
 
