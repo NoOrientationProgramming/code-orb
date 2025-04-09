@@ -261,9 +261,14 @@ Success SingleWireControlling::process()
 			break;
 		}
 #if 0
-		procWrnLog("content received: %02X > '%s'",
-						mResp.idContent,
-						mResp.content.c_str());
+		if (mResp.idContent != ContentNone)
+		{
+			procWrnLog("content received: %02X",
+						mResp.idContent);
+#if 0
+			procWrnLog("'%s'", mResp.content.c_str());
+#endif
+		}
 #endif
 		if (mResp.idContent == ContentProc &&
 				mContentProc != mResp.content)
@@ -376,7 +381,7 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 {
 	uint32_t diffMs = curTimeMs - mLastProcTreeRcvdMs;
 #if 0
-	procInfLog("Received byte in %s: 0x%02X '%c'",
+	procInfLog("received byte in %s: 0x%02X '%c'",
 				SwtStateString[mStateSwt], ch, ch);
 #endif
 	++mCntBytesRcvd;
@@ -387,8 +392,12 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 
 		if (ch == ContentNone)
 		{
+			//procWrnLog("received ContentNone");
 			mContentCurrent = ch;
+
 			mResp.idContent = ch;
+			mResp.content = "";
+
 			return Positive;
 		}
 
