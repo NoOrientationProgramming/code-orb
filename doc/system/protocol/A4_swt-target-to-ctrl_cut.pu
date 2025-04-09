@@ -15,11 +15,11 @@ ctrl is {-}
 tar is {-}
 
 @+20
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "A1"
+tar is "11"
 
 @+20
 tar is "Process Tree 1/2" #cyan
@@ -31,11 +31,11 @@ tar is "0F"
 tar is {-}
 
 @+40
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "A2"
+tar is "12"
 
 @+20
 tar is "Log Entry" #lightgreen
@@ -47,11 +47,11 @@ tar is "17"
 tar is {-}
 
 @+40
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "A1"
+tar is "11"
 
 @+20
 tar is "Process Tree 2/2" #cyan
@@ -63,7 +63,7 @@ tar is "17"
 tar is {-}
 
 @+40
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}

@@ -15,11 +15,11 @@ ctrl is {-}
 tar is {-}
 
 @+20
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "A3"
+tar is "13"
 
 @+20
 tar is "Command Response"
@@ -31,7 +31,7 @@ tar is "17"
 tar is {-}
 
 @+20
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}

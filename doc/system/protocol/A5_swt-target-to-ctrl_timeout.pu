@@ -15,13 +15,13 @@ ctrl is {-}
 tar is {-}
 
 @+20
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}
 
 @+80
-ctrl is "F2"
+ctrl is "0C"
 
 @+20
 ctrl is {-}

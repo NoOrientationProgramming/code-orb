@@ -23,13 +23,13 @@ frame "byteProcess()" as pRcv {
 
 sMain -u-> sMain
 
-sMain -u-> sProc : A1
+sMain -u-> sProc : 11
 sMain <-u- sProc
 
-sMain -u-> sLog : A2
+sMain -u-> sLog : 12
 sMain <-u- sLog
 
-sMain -d-> sCmd : A3
+sMain -d-> sCmd : 13
 sMain <-d- sCmd
 
 sProc -r-> sLogSave : 17

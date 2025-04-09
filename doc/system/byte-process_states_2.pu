@@ -24,7 +24,7 @@ sMain --> sMain
 sFrag --> sMain
 sFrag <-- sRcv : 0F
 
-sMain -> sRcv : "\tA1, A2, A3"
+sMain -> sRcv : "\t11, 12, 13"
 
 sMain <-- sSave
 sRcv --> sSave : 17
