@@ -73,6 +73,9 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	// Disable CR to NL translation
 	toNew.c_iflag &= ~ICRNL;
 
+	// Disable flow control
+	toNew.c_iflag &= ~(IXON | IXOFF | IXANY);
+
 	// Disable NL to CR translation
 	toNew.c_oflag &= ~ONLCR;
 
