@@ -111,6 +111,7 @@ SingleWireControlling::SingleWireControlling()
 	, mContentCurrent(ContentNone)
 	, mContentProcChanged(false)
 	, mCntBytesRcvd(0)
+	, mCntContentNoneRcvd(0)
 	, mLastProcTreeRcvdMs(0)
 	, mTargetIsOnlineOld(true)
 	, mContentIgnore(false)
@@ -393,6 +394,8 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 		if (ch == ContentNone)
 		{
 			//procWrnLog("received ContentNone");
+			++mCntContentNoneRcvd;
+
 			mContentCurrent = ch;
 
 			mResp.idContent = ch;
@@ -566,6 +569,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
 	dInfo("Bytes received\t\t%zu\n", mCntBytesRcvd);
+	dInfo("ContentNone received\t%zu", mCntContentNoneRcvd);
 #if 0
 	dInfo("Fragments\n");
 

@@ -108,6 +108,7 @@ private:
 	SingleWireResponse mResp;
 	bool mContentProcChanged;
 	size_t mCntBytesRcvd;
+	size_t mCntContentNoneRcvd;
 	uint32_t mLastProcTreeRcvdMs;
 	bool mTargetIsOnlineOld;
 	bool mContentIgnore;
