@@ -87,7 +87,7 @@ enum SwtContentEnd
 	ContentEnd = 0x17,
 };
 
-#define dTimeoutTargetInitMs	90
+#define dTimeoutTargetInitMs	35
 const size_t cSizeFragmentMax = 4095;
 const uint8_t cKeyEscape = 0x1B;
 const uint8_t cKeyTab = '\t';
@@ -112,6 +112,8 @@ SingleWireControlling::SingleWireControlling()
 	, mContentProcChanged(false)
 	, mCntBytesRcvd(0)
 	, mLastProcTreeRcvdMs(0)
+	, mTargetIsOnlineOld(true)
+	, mContentIgnore(false)
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -156,7 +158,7 @@ Success SingleWireControlling::process()
 		}
 
 		mDevUartIsOnline = false;
-		mTargetIsOnline = false;
+		targetOnlineSet(false);
 
 		mState = StDevUartInit;
 
@@ -180,7 +182,7 @@ Success SingleWireControlling::process()
 		break;
 	case StTargetInit:
 
-		mTargetIsOnline = false;
+		targetOnlineSet(false);
 
 		if (env.ctrlManual)
 		{
@@ -222,7 +224,7 @@ Success SingleWireControlling::process()
 		if (mResp.content != "Debug mode 1")
 			break;
 
-		mTargetIsOnline = true;
+		targetOnlineSet();
 
 		mState = StNextFlowDetermine;
 
@@ -308,12 +310,16 @@ void SingleWireControlling::cmdSend(const string &cmd)
 	uartSend(mRefUart, ContentEnd);
 
 	mStartMs = millis();
+
+	//procWrnLog("cmd sent: %s", cmd.c_str());
 }
 
 void SingleWireControlling::dataRequest()
 {
 	uartSend(mRefUart, FlowTargetToCtrl);
 	mStartMs = millis();
+
+	//procWrnLog("data requested");
 }
 
 Success SingleWireControlling::dataReceive()
@@ -335,6 +341,8 @@ Success SingleWireControlling::dataReceive()
 		if (success == Positive)
 			return Positive;
 	}
+
+	//procInfLog("diff: %u <=> %u", diffMs, dTimeoutTargetInitMs);
 
 	if ((!uartVirtual && diffMs > dTimeoutTargetInitMs) ||
 		(uartVirtual && uartVirtualTimeout))
@@ -367,27 +375,43 @@ Success SingleWireControlling::dataReceive()
 Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 {
 	uint32_t diffMs = curTimeMs - mLastProcTreeRcvdMs;
-
-	//procInfLog("Received byte: 0x%02X '%c'", ch, ch);
-
+#if 0
+	procInfLog("Received byte in %s: 0x%02X '%c'",
+				SwtStateString[mStateSwt], ch, ch);
+#endif
 	++mCntBytesRcvd;
 
 	switch (mStateSwt)
 	{
 	case StSwtContentRcvWait:
 
-		if (ch < ContentProc || ch > ContentCmd)
+		if (ch < ContentNone || ch > ContentCmd)
 			break;
 
-		if (ch == ContentProc)
-		{
-			if (diffMs < env.rateRefreshMs)
-				break;
+		mContentCurrent = ch;
 
-			mLastProcTreeRcvdMs = curTimeMs;
+		if (ch == ContentNone)
+			return Positive;
+
+		mContentIgnore = false;
+
+		if (ch != ContentProc)
+		{
+			mStateSwt = StSwtDataReceive;
+			break;
 		}
 
-		mContentCurrent = ch;
+		// Process Tree filter
+
+		if (diffMs > env.rateRefreshMs)
+		{
+			mLastProcTreeRcvdMs = curTimeMs;
+			mStateSwt = StSwtDataReceive;
+			break;
+		}
+
+		mContentCurrent = ContentNone;
+		mContentIgnore = true;
 
 		mStateSwt = StSwtDataReceive;
 
@@ -402,9 +426,10 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 
 		if (ch == ContentEnd)
 		{
-			fragmentFinish(mContentCurrent);
-			mStateSwt = StSwtContentRcvWait;
+			if (!mContentIgnore)
+				fragmentFinish(mContentCurrent);
 
+			mStateSwt = StSwtContentRcvWait;
 			return Positive;
 		}
 
@@ -417,13 +442,15 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 			ch == cKeyCr ||
 			ch == cKeyLf)
 		{
-			fragmentAppend(mContentCurrent, ch);
+			if (!mContentIgnore)
+				fragmentAppend(mContentCurrent, ch);
 			break;
 		}
 
-		fragmentDelete(mContentCurrent);
-		mStateSwt = StSwtContentRcvWait;
+		if (!mContentIgnore)
+			fragmentDelete(mContentCurrent);
 
+		mStateSwt = StSwtContentRcvWait;
 		return SwtErrRcvProtocol;
 
 		break;
@@ -492,6 +519,22 @@ void SingleWireControlling::fragmentDelete(uint8_t idContent)
 		return;
 
 	mFragments.erase(idContent);
+}
+
+void SingleWireControlling::targetOnlineSet(bool online)
+{
+	if (mTargetIsOnlineOld != online)
+	{
+		if (!online)
+		{
+			mContentProc += "\r\n[Target is offline]\r\n";
+			mContentProcChanged = true;
+		}
+
+		mTargetIsOnlineOld = online;
+	}
+
+	mTargetIsOnline = online;
 }
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)

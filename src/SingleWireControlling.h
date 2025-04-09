@@ -94,6 +94,8 @@ private:
 	void fragmentFinish(uint8_t idContent);
 	void fragmentDelete(uint8_t idContent);
 
+	void targetOnlineSet(bool online = true);
+
 	/* member variables */
 	uint32_t mStateSwt;
 	uint32_t mStartMs;
@@ -107,6 +109,8 @@ private:
 	bool mContentProcChanged;
 	size_t mCntBytesRcvd;
 	uint32_t mLastProcTreeRcvdMs;
+	bool mTargetIsOnlineOld;
+	bool mContentIgnore;
 
 	/* static functions */
 
