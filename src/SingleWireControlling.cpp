@@ -64,19 +64,19 @@ using namespace std;
 
 enum SwtFlowDirection
 {
-	FlowCtrlToTarget = 0xF1,
-	FlowTargetToCtrl
+	FlowCtrlToTarget = 0x0B,
+	FlowTargetToCtrl = 0x0C
 };
 
 enum SwtContentIdOut
 {
-	ContentOutCmd = 0x90,
+	ContentOutCmd = 0x1A,
 };
 
 enum SwtContentId
 {
-	ContentNone = 0xA0,
-	ContentProc,
+	ContentNone = 0x15,
+	ContentProc = 0x11,
 	ContentLog,
 	ContentCmd,
 };
@@ -385,13 +385,17 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 	{
 	case StSwtContentRcvWait:
 
-		if (ch < ContentNone || ch > ContentCmd)
+		if (ch == ContentNone)
+		{
+			mContentCurrent = ch;
+			mResp.idContent = ch;
+			return Positive;
+		}
+
+		if (ch < ContentProc || ch > ContentCmd)
 			break;
 
 		mContentCurrent = ch;
-
-		if (ch == ContentNone)
-			return Positive;
 
 		mContentIgnore = false;
 
@@ -688,13 +692,13 @@ void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd,
 
 	string str = string(pArgs, strlen(pArgs));
 
-	if (str == "flowOut")  str = "F1";
-	if (str == "flowIn")   str = "F2";
-	if (str == "cmdOut")   str = "90";
-	if (str == "none")     str = "A0";
-	if (str == "proc")     str = "A1";
-	if (str == "log")      str = "A2";
-	if (str == "cmd")      str = "A3";
+	if (str == "flowOut")  str = "0B";
+	if (str == "flowIn")   str = "0C";
+	if (str == "cmdOut")   str = "1A";
+	if (str == "none")     str = "15";
+	if (str == "proc")     str = "11";
+	if (str == "log")      str = "12";
+	if (str == "cmd")      str = "13";
 	if (str == "cut")      str = "0F";
 	if (str == "end")      str = "17";
 	if (str == "tab")      str = "09";
