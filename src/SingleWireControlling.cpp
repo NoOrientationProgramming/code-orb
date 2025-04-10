@@ -412,6 +412,9 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 
 		mContentCurrent = ch;
 
+		mResp.idContent = ch;
+		mResp.content = "";
+
 		mContentIgnore = false;
 
 		if (ch != ContentProc)
