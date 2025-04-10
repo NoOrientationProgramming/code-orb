@@ -25,7 +25,7 @@
 struct Environment
 {
 	int verbosity;
-	bool coreDumps;
+	bool coreDump;
 	uint8_t ctrlManual;
 	std::string deviceUart;
 	uint32_t rateRefreshMs;

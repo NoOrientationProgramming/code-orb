@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 	int res;
 
 	env.verbosity = 0;
-	env.coreDumps = false;
+	env.coreDump = false;
 
 	env.ctrlManual = 0;
 	env.deviceUart = dDeviceUartDefault;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 	levelLogSet(env.verbosity);
 
 	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
-	env.coreDumps = argCoreDump.getValue();
+	env.coreDump = argCoreDump.getValue();
 	env.deviceUart = argDevUart.getValue();
 
 	res = argRateRefreshMs.getValue();
