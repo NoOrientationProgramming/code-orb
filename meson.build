@@ -18,12 +18,14 @@ srcs = [
 	'ProcessingCommon/Res.cpp',
 	'ProcessingCommon/LibTime.cpp',
 	'ProcessingCommon/LibDspc.cpp',
+	'ProcessingCommon/KeyUser.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
 	'src/SingleWireControlling.cpp',
 	'src/RemoteCommanding.cpp',
 	'src/LibUart.cpp',
+	'src/TelnetFiltering.cpp',
 ]
 
 # Arguments
