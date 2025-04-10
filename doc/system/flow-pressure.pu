@@ -8,6 +8,7 @@ skinparam FooterFontSize 16
 
 hide time-axis
 
+clock "uC Tick" as clkTick with period 2 pulse 1
 clock "UART" as clkWire with period 10 pulse 1
 clock "uC Process Tree" as clkUc with period 40 pulse 7 offset 41
 
