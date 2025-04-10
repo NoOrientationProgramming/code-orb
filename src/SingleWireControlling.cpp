@@ -36,6 +36,8 @@
 		gen(StDevUartInit) \
 		gen(StTargetInit) \
 		gen(StTargetInitDoneWait) \
+		gen(StInfoHelpRequest) \
+		gen(StInfoHelpRcvdWait) \
 		gen(StNextFlowDetermine) \
 		gen(StContentReceiveWait) \
 		gen(StCtrlManual) \
@@ -98,6 +100,7 @@ static uint8_t uartVirtualTimeout = 0;
 RefDeviceUart refUart;
 
 const size_t cNumRequestsCmdMax = 40;
+const size_t cCntHelpMax = 97;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
@@ -114,6 +117,9 @@ SingleWireControlling::SingleWireControlling()
 	, mContentProcChanged(false)
 	, mCntBytesRcvd(0)
 	, mCntContentNoneRcvd(0)
+	, mHelpSynced(false)
+	, mEntryHelpFirst("")
+	, mCntHelp(0)
 	, mLastProcTreeRcvdMs(0)
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
@@ -136,6 +142,7 @@ Success SingleWireControlling::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -234,7 +241,54 @@ Success SingleWireControlling::process()
 
 		targetOnlineSet();
 
-		mState = StNextFlowDetermine;
+		mHelpSynced = false;
+		mEntryHelpFirst = "";
+		mCntHelp = 0;
+
+		mState = StInfoHelpRequest;
+
+		break;
+	case StInfoHelpRequest:
+
+		cmdSend("infoHelp");
+
+		dataRequest();
+		mState = StInfoHelpRcvdWait;
+
+		break;
+	case StInfoHelpRcvdWait:
+
+		success = dataReceive();
+		if (success == Pending)
+			break;
+
+		if (success == SwtErrRcvNoUart)
+		{
+			mState = StUartInit;
+			break;
+		}
+
+		if (success == SwtErrRcvNoTarget)
+		{
+			mState = StTargetInit;
+			break;
+		}
+#if 0
+		procWrnLog("content received: %02X > '%s'",
+						mResp.idContent,
+						mResp.content.c_str());
+#endif
+		if (mResp.idContent != ContentCmd)
+			break;
+
+		ok = entryHelpAdd(mResp.content);
+		if (!ok)
+		{
+			mState = StNextFlowDetermine;
+			break;
+		}
+
+		mState = StInfoHelpRequest;
 
 		break;
 	case StNextFlowDetermine:
@@ -566,6 +620,41 @@ void SingleWireControlling::targetOnlineSet(bool online)
 
 	mContentProc += "\r\n[Target is offline]\r\n";
 	mContentProcChanged = true;
+}
+
+bool SingleWireControlling::entryHelpAdd(const string &str)
+{
+	if (mCntHelp > cCntHelpMax)
+	{
+		procWrnLog("too many help steps");
+		return false;
+	}
+
+	++mCntHelp;
+
+	if (!mHelpSynced)
+	{
+		if (!str.size())
+			mHelpSynced = true;
+
+		return true;
+	}
+
+	if (!str.size() || str == mEntryHelpFirst)
+		return false;
+
+	const char *pMe = "infoHelp";
+
+	if (!strncmp(str.data(), pMe, strlen(pMe)))
+		return true;
+
+	if (!mEntryHelpFirst.size())
+		mEntryHelpFirst = mResp.content;
+#if 1
+	procWrnLog("help entry received: '%s'",
+					mResp.content.c_str());
+#endif
+	return true;
 }
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)

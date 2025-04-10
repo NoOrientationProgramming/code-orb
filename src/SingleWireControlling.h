@@ -48,6 +48,14 @@ enum SwtErrRcv
 
 typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
 
+struct EntryHelp
+{
+	std::string id;
+	std::string shortcut;
+	std::string desc;
+	std::string group;
+};
+
 struct RequestCommand
 {
 	RequestCommand(std::string c, uint32_t i, uint32_t s)
@@ -111,6 +119,7 @@ private:
 	void fragmentDelete(uint8_t idContent);
 
 	void targetOnlineSet(bool online = true);
+	bool entryHelpAdd(const std::string &str);
 
 	/* member variables */
 	uint32_t mStateSwt;
@@ -125,6 +134,9 @@ private:
 	bool mContentProcChanged;
 	size_t mCntBytesRcvd;
 	size_t mCntContentNoneRcvd;
+	bool mHelpSynced;
+	std::string mEntryHelpFirst;
+	size_t mCntHelp;
 	uint32_t mLastProcTreeRcvdMs;
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;
