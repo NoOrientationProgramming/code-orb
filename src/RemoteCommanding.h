@@ -27,7 +27,7 @@
 #define REMOTE_COMMANDING_H
 
 #include "Processing.h"
-#include "TcpTransfering.h"
+#include "TelnetFiltering.h"
 
 class RemoteCommanding : public Processing
 {
@@ -59,13 +59,13 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	void dataReceive();
+	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 
 	/* member variables */
 	//uint32_t mStartMs;
 	SOCKET mFdSocket;
-	TcpTransfering *mpTrans;
-	bool mDone;
+	TelnetFiltering *mpFilt;
+	uint32_t mIdReq;
 
 	/* static functions */
 

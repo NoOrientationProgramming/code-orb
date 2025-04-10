@@ -24,11 +24,13 @@
 */
 
 #include "RemoteCommanding.h"
+#include "SingleWireControlling.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
+		gen(StSendReadyWait) \
+		gen(StWelcomeSend) \
 		gen(StMain) \
-		gen(StNop) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -40,12 +42,16 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
+			"Remote Terminal\r\n\r\n" \
+			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
+
 RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
 	//, mStartMs(0)
 	, mFdSocket(fd)
-	, mpTrans(NULL)
-	, mDone(false)
+	, mpFilt(NULL)
+	, mIdReq(0)
 {
 	mState = StStart;
 }
@@ -57,6 +63,9 @@ Success RemoteCommanding::process()
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
+	PipeEntry<KeyUser> entKey;
+	KeyUser key;
+	string msg;
 #if 0
 	dStateTrace;
 #endif
@@ -67,42 +76,80 @@ Success RemoteCommanding::process()
 		if (mFdSocket == INVALID_SOCKET)
 			return procErrLog(-1, "socket file descriptor not set");
 
-		mpTrans = TcpTransfering::create(mFdSocket);
-		if (!mpTrans)
+		mpFilt = TelnetFiltering::create(mFdSocket);
+		if (!mpFilt)
 			return procErrLog(-1, "could not create process");
 
-		mpTrans->procTreeDisplaySet(false);
-		start(mpTrans);
+		mpFilt->titleSet("CodeOrb");
+
+		mpFilt->procTreeDisplaySet(false);
+		start(mpFilt);
+
+		mState = StSendReadyWait;
+
+		break;
+	case StSendReadyWait:
+
+		success = mpFilt->success();
+		if (success != Pending)
+			return success;
+
+		if (!mpFilt->mSendReady)
+			break;
+
+		mState = StWelcomeSend;
+
+		break;
+	case StWelcomeSend:
+
+		mpFilt->send(cWelcomeMsg.c_str(), cWelcomeMsg.size());
+		promptSend();
 
 		mState = StMain;
 
 		break;
 	case StMain:
 
-		success = mpTrans->success();
-		if (success != Pending)
-			return success;
-
-		dataReceive();
-
-		if (!mDone)
+		if (mpFilt->ppKeys.get(entKey) < 1)
 			break;
+		key = entKey.particle;
 
-		return Positive;
+		procWrnLog("Got key: %s", key.str().c_str());
 
-		break;
-	case StNop:
+		// TODO: Implement 'Done' on empty string
 
 		break;
 	default:
 		break;
 	}
 
+	if (!msg.size())
+		return Pending;
+
+	mpFilt->send(msg.c_str(), msg.size());
+
 	return Pending;
 }
 
-void RemoteCommanding::dataReceive()
+void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
 {
+	string msg;
+
+	if (preNewLine)
+		msg += "\r\n";
+
+	msg += "\rcore@";
+	msg += "remote";
+	msg += ":";
+	msg += "~"; // directory
+	msg += "# ";
+
+	(void)cursor;
+
+	if (postNewLine)
+		msg += "\r\n";
+
+	mpFilt->send(msg.c_str(), msg.size());
 }
 
 void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
