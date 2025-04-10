@@ -48,6 +48,19 @@ enum SwtErrRcv
 
 typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
 
+struct RequestCommand
+{
+	RequestCommand(std::string c, uint32_t i, uint32_t s)
+		: cmd(std::move(c))
+		, idReq(i)
+		, startMs(s)
+	{}
+
+	std::string cmd;
+	uint32_t idReq;
+	uint32_t startMs;
+};
+
 class SingleWireControlling : public Processing
 {
 
@@ -65,6 +78,9 @@ public:
 	std::string mContentProc;
 
 	Pipe<std::string> ppEntriesLog;
+
+	bool commandRequest(const std::string &cmd, uint32_t &idReq);
+	bool commandResponseGet(uint32_t idReq, const std::string &resp);
 
 protected:
 
@@ -113,6 +129,10 @@ private:
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
+	uint32_t mIdReqCmdNext;
+	std::queue<RequestCommand> mRequestsCmd;
+	uint32_t mIdReqCmdCurrent;
+	std::map<uint32_t, std::string> mResponsesCmd;
 
 	/* static functions */
 

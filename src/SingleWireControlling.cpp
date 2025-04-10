@@ -97,6 +97,8 @@ const uint8_t cKeyLf = '\n';
 static uint8_t uartVirtualTimeout = 0;
 RefDeviceUart refUart;
 
+const size_t cNumRequestsCmdMax = 40;
+
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
 	, mDevUartIsOnline(false)
@@ -116,6 +118,10 @@ SingleWireControlling::SingleWireControlling()
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
 	, mContentIgnore(false)
+	, mIdReqCmdNext(0)
+	, mRequestsCmd()
+	, mIdReqCmdCurrent(0)
+	, mResponsesCmd()
 {
 	mResp.idContent = ContentNone;
 	mResp.content = "";
@@ -597,6 +603,29 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 }
 
 /* static functions */
+
+bool SingleWireControlling::commandRequest(const string &cmd, uint32_t &idReq)
+{
+	// optional mutex
+
+	if (mRequestsCmd.size() > cNumRequestsCmdMax)
+		return false;
+
+	idReq = mIdReqCmdNext;
+	mRequestsCmd.emplace(cmd, idReq, millis());
+
+	++mIdReqCmdNext;
+
+	return true;
+}
+
+bool SingleWireControlling::commandResponseGet(uint32_t idReq, const string &resp)
+{
+	(void)idReq;
+	(void)resp;
+
+	return false;
+}
 
 void SingleWireControlling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
