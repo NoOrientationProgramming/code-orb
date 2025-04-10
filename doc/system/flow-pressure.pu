@@ -1,0 +1,51 @@
+
+@startuml
+
+' skinparam linetype polyline
+
+scale 10 as 60 pixels
+skinparam FooterFontSize 16
+
+hide time-axis
+
+clock "UART" as clkWire with period 10 pulse 1
+clock "uC Process Tree" as clkUc with period 40 pulse 7 offset 41
+
+binary "CodeOrb Command Request" as sCmd
+binary "uC Command Response" as sResp
+binary "TCP/IP" as sTcp
+
+@48
+sTcp is 1
+
+@+5
+sTcp is 0
+
+@51
+sCmd is 1
+
+@+1
+sCmd is 0
+
+@61
+sResp is 1
+
+@+5
+sResp is 0
+sTcp is 1
+
+@+2
+sTcp is 0
+
+@168
+sTcp is 1
+
+@+5
+sTcp is 0
+
+@200
+
+footer **SingleWireControlling()** Flow - Pressure\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
