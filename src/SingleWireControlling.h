@@ -111,6 +111,7 @@ private:
 	size_t mCntContentNoneRcvd;
 	uint32_t mLastProcTreeRcvdMs;
 	bool mTargetIsOnlineOld;
+	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
 
 	/* static functions */

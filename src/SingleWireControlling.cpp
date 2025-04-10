@@ -114,6 +114,7 @@ SingleWireControlling::SingleWireControlling()
 	, mCntContentNoneRcvd(0)
 	, mLastProcTreeRcvdMs(0)
 	, mTargetIsOnlineOld(true)
+	, mTargetIsOfflineMarked(false)
 	, mContentIgnore(false)
 {
 	mResp.idContent = ContentNone;
@@ -274,6 +275,8 @@ Success SingleWireControlling::process()
 		if (mResp.idContent == ContentProc &&
 				mContentProc != mResp.content)
 		{
+			mTargetIsOfflineMarked = false;
+
 			mContentProc = mResp.content;
 			mContentProcChanged = true;
 		}
@@ -539,18 +542,21 @@ void SingleWireControlling::fragmentDelete(uint8_t idContent)
 
 void SingleWireControlling::targetOnlineSet(bool online)
 {
-	if (mTargetIsOnlineOld != online)
-	{
-		if (!online)
-		{
-			mContentProc += "\r\n[Target is offline]\r\n";
-			mContentProcChanged = true;
-		}
-
-		mTargetIsOnlineOld = online;
-	}
-
 	mTargetIsOnline = online;
+
+	if (mTargetIsOnlineOld == mTargetIsOnline)
+		return;
+	mTargetIsOnlineOld = online;
+
+	if (online)
+		return;
+
+	if (mTargetIsOfflineMarked)
+		return;
+	mTargetIsOfflineMarked = true;
+
+	mContentProc += "\r\n[Target is offline]\r\n";
+	mContentProcChanged = true;
 }
 
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
