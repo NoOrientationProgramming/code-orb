@@ -1,0 +1,45 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+rectangle "Your Tools\nLevel: 1" as gTools {
+
+	frame "Process Tree\nLevel: 1.0" as pTree
+	frame "Log\nLevel: 1.0" as pLog
+	frame "Command\nLevel: 1.0" as pCmd
+}
+
+frame "CodeOrb\nLevel: 0" as pGw {
+
+	frame "<<TcpListening()>>\nLevel: 0.2" as pList
+	frame "TcpTransfering()\nLevel: 0.1" as pTrans
+	frame "RemoteCommanding()\nLevel: 0.1" as pCmdRemote
+	frame "InfoGathering()\nLevel: 0.1" as pGather
+	frame "<<SingleWireControlling()>>\nLevel: 0.0" as pSwc
+}
+
+component "Target" as pTarget {
+
+	frame "<<SingleWireTransfering()>>" as pSwt
+}
+
+pTree <-- pTrans
+pLog <-- pTrans
+pCmd <--> pCmdRemote : "TCP/IP"
+
+pList .l.> pTrans
+pList .r.> pCmdRemote
+
+pTrans <-- pSwc
+pCmdRemote <--> pSwc
+
+pCmdRemote <-- pGather
+
+pSwc <--> pSwt : "COM1 or\n/dev/ttyACM0"
+pSwc <-> pGather
+
+footer **Processing()** - Gateway overview and system levels\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
