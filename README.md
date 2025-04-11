@@ -3,6 +3,8 @@
 
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic)
 
+[![Linux Native](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux-native.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux-native.yml) [![Windows Native](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows-native.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows-native.yml) [![MacOS Native](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos-native.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos-native.yml) [![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/arm-and-mingw.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/arm-and-mingw.yml)
+
 <p align="center">
   <kbd>
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/codeorb.png" style="width: 700px; max-width:100%"/>
