@@ -24,20 +24,20 @@
 */
 
 #if defined(__unix__)
-#define GW_HAS_TCLAP	1
+#define CODE_ORB_HAS_TCLAP	1
 #else
-#define GW_HAS_TCLAP	0
+#define CODE_ORB_HAS_TCLAP	0
 #endif
 
 #if defined(__unix__)
 #include <signal.h>
 #endif
 #include <iostream>
-#if GW_HAS_TCLAP
+#if CODE_ORB_HAS_TCLAP
 #include <tclap/CmdLine.h>
 #endif
 
-#if GW_HAS_TCLAP
+#if CODE_ORB_HAS_TCLAP
 #include "TclapOutput.h"
 #endif
 #include "GwSupervising.h"
@@ -46,7 +46,7 @@
 #include "env.h"
 
 using namespace std;
-#if GW_HAS_TCLAP
+#if CODE_ORB_HAS_TCLAP
 using namespace TCLAP;
 #endif
 
@@ -68,7 +68,7 @@ const int cPortMax = 64000;
 Environment env;
 GwSupervising *pApp = NULL;
 
-#if GW_HAS_TCLAP
+#if CODE_ORB_HAS_TCLAP
 class AppHelpOutput : public TclapOutput {};
 #endif
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 	env.startPortsOrb = stoi(dStartPortsOrbDefault);
 	env.startPortsTarget = stoi(dStartPortsTargetDefault);
 
-#if GW_HAS_TCLAP
+#if CODE_ORB_HAS_TCLAP
 	CmdLine cmd("Command description message", ' ', appVersion());
 
 	AppHelpOutput aho;
