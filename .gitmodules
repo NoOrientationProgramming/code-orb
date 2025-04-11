@@ -4,6 +4,3 @@
 [submodule "deps/ProcessingCommon"]
 	path = deps/ProcessingCommon
 	url = https://github.com/NoOrientationProgramming/ProcessingCommon.git
-[submodule "deps/tclap"]
-	path = deps/tclap
-	url = https://github.com/mirror/tclap.git
