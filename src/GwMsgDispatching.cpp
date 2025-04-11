@@ -47,9 +47,6 @@ using namespace std;
 #define dColorRed "\033[38;5;196m"
 #define dColorClear "\033[0m"
 
-#define dOnline  dColorGreen  "Online" dColorClear
-#define dOffline dColorOrange "Offline" dColorClear
-
 #define dCursorHide "\033[?25l"
 #define dCursorShow "\033[?25h"
 #define dScreenClear "\033[2J\033[H"
@@ -117,13 +114,14 @@ Success GwMsgDispatching::process()
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");
 
+#ifndef _WIN32
 		if (!env.verbosity)
 		{
 			fprintf(stdout, dCursorHide);
 			fflush(stdout);
 			mCursorHidden = true;
 		}
-
+#endif
 		stateOnlineCheckAndPrint();
 
 		mState = StTargetOffline;
@@ -186,12 +184,17 @@ Success GwMsgDispatching::process()
 
 Success GwMsgDispatching::shutdown()
 {
+#ifdef _WIN32
+	fprintf(stdout, "\r\n");
+	fflush(stdout);
+#else
 	if (mCursorHidden)
 	{
 		fprintf(stdout, dCursorShow);
 		fflush(stdout);
 		mCursorHidden = false;
 	}
+#endif
 
 	return Positive;
 }
@@ -208,9 +211,11 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 	if (env.verbosity)
 		return;
 
-	fprintf(stdout, "\rUART [ %s ] - Target [ %s ]  ",
-		mDevUartIsOnline ? dOnline : dOffline,
-		mTargetIsOnline ? dOnline : dOffline);
+	fprintf(stdout, "\rUART [ ");
+	onlinePrint(mDevUartIsOnline);
+	fprintf(stdout, " ] - Target [ ");
+	onlinePrint(mTargetIsOnline);
+	fprintf(stdout, " ]  ");
 
 	fflush(stdout);
 }
