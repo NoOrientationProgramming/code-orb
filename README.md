@@ -47,14 +47,7 @@ TODO: Screenshot
 ## Status
 
 - Pre alpha
-
-## Running On
-
-- Linux
-- Windows
-- MacOSX
-- FreeBSD
-- Raspberry Pi
+- ETA: June 2025
 
 ## Architecture
 
