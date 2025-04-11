@@ -28,7 +28,6 @@
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
 		gen(StMain) \
-		gen(StNop) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -66,8 +65,9 @@ Success InfoGathering::process()
 		break;
 	case StMain:
 
-		break;
-	case StNop:
+		procWrnLog("gathered information");
+
+		return Positive;
 
 		break;
 	default:
