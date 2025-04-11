@@ -101,6 +101,7 @@ static void procTreeSave()
 	FILE *pFile;
 	int res;
 	size_t lenReq, lenDone;
+	string strTime;
 
 	if (procTreeSaveInProgress)
 		return;
@@ -122,9 +123,10 @@ static void procTreeSave()
 		true,
 		true);
 
+	strTime = to_string(now);
 	res = snprintf(nameFileProc, sizeof(nameFileProc),
-			"%ld_%s_tree-proc.txt",
-			now,
+			"%s_%s_tree-proc.txt",
+			strTime.c_str(),
 			nameApp);
 	if (res < 0)
 	{
