@@ -4,6 +4,7 @@ project(
 	'cpp',
 )
 
+fs = import('fs')
 cxx = meson.get_compiler('cpp')
 
 # Sources
@@ -90,10 +91,19 @@ endif
 
 deps = []
 deps += dependency('threads')
-deps += dependency('tclap')
 
 if host_machine.system() == 'windows'
 	deps += cxx.find_library('ws2_32')
+endif
+
+if fs.is_dir('deps/tclap_loc')
+	message('submodule tclap found')
+
+	incTclap = include_directories(['deps/tclap_loc/include'], is_system: true)
+	deps += declare_dependency(include_directories: incTclap)
+	args += '-DAPP_HAS_TCLAP=1'
+else
+	warning('submodule tclap not found. Limited CLI options')
 endif
 
 # Application

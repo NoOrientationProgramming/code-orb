@@ -24,9 +24,11 @@
 
 struct Environment
 {
+	bool haveTclap;
 	int verbosity;
 	bool coreDump;
 	uint8_t ctrlManual;
+	std::string codeUart;
 	std::string deviceUart;
 	uint32_t rateRefreshMs;
 	uint16_t startPortsOrb;

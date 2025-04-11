@@ -23,9 +23,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(__unix__)
-#define APP_HAS_TCLAP 1
-#else
+#ifndef APP_HAS_TCLAP
 #define APP_HAS_TCLAP 0
 #endif
 
@@ -50,12 +48,13 @@ using namespace std;
 using namespace TCLAP;
 #endif
 
+#define dCodeUartDefault		"aaaaa"
 #if defined(__unix__)
 #define dDeviceUartDefault	"/dev/ttyACM0"
 #elif defined(_WIN32)
 #define dDeviceUartDefault	"COM1"
 #else
-#define dDeviceUartDefault	""
+#define dDeviceUartDefault	"uart-dev-undef"
 #endif
 
 const int cRateRefreshDefaultMs = 500;
@@ -98,12 +97,12 @@ void applicationCloseRequest(int signum)
 
 int main(int argc, char *argv[])
 {
-	int res;
-
+	env.haveTclap = 1;
 	env.verbosity = 0;
 	env.coreDump = false;
 
 	env.ctrlManual = 0;
+	env.codeUart = dCodeUartDefault;
 	env.deviceUart = dDeviceUartDefault;
 	env.rateRefreshMs = cRateRefreshDefaultMs;
 
@@ -111,6 +110,8 @@ int main(int argc, char *argv[])
 	env.startPortsTarget = stoi(dStartPortsTargetDefault);
 
 #if APP_HAS_TCLAP
+	int res;
+
 	CmdLine cmd("Command description message", ' ', appVersion());
 
 	AppHelpOutput aho;
@@ -123,6 +124,9 @@ int main(int argc, char *argv[])
 
 	SwitchArg argCtrlManual("", "ctrl-manual", "Use manual control (automatic control disabled)", false);
 	cmd.add(argCtrlManual);
+	ValueArg<string> argCodeUart("c", "code", "Code used for UART initialization. Default: " dCodeUartDefault,
+								false, env.codeUart, "string");
+	cmd.add(argCodeUart);
 	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault,
 								false, env.deviceUart, "string");
 	cmd.add(argDevUart);
@@ -147,6 +151,7 @@ int main(int argc, char *argv[])
 
 	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
 	env.coreDump = argCoreDump.getValue();
+	env.codeUart = argCodeUart.getValue();
 	env.deviceUart = argDevUart.getValue();
 
 	res = argRateRefreshMs.getValue();
@@ -161,6 +166,14 @@ int main(int argc, char *argv[])
 	res = argStartPortTarget.getValue();
 	if (res > 0 && res <= cPortMax)
 		env.startPortsTarget = res;
+#else
+	env.haveTclap = 0;
+	env.verbosity = 2;
+
+	if (argc >= 2)
+		env.codeUart = string(argv[1]);
+	if (argc >= 3)
+		env.deviceUart = string(argv[2]);
 #endif
 
 #if defined(__unix__)

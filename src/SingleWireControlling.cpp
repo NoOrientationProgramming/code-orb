@@ -194,7 +194,7 @@ Success SingleWireControlling::process()
 			break;
 		}
 
-		cmdSend("aaaaa");
+		cmdSend(env.codeUart);
 
 		dataRequest();
 		mState = StTargetInitDoneWait;
