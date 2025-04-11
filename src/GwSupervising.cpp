@@ -23,7 +23,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(__unix__)
+#if defined(__linux__)
 #include <unistd.h>
 #include <signal.h>
 #endif
@@ -96,7 +96,7 @@ Success GwSupervising::process()
 	return Pending;
 }
 
-#if defined(__unix__)
+#if defined(__linux__)
 static void procTreeSave()
 {
 	time_t now;
@@ -177,7 +177,7 @@ void coreDumpRequest(int signum)
 
 bool GwSupervising::servicesStart()
 {
-#if defined(__unix__)
+#if defined(__linux__)
 	bool ok;
 
 	if (env.coreDump)
