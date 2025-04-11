@@ -24,6 +24,7 @@
 */
 
 #include "InfoGathering.h"
+#include "SingleWireControlling.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
