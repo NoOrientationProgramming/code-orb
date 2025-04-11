@@ -34,7 +34,7 @@ tar is "15"
 @+20
 tar is {-}
 
-footer **SingleWireControling()** Target to Controller - None\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireControling()** - Target to Controller - None\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

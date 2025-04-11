@@ -31,7 +31,7 @@ ctrl is {-}
 @180
 tar -> ctrl : Timeout
 
-footer **SingleWireControling()** Target to Controller - Timeout\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireControling()** - Target to Controller - Timeout\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

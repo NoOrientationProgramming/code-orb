@@ -55,7 +55,7 @@ tar is "15"
 @+20
 tar is {-}
 
-footer **SingleWireControling()** Controller to Target and back - Command and Response\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireControling()** - Controller to Target and back - Command and Response\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

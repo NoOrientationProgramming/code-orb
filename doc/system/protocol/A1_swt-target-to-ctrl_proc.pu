@@ -36,7 +36,7 @@ ctrl is "0C"
 @+20
 ctrl is {-}
 
-footer **SingleWireControling()** Target to Controller - Process Tree\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireControling()** - Target to Controller - Process Tree\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 
