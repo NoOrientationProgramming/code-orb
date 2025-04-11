@@ -72,21 +72,13 @@ enum SwtFlowDirection
 
 enum SwtContentIdOut
 {
-	ContentOutCmd = 0x1A,
-};
-
-enum SwtContentId
-{
-	ContentNone = 0x15,
-	ContentProc = 0x11,
-	ContentLog,
-	ContentCmd,
+	IdContentOutCmd = 0x1A,
 };
 
 enum SwtContentEnd
 {
-	ContentCut = 0x0F,
-	ContentEnd = 0x17,
+	IdContentCut = 0x0F,
+	IdContentEnd = 0x17,
 };
 
 #define dTimeoutTargetInitMs	35
@@ -113,7 +105,6 @@ SingleWireControlling::SingleWireControlling()
 	, mpBuf(NULL)
 	, mLenDone(0)
 	, mFragments()
-	, mContentCurrent(ContentNone)
 	, mContentProcChanged(false)
 	, mCntBytesRcvd(0)
 	, mCntContentNoneRcvd(0)
@@ -129,9 +120,7 @@ SingleWireControlling::SingleWireControlling()
 	, mIdReqCmdCurrent(0)
 	, mResponsesCmd()
 {
-	mResp.idContent = ContentNone;
-	mResp.content = "";
-
+	responseReset();
 	mState = StStart;
 }
 
@@ -233,7 +222,7 @@ Success SingleWireControlling::process()
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
-		if (mResp.idContent != ContentCmd)
+		if (mResp.idContent != IdContentCmd)
 			break;
 
 		if (mResp.content != "Debug mode 1")
@@ -273,12 +262,12 @@ Success SingleWireControlling::process()
 			mState = StTargetInit;
 			break;
 		}
-#if 0
+#if 1
 		procWrnLog("content received: %02X > '%s'",
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
-		if (mResp.idContent != ContentCmd)
+		if (mResp.idContent != IdContentCmd)
 			break;
 
 		ok = entryHelpAdd(mResp.content);
@@ -287,6 +276,8 @@ Success SingleWireControlling::process()
 			mState = StNextFlowDetermine;
 			break;
 		}
+
+		responseReset();
 
 		mState = StInfoHelpRequest;
 
@@ -323,7 +314,7 @@ Success SingleWireControlling::process()
 			break;
 		}
 #if 0
-		if (mResp.idContent != ContentNone)
+		if (mResp.idContent != IdContentNone)
 		{
 			procWrnLog("content received: %02X",
 						mResp.idContent);
@@ -332,7 +323,7 @@ Success SingleWireControlling::process()
 #endif
 		}
 #endif
-		if (mResp.idContent == ContentProc &&
+		if (mResp.idContent == IdContentProc &&
 				mContentProc != mResp.content)
 		{
 			mTargetIsOfflineMarked = false;
@@ -341,8 +332,10 @@ Success SingleWireControlling::process()
 			mContentProcChanged = true;
 		}
 
-		if (mResp.idContent == ContentLog)
+		if (mResp.idContent == IdContentLog)
 			ppEntriesLog.commit(mResp.content);
+
+		responseReset();
 
 		mState = StNextFlowDetermine;
 
@@ -373,10 +366,10 @@ bool SingleWireControlling::contentProcChanged()
 void SingleWireControlling::cmdSend(const string &cmd)
 {
 	uartSend(mRefUart, FlowCtrlToTarget);
-	uartSend(mRefUart, ContentOutCmd);
+	uartSend(mRefUart, IdContentOutCmd);
 	uartSend(mRefUart, cmd.data(), cmd.size());
 	uartSend(mRefUart, 0x00);
-	uartSend(mRefUart, ContentEnd);
+	uartSend(mRefUart, IdContentEnd);
 
 	mStartMs = millis();
 
@@ -454,30 +447,23 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 	{
 	case StSwtContentRcvWait:
 
-		if (ch == ContentNone)
+		if (ch == IdContentNone)
 		{
-			//procWrnLog("received ContentNone");
+			//procWrnLog("received IdContentNone");
 			++mCntContentNoneRcvd;
 
-			mContentCurrent = ch;
-
-			mResp.idContent = ch;
-			mResp.content = "";
+			responseReset();
 
 			return Positive;
 		}
 
-		if (ch < ContentProc || ch > ContentCmd)
+		if (ch < IdContentProc || ch > IdContentCmd)
 			break;
 
-		mContentCurrent = ch;
-
-		mResp.idContent = ch;
-		mResp.content = "";
-
+		responseReset(ch);
 		mContentIgnore = false;
 
-		if (ch != ContentProc)
+		if (ch != IdContentProc)
 		{
 			mStateSwt = StSwtDataReceive;
 			break;
@@ -492,7 +478,7 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 			break;
 		}
 
-		mContentCurrent = ContentNone;
+		responseReset();
 		mContentIgnore = true;
 
 		mStateSwt = StSwtDataReceive;
@@ -500,16 +486,16 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 		break;
 	case StSwtDataReceive:
 
-		if (ch == ContentCut)
+		if (ch == IdContentCut)
 		{
 			mStateSwt = StSwtContentRcvWait;
 			break;
 		}
 
-		if (ch == ContentEnd)
+		if (ch == IdContentEnd)
 		{
 			if (!mContentIgnore)
-				fragmentFinish(mContentCurrent);
+				fragmentFinish();
 
 			mStateSwt = StSwtContentRcvWait;
 			return Positive;
@@ -525,12 +511,12 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 			ch == cKeyLf)
 		{
 			if (!mContentIgnore)
-				fragmentAppend(mContentCurrent, ch);
+				fragmentAppend(ch);
 			break;
 		}
 
 		if (!mContentIgnore)
-			fragmentDelete(mContentCurrent);
+			fragmentDelete();
 
 		mStateSwt = StSwtContentRcvWait;
 		return SwtErrRcvProtocol;
@@ -555,11 +541,12 @@ Success SingleWireControlling::shutdown()
 	return Positive;
 }
 
-void SingleWireControlling::fragmentAppend(uint8_t idContent, uint8_t ch)
+void SingleWireControlling::fragmentAppend(uint8_t ch)
 {
 	if (!ch)
 		return;
 
+	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
 			mFragments.find(idContent) != mFragments.end();
 
@@ -577,23 +564,22 @@ void SingleWireControlling::fragmentAppend(uint8_t idContent, uint8_t ch)
 	mFragments[idContent] += string(1, ch);
 }
 
-void SingleWireControlling::fragmentFinish(uint8_t idContent)
+void SingleWireControlling::fragmentFinish()
 {
+	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
 			mFragments.find(idContent) != mFragments.end();
 
 	if (!fragmentFound)
 		return;
 
-	mResp.idContent = idContent;
 	mResp.content = mFragments[idContent];
-
 	mFragments.erase(idContent);
-	mContentCurrent = ContentNone;
 }
 
-void SingleWireControlling::fragmentDelete(uint8_t idContent)
+void SingleWireControlling::fragmentDelete()
 {
+	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
 			mFragments.find(idContent) != mFragments.end();
 
@@ -657,6 +643,12 @@ bool SingleWireControlling::entryHelpAdd(const string &str)
 	return true;
 }
 
+void SingleWireControlling::responseReset(uint8_t idContent)
+{
+	mResp.idContent = idContent;
+	mResp.content = "";
+}
+
 void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 {
 	dInfo("Manual control\t\t%sabled\n", env.ctrlManual ? "En" : "Dis");
@@ -673,7 +665,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
 	dInfo("Bytes received\t\t%zu\n", mCntBytesRcvd);
-	dInfo("ContentNone received\t%zu", mCntContentNoneRcvd);
+	dInfo("IdContentNone received\t%zu", mCntContentNoneRcvd);
 #if 0
 	dInfo("Fragments\n");
 

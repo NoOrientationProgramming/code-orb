@@ -33,6 +33,14 @@
 #include "Pipe.h"
 #include "LibUart.h"
 
+enum SwtContentId
+{
+	IdContentNone = 0x15,
+	IdContentProc = 0x11,
+	IdContentLog,
+	IdContentCmd,
+};
+
 struct SingleWireResponse
 {
 	uint8_t idContent;
@@ -114,12 +122,14 @@ private:
 	void dataRequest();
 	Success dataReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
-	void fragmentAppend(uint8_t idContent, uint8_t ch);
-	void fragmentFinish(uint8_t idContent);
-	void fragmentDelete(uint8_t idContent);
+	void fragmentAppend(uint8_t ch);
+	void fragmentFinish();
+	void fragmentDelete();
 
 	void targetOnlineSet(bool online = true);
 	bool entryHelpAdd(const std::string &str);
+
+	void responseReset(uint8_t idContent = IdContentNone);
 
 	/* member variables */
 	uint32_t mStateSwt;
@@ -129,7 +139,6 @@ private:
 	char *mpBuf;
 	ssize_t mLenDone;
 	std::map<int, std::string> mFragments;
-	uint8_t mContentCurrent;
 	SingleWireResponse mResp;
 	bool mContentProcChanged;
 	size_t mCntBytesRcvd;
