@@ -30,6 +30,10 @@
 #if defined(__unix__)
 #include <signal.h>
 #endif
+#if defined(_WIN32)
+#include <winsock2.h>
+#include <windows.h>
+#endif
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -97,6 +101,22 @@ void applicationCloseRequest(int signum)
 	cout << endl;
 	pApp->unusedSet();
 }
+
+#if defined(_WIN32)
+/*
+Literature
+- https://learn.microsoft.com/en-us/windows/console/setconsolectrlhandler
+*/
+BOOL WINAPI signalWinReceived(DWORD signal)
+{
+	if (signal != CTRL_C_EVENT)
+		return FALSE;
+
+	applicationCloseRequest(0);
+
+	return TRUE;
+}
+#endif
 
 #if !APP_HAS_TCLAP
 void helpPrint()
@@ -202,8 +222,18 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-#if defined(__unix__)
-	/* https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html */
+#if defined(_WIN32)
+	// https://learn.microsoft.com/en-us/windows/console/setconsolectrlhandler
+	BOOL okWin;
+
+	okWin = SetConsoleCtrlHandler(signalWinReceived, TRUE);
+	if (!okWin)
+	{
+		errLog(-1, "could not set ctrl handler");
+		return 1;
+	}
+#else
+	// https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html
 	signal(SIGINT, applicationCloseRequest);
 	signal(SIGTERM, applicationCloseRequest);
 #endif
