@@ -262,7 +262,7 @@ Success SingleWireControlling::process()
 			mState = StTargetInit;
 			break;
 		}
-#if 1
+#if 0
 		procWrnLog("content received: %02X > '%s'",
 						mResp.idContent,
 						mResp.content.c_str());
