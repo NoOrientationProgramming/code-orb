@@ -36,6 +36,7 @@ srcs = [
 args = [
 	'-DdPackageName="' + meson.project_name() + '"',
 	'-DdAppName="codeorb"',
+	'-DdVersion="CodeOrb_1-25.04-1"',
 	'-DCONFIG_PROC_HAVE_LOG=1',
 	'-DCONFIG_CMD_SIZE_HISTORY=20',
 	'-DCONFIG_CMD_SIZE_BUFFER_OUT=2048',
