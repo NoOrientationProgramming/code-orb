@@ -83,7 +83,7 @@ else
 endif
 
 if cxx.get_id() == 'msvc'
-	args += '/std:c11'
+	args += '/std:c++11'
 elif cxx.get_id() == 'gcc'
 	args += warningsLinux
 endif
