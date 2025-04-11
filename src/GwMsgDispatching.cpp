@@ -215,6 +215,31 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 	fflush(stdout);
 }
 
+void GwMsgDispatching::onlinePrint(bool online)
+{
+	const char *pContent = online ? "On" : "Off";
+#ifdef _WIN32
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	WORD idColor = online ? 2 : 6;
+#else
+	const char *pColor = online ? dColorGreen : dColorOrange;
+#endif
+
+#ifdef _WIN32
+	SetConsoleTextAttribute(hConsole, idColor);
+#else
+	fprintf(stdout, "%s", pColor);
+#endif
+
+	fprintf(stdout, "%sline", pContent);
+
+#ifdef _WIN32
+	SetConsoleTextAttribute(hConsole, 7);
+#else
+	fprintf(stdout, "%s", dColorClear);
+#endif
+}
+
 bool GwMsgDispatching::listenersStart()
 {
 	// proc tree

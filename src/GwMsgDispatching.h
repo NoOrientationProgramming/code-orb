@@ -77,6 +77,7 @@ private:
 	void processInfo(char *pBuf, char *pBufEnd);
 
 	void stateOnlineCheckAndPrint();
+	void onlinePrint(bool online = true);
 	bool listenersStart();
 	void peerListUpdate();
 	void contentDistribute();
