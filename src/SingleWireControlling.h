@@ -41,17 +41,24 @@ enum SwtContentId
 	IdContentCmd,
 };
 
-struct SingleWireResponse
-{
-	uint8_t idContent;
-	std::string content;
-};
-
 enum SwtErrRcv
 {
 	SwtErrRcvNoUart = -3,
 	SwtErrRcvNoTarget,
 	SwtErrRcvProtocol,
+};
+
+enum PrioCmd
+{
+	PrioSysHigh = 0,
+	PrioUser,
+	PrioSysLow,
+};
+
+struct SingleWireResponse
+{
+	uint8_t idContent;
+	std::string content;
 };
 
 typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
@@ -95,7 +102,9 @@ public:
 
 	Pipe<std::string> ppEntriesLog;
 
-	bool commandRequest(const std::string &cmd, uint32_t &idReq);
+	bool commandRequest(const std::string &cmd,
+					uint32_t &idReq,
+					PrioCmd prio = PrioUser);
 	bool commandResponseGet(uint32_t idReq, const std::string &resp);
 
 protected:

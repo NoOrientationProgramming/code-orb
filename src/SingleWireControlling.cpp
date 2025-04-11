@@ -685,9 +685,11 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
-bool SingleWireControlling::commandRequest(const string &cmd, uint32_t &idReq)
+bool SingleWireControlling::commandRequest(const string &cmd, uint32_t &idReq, PrioCmd prio)
 {
 	// optional mutex
+
+	(void)prio;
 
 	if (mRequestsCmd.size() > cNumRequestsCmdMax)
 		return false;
