@@ -27,6 +27,7 @@ srcs = [
 	'src/RemoteCommanding.cpp',
 	'src/LibUart.cpp',
 	'src/TelnetFiltering.cpp',
+	'src/InfoGathering.cpp',
 ]
 
 # Arguments
