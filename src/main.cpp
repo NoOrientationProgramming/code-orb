@@ -31,6 +31,8 @@
 #include <signal.h>
 #endif
 #include <iostream>
+#include <chrono>
+#include <thread>
 #if APP_HAS_TCLAP
 #include <tclap/CmdLine.h>
 #endif
@@ -44,6 +46,7 @@
 #include "env.h"
 
 using namespace std;
+using namespace chrono;
 #if APP_HAS_TCLAP
 using namespace TCLAP;
 #endif
@@ -111,8 +114,9 @@ int main(int argc, char *argv[])
 {
 	env.haveTclap = 1;
 	env.verbosity = 0;
+#if defined(__unix__)
 	env.coreDump = false;
-
+#endif
 	env.ctrlManual = 0;
 	env.codeUart = dCodeUartDefault;
 	env.deviceUart = dDeviceUartDefault;
@@ -131,9 +135,10 @@ int main(int argc, char *argv[])
 
 	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 0, "uint8");
 	cmd.add(argVerbosity);
+#if defined(__unix__)
 	SwitchArg argCoreDump("", "core-dump", "Enable core dumps", false);
 	cmd.add(argCoreDump);
-
+#endif
 	SwitchArg argCtrlManual("", "ctrl-manual", "Use manual control (automatic control disabled)", false);
 	cmd.add(argCtrlManual);
 	ValueArg<string> argCodeUart("c", "code", "Code used for UART initialization. Default: " dCodeUartDefault,
@@ -162,7 +167,9 @@ int main(int argc, char *argv[])
 	levelLogSet(env.verbosity);
 
 	env.ctrlManual = argCtrlManual.getValue() ? 1 : 0;
+#if defined(__unix__)
 	env.coreDump = argCoreDump.getValue();
+#endif
 	env.codeUart = argCodeUart.getValue();
 	env.deviceUart = argDevUart.getValue();
 

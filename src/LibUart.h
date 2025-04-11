@@ -34,6 +34,12 @@
 #if defined(__unix__)
 typedef int RefDeviceUart;
 #define RefDeviceUartInvalid -1
+#elif defined(_WIN32)
+typedef int RefDeviceUart;
+#define RefDeviceUartInvalid -1
+#else
+typedef int RefDeviceUart;
+#define RefDeviceUartInvalid -1
 #endif
 
 extern uint8_t uartVirtualMode;

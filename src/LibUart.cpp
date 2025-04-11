@@ -28,6 +28,9 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
+#if defined(_WIN32)
+#include <winsock2.h>
+#endif
 
 #include "LibUart.h"
 
@@ -52,13 +55,14 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	if (uartVirtual)
 		return uartVirtualMounted ? Positive : Pending;
 
+	Success success;
+
 #if defined(__unix__)
 	refUart = open(deviceUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (refUart < 0)
 		return Pending; // no error!
 
 	struct termios toOld, toNew;
-	Success success;
 	int res;
 
 	res = tcgetattr(refUart, &toOld);
@@ -101,6 +105,9 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 #else
 	(void)deviceUart;
 	(void)refUart;
+
+	success = errLog(-1, "not implemented");
+	goto errInit;
 #endif
 	return Positive;
 
@@ -199,10 +206,15 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 	if (refUart == RefDeviceUartInvalid)
 		return -1;
 
-	ssize_t lenRead = read(refUart, pBuf, lenReq);
+	ssize_t lenRead;
+
 #if defined(__unix__)
+	lenRead = read(refUart, pBuf, lenReq);
 	if (!lenRead)
 		return -2;
+#else
+	lenRead = -1;
+	return lenRead;
 #endif
 	if (lenRead < 0)
 	{

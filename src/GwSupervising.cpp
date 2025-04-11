@@ -46,11 +46,13 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+#if defined(__unix__)
 static Processing *pTreeRoot = NULL;
 static char nameApp[16];
 static char nameFileProc[64];
 static char buffProcTree[2*1024*1024];
 static bool procTreeSaveInProgress = false;
+#endif
 
 GwSupervising::GwSupervising()
 	: Processing("GwSupervising")
@@ -92,6 +94,7 @@ Success GwSupervising::process()
 	return Pending;
 }
 
+#if defined(__unix__)
 static void procTreeSave()
 {
 	time_t now;
@@ -166,9 +169,11 @@ void coreDumpRequest(int signum)
 	wrnLog("Creating process tree file");
 	procTreeSave();
 }
+#endif
 
 bool GwSupervising::servicesStart()
 {
+#if defined(__unix__)
 	bool ok;
 
 	if (env.coreDump)
@@ -181,7 +186,7 @@ bool GwSupervising::servicesStart()
 		if (!ok)
 			procWrnLog("could not enable core dumps");
 	}
-
+#endif
 	SystemDebugging *pDbg;
 
 	pDbg = SystemDebugging::create(this);

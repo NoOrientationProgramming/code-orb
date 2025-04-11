@@ -26,7 +26,9 @@ struct Environment
 {
 	bool haveTclap;
 	int verbosity;
+#if defined(__unix__)
 	bool coreDump;
+#endif
 	uint8_t ctrlManual;
 	std::string codeUart;
 	std::string deviceUart;
