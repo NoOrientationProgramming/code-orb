@@ -28,15 +28,15 @@
 
 #include <cinttypes>
 #include <string>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 #include "Processing.h"
 
-#if defined(__unix__)
-typedef int RefDeviceUart;
-#define RefDeviceUartInvalid -1
-#elif defined(_WIN32)
-typedef int RefDeviceUart;
-#define RefDeviceUartInvalid -1
+#if defined(_WIN32)
+typedef HANDLE RefDeviceUart;
+#define RefDeviceUartInvalid INVALID_HANDLE_VALUE
 #else
 typedef int RefDeviceUart;
 #define RefDeviceUartInvalid -1
