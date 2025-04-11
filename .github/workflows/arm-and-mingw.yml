@@ -1,0 +1,42 @@
+
+name: Cross arm & mingw
+
+on:
+  workflow_dispatch
+
+jobs:
+
+  linux-native-build-run:
+    runs-on: ubuntu-latest
+    steps:
+
+# Toolchain + git
+
+      - name: Update
+        run: sudo apt update
+      - name: Install build tools cross
+        run: sudo apt install mingw-w64 gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+      - name: Setup mingw
+        run: sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install build tools
+        run: python -m pip install meson ninja
+
+      - uses: actions/checkout@v4
+      - name: Initialize git submodules
+        run: git submodule update --init --recursive
+
+# Cross
+
+      - name: Setup build directory meson win64
+        run: meson setup --cross-file tools/cross/meson-cross-win64.txt build-meson-win64
+      - name: Build application meson win64
+        run: ninja -C build-meson-win64
+
+      - name: Setup build directory meson rpi
+        run: meson setup --cross-file tools/cross/meson-cross-rpi.txt build-meson-rpi
+      - name: Build application meson rpi
+        run: ninja -C build-meson-rpi
+
