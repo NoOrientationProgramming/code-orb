@@ -31,6 +31,7 @@
 #include "TcpTransfering.h"
 #include "SingleWireControlling.h"
 #include "RemoteCommanding.h"
+#include "InfoGathering.h"
 
 enum RemotePeerType {
 	RemotePeerProc = 0,
@@ -92,6 +93,7 @@ private:
 	TcpListening *mpLstLog;
 	TcpListening *mpLstCmd;
 	SingleWireControlling *mpCtrl;
+	InfoGathering *mpGather;
 	bool mCursorHidden;
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;

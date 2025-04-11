@@ -29,8 +29,8 @@
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
-		gen(StMain) \
-		gen(StNop) \
+		gen(StTargetOffline) \
+		gen(StTargetOnline) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -68,6 +68,7 @@ GwMsgDispatching::GwMsgDispatching()
 	, mpLstLog(NULL)
 	, mpLstCmd(NULL)
 	, mpCtrl(NULL)
+	, mpGather(NULL)
 	, mCursorHidden(false)
 	, mDevUartIsOnline(true)
 	, mTargetIsOnline(false)
@@ -82,7 +83,7 @@ Success GwMsgDispatching::process()
 {
 	//uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
-	//Success success;
+	Success success;
 	bool ok;
 #if 0
 	dStateTrace;
@@ -121,23 +122,58 @@ Success GwMsgDispatching::process()
 			fprintf(stdout, dCursorHide);
 			fflush(stdout);
 			mCursorHidden = true;
-
-			stateOnlineCheckAndPrint();
 		}
 
-		mState = StMain;
+		stateOnlineCheckAndPrint();
+
+		mState = StTargetOffline;
 
 		break;
-	case StMain:
+	case StTargetOffline:
 
-		if (!env.verbosity)
-			stateOnlineCheckAndPrint();
-
+		stateOnlineCheckAndPrint();
 		peerListUpdate();
 		contentDistribute();
 
+		if (!mTargetIsOnline)
+			break;
+
+		if (!mpGather)
+			mpGather = InfoGathering::create();
+		if (!mpGather)
+			procWrnLog("could not create process");
+
+		start(mpGather);
+
+		mState = StTargetOnline;
+
 		break;
-	case StNop:
+	case StTargetOnline:
+
+		stateOnlineCheckAndPrint();
+		peerListUpdate();
+		contentDistribute();
+
+		if (!mTargetIsOnline)
+		{
+			mState = StTargetOffline;
+			break;
+		}
+
+		if (!mpGather)
+			break;
+
+		success = mpGather->success();
+		if (success == Pending)
+			break;
+
+		if (success == Positive)
+		{
+			procWrnLog("gathered information");
+		}
+
+		repel(mpGather);
+		mpGather = NULL;
 
 		break;
 	default:
@@ -167,6 +203,9 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 
 	mDevUartIsOnline = mpCtrl->mDevUartIsOnline;
 	mTargetIsOnline = mpCtrl->mTargetIsOnline;
+
+	if (env.verbosity)
+		return;
 
 	fprintf(stdout, "\rUART [ %s ] - Target [ %s ]  ",
 		mDevUartIsOnline ? dOnline : dOffline,
