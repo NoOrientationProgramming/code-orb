@@ -1,6 +1,6 @@
-[submodule "ProcessingCore"]
-	path = ProcessingCore
+[submodule "deps/ProcessingCore"]
+	path = deps/ProcessingCore
 	url = https://github.com/NoOrientationProgramming/ProcessingCore.git
-[submodule "ProcessingCommon"]
-	path = ProcessingCommon
+[submodule "deps/ProcessingCommon"]
+	path = deps/ProcessingCommon
 	url = https://github.com/NoOrientationProgramming/ProcessingCommon.git
