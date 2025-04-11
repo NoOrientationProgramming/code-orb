@@ -13,11 +13,10 @@ rectangle "Your Tools" as gTools {
 frame "CodeOrb" as pGw {
 
 	frame "<<SingleWireControlling()>>" as pSwc
-	frame "<<TcpListening()>>" as pTcp
+	frame "<<TcpListening()>>" as pList
 	frame "TcpTransfering()" as pTrans
-	frame "RemoteCommanding()" as pCmdRemote {
-		frame "<<TcpTransfering()>>" as pTrans2
-	}
+	frame "RemoteCommanding()" as pCmdRemote
+	frame "InfoGathering()" as pGather
 }
 
 component "Target" as pTarget {
@@ -27,15 +26,18 @@ component "Target" as pTarget {
 
 pTree <-- pTrans
 pLog <-- pTrans
-pCmd <--> pTrans2 : "TCP/IP"
+pCmd <--> pCmdRemote : "TCP/IP"
+
+pList .l.> pTrans
+pList .r.> pCmdRemote
 
 pTrans <-- pSwc
-pTrans2 <--> pSwc
+pCmdRemote <--> pSwc
 
-pTrans <.. pTcp
-pCmdRemote <.. pTcp
+pCmdRemote <-- pGather
 
 pSwc <--> pSwt : "COM1 or\n/dev/ttyACM0"
+pSwc <-> pGather
 
 footer **Processing()** - Gateway overview\n(C) DSP-Crowd Electronics GmbH
 
