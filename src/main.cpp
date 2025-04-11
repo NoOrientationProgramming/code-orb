@@ -95,6 +95,18 @@ void applicationCloseRequest(int signum)
 	pApp->unusedSet();
 }
 
+#if !APP_HAS_TCLAP
+void helpPrint()
+{
+	cout << endl << dPackageName << endl;
+	cout << "Version: " << dVersion << endl;
+
+	cout << endl;
+	cout << "Usage: " << dAppName << " [code] [device]" << endl;
+	cout << endl;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	env.haveTclap = 1;
@@ -174,6 +186,13 @@ int main(int argc, char *argv[])
 		env.codeUart = string(argv[1]);
 	if (argc >= 3)
 		env.deviceUart = string(argv[2]);
+
+	if (env.codeUart == "--help" ||
+			env.codeUart == "-h")
+	{
+		helpPrint();
+		return 0;
+	}
 #endif
 
 #if defined(__unix__)
