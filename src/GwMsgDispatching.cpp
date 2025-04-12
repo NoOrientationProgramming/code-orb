@@ -130,7 +130,11 @@ Success GwMsgDispatching::process()
 #if 0
 		start(ColorTesting::create(), DrivenByParent);
 		start(ColorTesting::create(), DrivenByNewInternalDriver);
+#if 1
 		ThreadPooling::procAdd(start(ColorTesting::create(), DrivenByExternalDriver));
+#else
+		start(ColorTesting::create(), DrivenByExternalDriver);
+#endif
 #endif
 		mState = StTargetOffline;
 
