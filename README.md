@@ -28,6 +28,23 @@ The task viewer provides a detailed insight into the entire system, whereas the 
   - Log
   - Command Interface
 
+## Status
+
+- Pre alpha
+- ETA: June 2025
+
+## How To Use
+
+### Topology
+
+This repository provides `CodeOrb` the microcontroller debugger highlighted in orange. Check out the [example for STM32](https://github.com/NoOrientationProgramming/hello-world-stm32) as well!
+
+<p align="center">
+  <kbd>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
+  </kbd>
+</p>
+
 ### Process Tree
 
 <p align="center">
@@ -44,18 +61,24 @@ TODO: Screenshot
 
 TODO: Screenshot
 
-## Status
+## How To Build
 
-- Pre alpha
-- ETA: June 2025
+Clone repo
+```
+git clone https://github.com/NoOrientationProgramming/code-orb.git
+```
 
-## Architecture
+Initialize GIT submodules
+```
+git submodule update --init --recursive
+```
 
-This repository provides `CodeOrb` the microcontroller debugger highlighted in orange. Check out the [application](https://github.com/NoOrientationProgramming/hello-world-stm32) for the microcontroller as well!
+Setup build directory
+```
+meson setup build-native
+```
 
-<p align="center">
-  <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
-  </kbd>
-</p>
-
+Build the application
+```
+ninja -C build-native
+```
