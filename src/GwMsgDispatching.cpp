@@ -24,8 +24,10 @@
 */
 
 #include "GwMsgDispatching.h"
+#if 0
 #include "ColorTesting.h"
 #include "ThreadPooling.h"
+#endif
 
 #include "env.h"
 
@@ -125,11 +127,11 @@ Success GwMsgDispatching::process()
 		}
 #endif
 		stateOnlineCheckAndPrint();
-
+#if 0
 		start(ColorTesting::create(), DrivenByParent);
 		start(ColorTesting::create(), DrivenByNewInternalDriver);
 		ThreadPooling::procAdd(start(ColorTesting::create(), DrivenByExternalDriver));
-
+#endif
 		mState = StTargetOffline;
 
 		break;
@@ -283,7 +285,7 @@ bool GwMsgDispatching::servicesStart()
 
 	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
-
+#if 0
 	ThreadPooling *pPool;
 
 	pPool = ThreadPooling::create();
@@ -292,7 +294,7 @@ bool GwMsgDispatching::servicesStart()
 
 	pPool->procTreeDisplaySet(false);
 	start(pPool);
-
+#endif
 	return true;
 }
 
