@@ -60,7 +60,7 @@ dProcessStateStr(SdState);
 
 using namespace std;
 
-#if defined(__unix__)
+#if defined(__linux__)
 static Processing *pTreeRoot = NULL;
 static char nameApp[16];
 static char nameFileProc[64];
