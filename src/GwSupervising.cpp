@@ -46,6 +46,18 @@ dProcessStateEnum(ProcState);
 dProcessStateStr(ProcState);
 #endif
 
+#define dForEach_SdState(gen) \
+		gen(StSdStart) \
+		gen(StSdAppDoneWait) \
+
+#define dGenSdStateEnum(s) s,
+dProcessStateEnum(SdState);
+
+#if 0
+#define dGenSdStateString(s) #s,
+dProcessStateStr(SdState);
+#endif
+
 using namespace std;
 
 #if defined(__unix__)
@@ -59,6 +71,7 @@ static bool procTreeSaveInProgress = false;
 GwSupervising::GwSupervising()
 	: Processing("GwSupervising")
 	//, mStartMs(0)
+	, mStateSd(StSdStart)
 	, mpApp(NULL)
 {
 	mState = StStart;
@@ -87,6 +100,32 @@ Success GwSupervising::process()
 
 		break;
 	case StMain:
+
+		break;
+	default:
+		break;
+	}
+
+	return Pending;
+}
+
+Success GwSupervising::shutdown()
+{
+	switch (mStateSd)
+	{
+	case StSdStart:
+
+		cancel(mpApp);
+
+		mStateSd = StSdAppDoneWait;
+
+		break;
+	case StSdAppDoneWait:
+
+		if (mpApp->progress())
+			break;
+
+		return Positive;
 
 		break;
 	default:
