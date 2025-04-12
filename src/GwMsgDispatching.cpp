@@ -24,6 +24,8 @@
 */
 
 #include "GwMsgDispatching.h"
+#include "ColorTesting.h"
+#include "ThreadPooling.h"
 
 #include "env.h"
 
@@ -91,9 +93,9 @@ Success GwMsgDispatching::process()
 
 		mPortStart = env.startPortsTarget;
 
-		ok = listenersStart();
+		ok = servicesStart();
 		if (!ok)
-			return procErrLog(-1, "could not start listeners");
+			return procErrLog(-1, "could not start services");
 
 		mpCtrl = SingleWireControlling::create();
 		if (!mpCtrl)
@@ -123,6 +125,10 @@ Success GwMsgDispatching::process()
 		}
 #endif
 		stateOnlineCheckAndPrint();
+
+		start(ColorTesting::create(), DrivenByParent);
+		start(ColorTesting::create(), DrivenByNewInternalDriver);
+		ThreadPooling::procAdd(start(ColorTesting::create(), DrivenByExternalDriver));
 
 		mState = StTargetOffline;
 
@@ -245,7 +251,7 @@ void GwMsgDispatching::onlinePrint(bool online)
 #endif
 }
 
-bool GwMsgDispatching::listenersStart()
+bool GwMsgDispatching::servicesStart()
 {
 	// proc tree
 	mpLstProc = TcpListening::create();
@@ -277,6 +283,15 @@ bool GwMsgDispatching::listenersStart()
 
 	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
+
+	ThreadPooling *pPool;
+
+	pPool = ThreadPooling::create();
+	if (!pPool)
+		return procErrLog(-1, "could not create process");
+
+	pPool->procTreeDisplaySet(false);
+	start(pPool);
 
 	return true;
 }

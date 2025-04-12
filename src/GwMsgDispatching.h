@@ -78,7 +78,7 @@ private:
 
 	void stateOnlineCheckAndPrint();
 	void onlinePrint(bool online = true);
-	bool listenersStart();
+	bool servicesStart();
 	void peerListUpdate();
 	void contentDistribute();
 	void contentSend(const std::string &str, RemotePeerType typePeer);
