@@ -129,4 +129,7 @@ Optional
        --ctrl-manual                 Use manual control (automatic control disabled)
        --core-dump                   Enable core dumps
        --version                     Displays version information and exits.
+
+(C) DSP-Crowd Electronics GmbH
+
 ```
