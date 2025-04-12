@@ -59,7 +59,7 @@ using namespace TCLAP;
 #if defined(__unix__)
 #define dDeviceUartDefault	"/dev/ttyACM0"
 #elif defined(_WIN32)
-#define dDeviceUartDefault	"\\\\.\\COM1"
+#define dDeviceUartDefault	"COM1"
 #else
 #define dDeviceUartDefault	"uart-dev-undef"
 #endif
