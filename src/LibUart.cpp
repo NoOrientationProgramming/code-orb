@@ -86,10 +86,6 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	// Disable echo and canonical mode
 	toNew.c_lflag &= ~(ECHO | ICANON);
 
-	// Clear baud rate and set extended baud rate
-	toNew.c_cflag &= ~CBAUD;
-	toNew.c_cflag |= CBAUDEX;
-
 	// Set baud rate to 115200
 	cfsetispeed(&toNew, B115200);
 	cfsetospeed(&toNew, B115200);
