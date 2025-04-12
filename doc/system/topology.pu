@@ -1,0 +1,38 @@
+
+@startuml
+
+' skinparam linetype ortho
+' scale 0.6
+
+component PC as pPc {
+
+	rectangle "Your Tools" as pTools {
+
+		frame "Process Tree" as pTree
+		frame "Log" as pLog
+		frame "Command" as pCmd
+		' frame "Custom\nChannels" as pCustom
+	}
+
+	frame "CodeOrb" as pGw #orange
+
+	pTree <-- pGw
+	pLog <-- pGw
+	pCmd <--> pGw : "TCP/IP"
+	' pCustom <--> pGw
+}
+
+component "Microcontroller" {
+
+	frame "<<SystemDebugging()>>" as pSysDbg
+	frame "<<Application>>" as pApp
+
+	pSysDbg <--> pApp
+}
+
+pGw <--> pSysDbg : "COM1 or\n  /dev/ttyACM0"
+
+footer **CodeOrb** - Debugging Microcontrollers\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
