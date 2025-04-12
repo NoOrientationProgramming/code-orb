@@ -41,7 +41,7 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/system/stm32-uart_3.svg" style="width: 400px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/system/topology.svg" style="width: 300px; max-width:100%"/>
   </kbd>
 </p>
 
