@@ -63,9 +63,21 @@ TODO: Screenshot
 
 ## How To Build
 
+### Requirements
+
+You will need [meson](https://mesonbuild.com/) and [ninja](https://ninja-build.org/) for the build.
+Check the instructions for your OS on how to install these tools.
+
+### Steps
+
 Clone repo
 ```
 git clone https://github.com/NoOrientationProgramming/code-orb.git
+```
+
+Enter the directory
+```
+cd code-orb
 ```
 
 Initialize GIT submodules
@@ -81,4 +93,40 @@ meson setup build-native
 Build the application
 ```
 ninja -C build-native
+```
+
+Test CodeOrb on Windows
+```
+.\build-native\CodeOrb.exe --help
+```
+
+Test CodeOrb on UNIX systems
+```
+./build-native/codeorb --help
+```
+
+The output should look like this
+```
+CodeOrb - Microcontroller Debugging
+Version: CodeOrb_1-25.04-1
+
+Usage: codeorb [OPTION]
+
+Required
+
+None
+
+Optional
+
+  -d,  --device <string>             Device used for UART communication. Default: /dev/ttyACM0
+  -c,  --code <string>               Code used for UART initialization. Default: aaaaa
+  -v,  --verbosity <uint8>           Verbosity: high => more output
+  --,  --ignore_rest                 Ignores the rest of the labeled arguments following this flag.
+  -h,  --help                        Displays usage information and exits.
+       --start-ports-target <uint16> Start of 3-port interface for the target. Default: 3000
+       --start-ports-orb <uint16>    Start of 3-port interface for CodeOrb. Default: 2000
+       --refresh-rate <uint16>       Refresh rate of process tree in [ms]
+       --ctrl-manual                 Use manual control (automatic control disabled)
+       --core-dump                   Enable core dumps
+       --version                     Displays version information and exits.
 ```
