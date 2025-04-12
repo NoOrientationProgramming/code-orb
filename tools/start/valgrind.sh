@@ -2,7 +2,7 @@
 
 dHere="$(pwd)"
 dTool="$dHere/$(dirname $0)"
-dTarget="$dTool/../build-native"
+dTarget="$dTool/../../build-native"
 dRelHereToTarget="$(realpath --relative-to=$dHere $dTarget)"
 dRelTargetToTool="$(realpath --relative-to=$dTarget $dTool)"
 
