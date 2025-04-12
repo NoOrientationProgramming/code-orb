@@ -21,6 +21,7 @@ srcs = [
 	'deps/ProcessingCommon/LibFilesys.cpp',
 	'deps/ProcessingCommon/LibDspc.cpp',
 	'deps/ProcessingCommon/KeyUser.cpp',
+	'deps/ProcessingCommon/ThreadPooling.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
@@ -29,6 +30,7 @@ srcs = [
 	'src/LibUart.cpp',
 	'src/TelnetFiltering.cpp',
 	'src/InfoGathering.cpp',
+	'src/ColorTesting.cpp',
 ]
 
 # Arguments
