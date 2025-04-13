@@ -21,7 +21,7 @@ The task viewer provides a detailed insight into the entire system, whereas the 
 
 ## Features
 
-- Full control over the target
+- Full control over target
 - Crystal-clear insight into the system
 - Through three dedicated channels
   - Process Tree
