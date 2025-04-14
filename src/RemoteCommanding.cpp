@@ -46,6 +46,8 @@ const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
 
+list<EntryHelp> RemoteCommanding::listCmds;
+
 RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
 	//, mStartMs(0)
@@ -160,4 +162,26 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 }
 
 /* static functions */
+
+void RemoteCommanding::listCommandsUpdate(list<string> &listStr)
+{
+	list<string>::iterator iter;
+
+	listCmds.clear();
+
+	iter = listStr.begin();
+	for (; iter != listStr.end(); ++iter)
+	{
+		string &str = *iter;
+
+		if (!str.size())
+			continue;
+
+		if (str == "infoHelp|||")
+			continue;
+
+		wrnLog("Entry received: %s", str.c_str());
+		// TODO: Parse
+	}
+}
 

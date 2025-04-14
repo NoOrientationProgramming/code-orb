@@ -29,6 +29,14 @@
 #include "Processing.h"
 #include "TelnetFiltering.h"
 
+struct EntryHelp
+{
+	std::string id;
+	std::string shortcut;
+	std::string desc;
+	std::string group;
+};
+
 class RemoteCommanding : public Processing
 {
 
@@ -38,6 +46,8 @@ public:
 	{
 		return new dNoThrow RemoteCommanding(fd);
 	}
+
+	static void listCommandsUpdate(std::list<std::string> &listStr);
 
 protected:
 
@@ -70,6 +80,7 @@ private:
 	/* static functions */
 
 	/* static variables */
+	static std::list<EntryHelp> listCmds;
 
 	/* constants */
 
