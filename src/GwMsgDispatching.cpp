@@ -148,8 +148,13 @@ Success GwMsgDispatching::process()
 		if (!mTargetIsOnline)
 			break;
 
-		if (!mpGather)
-			mpGather = InfoGathering::create();
+		if (mpGather)
+		{
+			mState = StTargetOnline;
+			break;
+		}
+
+		mpGather = InfoGathering::create();
 
 		if (!mpGather)
 			procWrnLog("could not create process");
