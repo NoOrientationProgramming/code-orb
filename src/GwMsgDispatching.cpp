@@ -102,6 +102,8 @@ Success GwMsgDispatching::process()
 		mpCtrl = SingleWireControlling::create();
 		if (!mpCtrl)
 			return procErrLog(-1, "could not create process");
+
+		//mpCtrl->procTreeDisplaySet(false);
 #if 1
 		start(mpCtrl);
 #else
@@ -148,6 +150,8 @@ Success GwMsgDispatching::process()
 		if (!mTargetIsOnline)
 			break;
 
+		//procWrnLog("target is online");
+
 		if (mpGather)
 		{
 			mState = StTargetOnline;
@@ -155,11 +159,15 @@ Success GwMsgDispatching::process()
 		}
 
 		mpGather = InfoGathering::create();
-
 		if (!mpGather)
+		{
 			procWrnLog("could not create process");
-		else
-			start(mpGather);
+
+			mState = StTargetOnline;
+			break;
+		}
+
+		start(mpGather);
 
 		mState = StTargetOnline;
 
@@ -182,11 +190,12 @@ Success GwMsgDispatching::process()
 		success = mpGather->success();
 		if (success == Pending)
 			break;
-
+#if 1
+		if (success != Positive)
+			procWrnLog("could not gather information");
+#endif
 		if (success == Positive)
-		{
-			procWrnLog("gathered information");
-		}
+			RemoteCommanding::listCommandsUpdate(mpGather->mEntriesReceived);
 
 		repel(mpGather);
 		mpGather = NULL;
