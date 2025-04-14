@@ -687,7 +687,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
-bool SingleWireControlling::commandRequest(const string &cmd, uint32_t &idReq, PrioCmd prio)
+bool SingleWireControlling::commandSend(const string &cmd, uint32_t &idReq, PrioCmd prio)
 {
 	// optional mutex
 

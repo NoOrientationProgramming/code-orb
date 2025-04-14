@@ -102,7 +102,7 @@ public:
 
 	Pipe<std::string> ppEntriesLog;
 
-	bool commandRequest(const std::string &cmd,
+	bool commandSend(const std::string &cmd,
 					uint32_t &idReq,
 					PrioCmd prio = PrioUser);
 	bool commandResponseGet(uint32_t idReq, const std::string &resp);
