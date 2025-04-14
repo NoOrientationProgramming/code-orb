@@ -1,5 +1,5 @@
 
-name: MacOS Native
+name: MacOS
 
 on:
   workflow_dispatch

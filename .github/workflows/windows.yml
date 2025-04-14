@@ -1,19 +1,21 @@
 
-name: Linux Native
+name: Windows
 
 on:
   workflow_dispatch
 
 jobs:
 
-  linux-native-build-run:
-    runs-on: ubuntu-latest
+  windows-native-build-run:
+    runs-on: windows-latest
     steps:
 
 # Toolchain + git
 
-      - name: Update
-        run: sudo apt update
+      - name: Set up Visual Studio Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -26,9 +28,9 @@ jobs:
 
 # Native meson
 
-      - name: Setup build directory meson native
+      - name: Setup build directory meson
         run: meson setup build-meson-native
-      - name: Build application meson native
+      - name: Build application meson
         run: ninja -C build-meson-native
       - name: Start application meson
         run: ./build-meson-native/codeorb --help

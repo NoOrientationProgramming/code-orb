@@ -31,12 +31,12 @@ jobs:
 # Cross
 
       - name: Setup build directory meson win64
-        run: meson setup --cross-file tools/cross/meson-cross-win64.txt build-meson-win64
+        run: meson setup --cross-file tools-dev/cross/meson-cross-win64.txt build-meson-win64
       - name: Build application meson win64
         run: ninja -C build-meson-win64
 
       - name: Setup build directory meson rpi
-        run: meson setup --cross-file tools/cross/meson-cross-rpi.txt build-meson-rpi
+        run: meson setup --cross-file tools-dev/cross/meson-cross-rpi.txt build-meson-rpi
       - name: Build application meson rpi
         run: ninja -C build-meson-rpi
 
