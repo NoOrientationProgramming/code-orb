@@ -160,7 +160,7 @@ private:
 	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
 	uint32_t mIdReqCmdNext;
-	std::queue<RequestCommand> mRequestsCmd;
+	std::list<RequestCommand> mRequestsCmd[3];
 	uint32_t mIdReqCmdCurrent;
 	std::map<uint32_t, std::string> mResponsesCmd;
 

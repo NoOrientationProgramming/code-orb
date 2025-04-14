@@ -683,6 +683,30 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 	for (; iter != mFragments.end(); ++iter)
 		dInfo("  %02X > '%s'\n", iter->first, iter->second.c_str());
 #endif
+#if 1
+	dInfo("Command requests\n");
+	list<RequestCommand> *pList;
+	list<RequestCommand>::iterator iter;
+
+	for (size_t i = 0; i < 3; ++i)
+	{
+		pList = &mRequestsCmd[i];
+
+		dInfo("Priority %zu\n", i);
+
+		if (!pList->size())
+		{
+			dInfo("  None\n");
+			continue;
+		}
+
+		iter = pList->begin();
+		for (; iter != pList->end(); ++iter)
+		{
+			dInfo("  Cmd: %s\n", iter->cmd.c_str());
+		}
+	}
+#endif
 }
 
 /* static functions */
@@ -691,15 +715,15 @@ bool SingleWireControlling::commandSend(const string &cmd, uint32_t &idReq, Prio
 {
 	// optional mutex
 
-	(void)prio;
+	list<RequestCommand> *pList = &mRequestsCmd[prio];
 
-	if (mRequestsCmd.size() > cNumRequestsCmdMax)
+	if (pList->size() > cNumRequestsCmdMax)
 		return false;
 
 	idReq = mIdReqCmdNext;
-	mRequestsCmd.emplace(cmd, idReq, millis());
-
 	++mIdReqCmdNext;
+
+	pList->emplace_back(cmd, idReq, millis());
 
 	return true;
 }
