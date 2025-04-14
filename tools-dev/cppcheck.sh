@@ -4,10 +4,14 @@ find \
 	. \
 	-type f \
 	-name "*.cpp" \
-	! -path "./deps/ProcessingCore/targets/stm32/SystemDebugging.*" \
 	! -path "./deps/tclap_loc/*" \
 | xargs cppcheck \
 	--language=c++ \
 	--std=c++11 \
+	--enable=all \
+	--suppress=ctuOneDefinitionRuleViolation \
+	--suppress=unusedFunction \
+	--suppress=missingOverride \
+	--suppress=cstyleCast \
 	$@
 
