@@ -24,15 +24,15 @@ component "Target" as pTarget {
 	frame "<<SingleWireTransfering()>>" as pSwt
 }
 
-pTree <-- pTrans
-pLog <-- pTrans
-pCmd <--> pCmdRemote : "TCP/IP"
+pTree <-[thickness=2]- pTrans
+pLog <-[thickness=2]- pTrans
+pCmd <-[thickness=2]-> pCmdRemote : "TCP/IP"
 
 pList .l.> pTrans
 pList .r.> pCmdRemote
 
-pTrans <-- pSwc
-pCmdRemote <--> pSwc
+pTrans <-[thickness=2]- pSwc
+pCmdRemote <-[thickness=2]-> pSwc
 
 pCmdRemote <-- pGather
 
