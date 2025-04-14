@@ -26,9 +26,12 @@
 #include "InfoGathering.h"
 #include "SingleWireControlling.h"
 
+#include "LibTime.h"
+
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
 		gen(StMain) \
+		gen(StRespCmdWait) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -42,18 +45,22 @@ using namespace std;
 
 InfoGathering::InfoGathering()
 	: Processing("InfoGathering")
-	//, mStartMs(0)
+	, mStartMs(0)
+	, mIdReq(0)
 {
 	mState = StStart;
 }
+
+const uint32_t cTimeoutResponseMs = 3300;
 
 /* member functions */
 
 Success InfoGathering::process()
 {
-	//uint32_t curTimeMs = millis();
-	//uint32_t diffMs = curTimeMs - mStartMs;
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs = curTimeMs - mStartMs;
 	//Success success;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -66,6 +73,25 @@ Success InfoGathering::process()
 		break;
 	case StMain:
 
+		ok = SingleWireControlling::commandSend("infoHelp", mIdReq, PrioSysLow);
+		if (!ok)
+			return procErrLog(-1, "could not send command");
+
+		procWrnLog("request ID: %u", mIdReq);
+
+		mStartMs = curTimeMs;
+		mState = StRespCmdWait;
+
+		break;
+	case StRespCmdWait:
+
+		if (diffMs > cTimeoutResponseMs)
+			return procErrLog(-1, "timeout getting response");
+
+		ok = responseCheck();
+		if (!ok)
+			break;
+
 		procWrnLog("gathered information");
 
 		return Positive;
@@ -76,6 +102,20 @@ Success InfoGathering::process()
 	}
 
 	return Pending;
+}
+
+bool InfoGathering::responseCheck()
+{
+	string resp;
+	bool ok;
+
+	ok = SingleWireControlling::commandResponseGet(mIdReq, resp);
+	if (!ok)
+		return false;
+
+	procWrnLog("response received: %s", resp.c_str());
+
+	return true;
 }
 
 void InfoGathering::processInfo(char *pBuf, char *pBufEnd)

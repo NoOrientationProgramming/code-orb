@@ -57,8 +57,12 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	bool responseCheck();
+
 	/* member variables */
-	//uint32_t mStartMs;
+	uint32_t mStartMs;
+	uint32_t mIdReq;
+	std::string mResp;
 
 	/* static functions */
 
