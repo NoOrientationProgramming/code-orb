@@ -667,7 +667,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
 	dInfo("Bytes received\t\t%zu\n", mCntBytesRcvd);
-	dInfo("IdContentNone received\t%zu", mCntContentNoneRcvd);
+	dInfo("IdContentNone received\t%zu\n", mCntContentNoneRcvd);
 #if 0
 	dInfo("Fragments\n");
 
