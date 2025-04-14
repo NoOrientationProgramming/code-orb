@@ -13,5 +13,7 @@ find \
 	--suppress=unusedFunction \
 	--suppress=missingOverride \
 	--suppress=cstyleCast \
+	--suppress=variableScope \
+	--suppress=noExplicitConstructor \
 	$@
 
