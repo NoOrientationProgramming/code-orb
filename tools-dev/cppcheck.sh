@@ -15,5 +15,6 @@ find \
 	--suppress=cstyleCast \
 	--suppress=variableScope \
 	--suppress=noExplicitConstructor \
+	--suppress=uselessAssignmentPtrArg \
 	$@
 
