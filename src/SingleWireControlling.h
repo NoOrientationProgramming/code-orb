@@ -63,14 +63,6 @@ struct SingleWireResponse
 
 typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
 
-struct EntryHelp
-{
-	std::string id;
-	std::string shortcut;
-	std::string desc;
-	std::string group;
-};
-
 struct CommandReqResp
 {
 	CommandReqResp(std::string cmd, uint32_t id, uint32_t start)
@@ -140,8 +132,6 @@ private:
 	void fragmentDelete();
 
 	void targetOnlineSet(bool online = true);
-	bool entryHelpAdd(const std::string &str);
-
 	void responseReset(uint8_t idContent = IdContentNone);
 
 	/* member variables */
@@ -156,9 +146,6 @@ private:
 	bool mContentProcChanged;
 	size_t mCntBytesRcvd;
 	size_t mCntContentNoneRcvd;
-	bool mHelpSynced;
-	std::string mEntryHelpFirst;
-	size_t mCntHelp;
 	uint32_t mLastProcTreeRcvdMs;
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;

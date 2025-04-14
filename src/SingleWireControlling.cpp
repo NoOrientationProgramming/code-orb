@@ -36,8 +36,6 @@
 		gen(StDevUartInit) \
 		gen(StTargetInit) \
 		gen(StTargetInitDoneWait) \
-		gen(StInfoHelpRequest) \
-		gen(StInfoHelpRcvdWait) \
 		gen(StNextFlowDetermine) \
 		gen(StContentReceiveWait) \
 		gen(StCtrlManual) \
@@ -92,7 +90,6 @@ static uint8_t uartVirtualTimeout = 0;
 RefDeviceUart refUart;
 
 const size_t cNumRequestsCmdMax = 40;
-const size_t cCntHelpMax = 97;
 const uint32_t cTimeoutCmduC = 100;
 const uint32_t cTimeoutCmdReq = 5500;
 
@@ -114,9 +111,6 @@ SingleWireControlling::SingleWireControlling()
 	, mContentProcChanged(false)
 	, mCntBytesRcvd(0)
 	, mCntContentNoneRcvd(0)
-	, mHelpSynced(false)
-	, mEntryHelpFirst("")
-	, mCntHelp(0)
 	, mLastProcTreeRcvdMs(0)
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
@@ -238,58 +232,10 @@ Success SingleWireControlling::process()
 
 		targetOnlineSet();
 
-		mHelpSynced = false;
-		mEntryHelpFirst = "";
-		mCntHelp = 0;
 		mpListCmdCurrent = NULL;
+		mStartCmdMs = 0;
 
-		mState = StInfoHelpRequest;
-
-		break;
-	case StInfoHelpRequest:
-
-		cmdSend("infoHelp");
-
-		dataRequest();
-		mState = StInfoHelpRcvdWait;
-
-		break;
-	case StInfoHelpRcvdWait:
-
-		success = dataReceive();
-		if (success == Pending)
-			break;
-
-		if (success == SwtErrRcvNoUart)
-		{
-			mState = StUartInit;
-			break;
-		}
-
-		if (success == SwtErrRcvNoTarget)
-		{
-			mState = StTargetInit;
-			break;
-		}
-#if 0
-		procWrnLog("content received: %02X > '%s'",
-						mResp.idContent,
-						mResp.content.c_str());
-#endif
-		if (mResp.idContent != IdContentCmd)
-			break;
-
-		ok = entryHelpAdd(mResp.content);
-		if (!ok)
-		{
-			mStartCmdMs = 0;
-			mState = StNextFlowDetermine;
-			break;
-		}
-
-		responseReset();
-
-		mState = StInfoHelpRequest;
+		mState = StNextFlowDetermine;
 
 		break;
 	case StNextFlowDetermine:
@@ -413,10 +359,10 @@ void SingleWireControlling::cmdResponseReceived(const string &resp)
 {
 	if (!mpListCmdCurrent)
 		return;
-
+#if 0
 	procWrnLog("command response received: %s",
 				resp.c_str());
-
+#endif
 	uint32_t idReq = mpListCmdCurrent->front().idReq;
 	mpListCmdCurrent->pop_front();
 	responsesCmd.emplace_back(resp, idReq, millis());
@@ -452,10 +398,10 @@ void SingleWireControlling::cmdResponsesClear(uint32_t curTimeMs)
 			++iter;
 			continue;
 		}
-
+#if 0
 		procWrnLog("response timeout for: %u",
 					iter->idReq);
-
+#endif
 		iter = responsesCmd.erase(iter);
 	}
 }
@@ -470,7 +416,7 @@ void SingleWireControlling::cmdSend(const string &cmd)
 
 	mStartMs = millis();
 
-	procWrnLog("cmd sent: %s", cmd.c_str());
+	//procWrnLog("cmd sent: %s", cmd.c_str());
 }
 
 void SingleWireControlling::dataRequest()
@@ -483,7 +429,7 @@ void SingleWireControlling::dataRequest()
 	if (mCntDelayPrioLow)
 	{
 		--mCntDelayPrioLow;
-		procWrnLog("low prio delay: %u", mCntDelayPrioLow);
+		//procWrnLog("low prio delay: %u", mCntDelayPrioLow);
 	}
 }
 
@@ -711,41 +657,6 @@ void SingleWireControlling::targetOnlineSet(bool online)
 	mContentProcChanged = true;
 }
 
-bool SingleWireControlling::entryHelpAdd(const string &str)
-{
-	if (mCntHelp > cCntHelpMax)
-	{
-		procWrnLog("too many help steps");
-		return false;
-	}
-
-	++mCntHelp;
-
-	if (!mHelpSynced)
-	{
-		if (!str.size())
-			mHelpSynced = true;
-
-		return true;
-	}
-
-	if (!str.size() || str == mEntryHelpFirst)
-		return false;
-
-	const char *pMe = "infoHelp";
-
-	if (!strncmp(str.data(), pMe, strlen(pMe)))
-		return true;
-
-	if (!mEntryHelpFirst.size())
-		mEntryHelpFirst = mResp.content;
-#if 1
-	procWrnLog("help entry received: '%s'",
-					mResp.content.c_str());
-#endif
-	return true;
-}
-
 void SingleWireControlling::responseReset(uint8_t idContent)
 {
 	mResp.idContent = idContent;
@@ -784,7 +695,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 	for (; iter != mFragments.end(); ++iter)
 		dInfo("  %02X > '%s'\n", iter->first, iter->second.c_str());
 #endif
-#if 1
+#if 0
 	dInfo("Command requests\n");
 	dInfo("ID next\t\t\t%u\n", idReqCmdNext);
 
@@ -1029,6 +940,7 @@ void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, 
 	dInfo("String moved");
 }
 
+// TEMP
 void SingleWireControlling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	uint32_t idReq;
@@ -1043,4 +955,5 @@ void SingleWireControlling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEn
 
 	dInfo("Command sent: %s", pArgs);
 }
+// TEMP end
 
