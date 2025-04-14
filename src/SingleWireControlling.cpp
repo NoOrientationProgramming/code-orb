@@ -121,6 +121,8 @@ SingleWireControlling::SingleWireControlling()
 	, mResponsesCmd()
 {
 	responseReset();
+	mBufRcv[0] = 0;
+
 	mState = StStart;
 }
 
@@ -556,7 +558,7 @@ void SingleWireControlling::fragmentAppend(uint8_t ch)
 		return;
 	}
 
-	string &str = mFragments[idContent];
+	const string &str = mFragments[idContent];
 
 	if (str.size() > cSizeFragmentMax)
 		return;
