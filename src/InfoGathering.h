@@ -62,7 +62,7 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	Success gatheringFinished();
+	Success entryNewGet();
 	bool entryFound(const std::string &entry);
 
 	/* member variables */

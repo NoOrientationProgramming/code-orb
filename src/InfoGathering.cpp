@@ -104,11 +104,11 @@ Success InfoGathering::process()
 			break;
 		}
 
-		success = gatheringFinished();
+		success = entryNewGet();
 		if (success == Pending)
 			break;
 
-		if (success != Positive)
+		if (success == Positive)
 		{
 			mState = StCmdSend;
 			break;
@@ -134,7 +134,7 @@ Success InfoGathering::process()
 	return Pending;
 }
 
-Success InfoGathering::gatheringFinished()
+Success InfoGathering::entryNewGet()
 {
 	string resp;
 	bool ok;
@@ -148,11 +148,11 @@ Success InfoGathering::gatheringFinished()
 
 	ok = entryFound(resp);
 	if (ok)
-		return Positive;
+		return -1;
 
 	mEntriesReceived.push_back(resp);
 
-	return -1;
+	return Positive;
 }
 
 bool InfoGathering::entryFound(const string &entry)
