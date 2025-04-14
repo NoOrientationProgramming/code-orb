@@ -26,6 +26,9 @@
 #ifndef INFO_GATHERING_H
 #define INFO_GATHERING_H
 
+#include <string>
+#include <list>
+
 #include "Processing.h"
 
 class InfoGathering : public Processing
@@ -37,6 +40,8 @@ public:
 	{
 		return new dNoThrow InfoGathering;
 	}
+
+	std::list<std::string> mEntriesReceived;
 
 protected:
 
@@ -57,12 +62,14 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	bool responseCheck();
+	Success gatheringFinished();
+	bool entryFound(const std::string &entry);
 
 	/* member variables */
 	uint32_t mStartMs;
 	uint32_t mIdReq;
 	std::string mResp;
+	uint8_t mCntFilt;
 
 	/* static functions */
 

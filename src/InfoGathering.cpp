@@ -30,7 +30,7 @@
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
-		gen(StMain) \
+		gen(StCmdSend) \
 		gen(StRespCmdWait) \
 
 #define dGenProcStateEnum(s) s,
@@ -43,10 +43,14 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+const uint8_t cCntFiltMax = 4;
+
 InfoGathering::InfoGathering()
 	: Processing("InfoGathering")
+	, mEntriesReceived()
 	, mStartMs(0)
 	, mIdReq(0)
+	, mCntFilt(0)
 {
 	mState = StStart;
 }
@@ -59,7 +63,7 @@ Success InfoGathering::process()
 {
 	uint32_t curTimeMs = millis();
 	uint32_t diffMs = curTimeMs - mStartMs;
-	//Success success;
+	Success success;
 	bool ok;
 #if 0
 	dStateTrace;
@@ -68,16 +72,18 @@ Success InfoGathering::process()
 	{
 	case StStart:
 
-		mState = StMain;
+		mEntriesReceived.clear();
+
+		mState = StCmdSend;
 
 		break;
-	case StMain:
+	case StCmdSend:
 
 		ok = SingleWireControlling::commandSend("infoHelp", mIdReq, PrioSysLow);
 		if (!ok)
 			return procErrLog(-1, "could not send command");
 
-		procWrnLog("request ID: %u", mIdReq);
+		//procWrnLog("request ID: %u", mIdReq);
 
 		mStartMs = curTimeMs;
 		mState = StRespCmdWait;
@@ -86,14 +92,38 @@ Success InfoGathering::process()
 	case StRespCmdWait:
 
 		if (diffMs > cTimeoutResponseMs)
-			return procErrLog(-1, "timeout getting response");
+		{
+			if (mCntFilt >= cCntFiltMax)
+				return procErrLog(-1, "timeout getting response");
 
-		ok = responseCheck();
-		if (!ok)
+			++mCntFilt;
+
+			// clear?
+
+			mState = StCmdSend;
+			break;
+		}
+
+		success = gatheringFinished();
+		if (success == Pending)
 			break;
 
+		if (success != Positive)
+		{
+			mState = StCmdSend;
+			break;
+		}
+#if 0
 		procWrnLog("gathered information");
 
+		{
+			list<string>::iterator iter;
+
+			iter = mEntriesReceived.begin();
+			for (; iter != mEntriesReceived.end(); ++iter)
+				procWrnLog("  %s", iter->c_str());
+		}
+#endif
 		return Positive;
 
 		break;
@@ -104,18 +134,41 @@ Success InfoGathering::process()
 	return Pending;
 }
 
-bool InfoGathering::responseCheck()
+Success InfoGathering::gatheringFinished()
 {
 	string resp;
 	bool ok;
 
 	ok = SingleWireControlling::commandResponseGet(mIdReq, resp);
 	if (!ok)
-		return false;
+		return Pending;
 
-	procWrnLog("response received: %s", resp.c_str());
+	//procWrnLog("response received: %s", resp.c_str());
+	mCntFilt = 0;
 
-	return true;
+	ok = entryFound(resp);
+	if (ok)
+		return Positive;
+
+	mEntriesReceived.push_back(resp);
+
+	return -1;
+}
+
+bool InfoGathering::entryFound(const string &entry)
+{
+	list<string>::iterator iter;
+
+	iter = mEntriesReceived.begin();
+	for (; iter != mEntriesReceived.end(); ++iter)
+	{
+		if (*iter != entry)
+			continue;
+
+		return true;
+	}
+
+	return false;
 }
 
 void InfoGathering::processInfo(char *pBuf, char *pBufEnd)
