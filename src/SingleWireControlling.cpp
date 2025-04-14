@@ -93,6 +93,7 @@ RefDeviceUart refUart;
 
 const size_t cNumRequestsCmdMax = 40;
 const size_t cCntHelpMax = 97;
+const uint32_t cTimeoutCmduC = 100;
 const uint32_t cTimeoutCmdReq = 5500;
 
 list<CommandReqResp> SingleWireControlling::requestsCmd[3];
@@ -122,6 +123,7 @@ SingleWireControlling::SingleWireControlling()
 	, mContentIgnore(false)
 	, mpListCmdCurrent(NULL)
 	, mCntDelayPrioLow(0)
+	, mStartCmdMs(0)
 {
 	responseReset();
 	mBufRcv[0] = 0;
@@ -133,7 +135,7 @@ SingleWireControlling::SingleWireControlling()
 
 Success SingleWireControlling::process()
 {
-	//uint32_t curTimeMs = millis();
+	uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
 	bool ok;
@@ -239,6 +241,7 @@ Success SingleWireControlling::process()
 		mHelpSynced = false;
 		mEntryHelpFirst = "";
 		mCntHelp = 0;
+		mpListCmdCurrent = NULL;
 
 		mState = StInfoHelpRequest;
 
@@ -279,6 +282,7 @@ Success SingleWireControlling::process()
 		ok = entryHelpAdd(mResp.content);
 		if (!ok)
 		{
+			mStartCmdMs = 0;
 			mState = StNextFlowDetermine;
 			break;
 		}
@@ -296,7 +300,7 @@ Success SingleWireControlling::process()
 			break;
 		}
 
-		cmdResponsesClear();
+		commandsCheck(curTimeMs);
 
 		// flow determine
 
@@ -397,9 +401,9 @@ bool SingleWireControlling::cmdQueueCheck()
 
 	if (!mpListCmdCurrent)
 		return false;
+	mStartCmdMs = millis();
 
 	CommandReqResp *pReq = &mpListCmdCurrent->front();
-
 	cmdSend(pReq->str);
 
 	return true;
@@ -414,17 +418,28 @@ void SingleWireControlling::cmdResponseReceived(const string &resp)
 				resp.c_str());
 
 	uint32_t idReq = mpListCmdCurrent->front().idReq;
-
 	mpListCmdCurrent->pop_front();
-	mpListCmdCurrent = NULL;
-
 	responsesCmd.emplace_back(resp, idReq, millis());
+
+	mpListCmdCurrent = NULL;
 }
 
-void SingleWireControlling::cmdResponsesClear()
+void SingleWireControlling::commandsCheck(uint32_t curTimeMs)
+{
+	cmdResponsesClear(curTimeMs);
+
+	if (!mpListCmdCurrent)
+		return;
+
+	uint32_t diffMs = curTimeMs - mStartCmdMs;
+
+	if (diffMs > cTimeoutCmduC)
+		mpListCmdCurrent = NULL;
+}
+
+void SingleWireControlling::cmdResponsesClear(uint32_t curTimeMs)
 {
 	list<CommandReqResp>::iterator iter;
-	uint32_t curTimeMs = millis();
 	uint32_t diffMs;
 
 	iter = responsesCmd.begin();

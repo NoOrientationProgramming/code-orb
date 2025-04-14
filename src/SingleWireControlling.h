@@ -129,7 +129,8 @@ private:
 
 	bool cmdQueueCheck();
 	void cmdResponseReceived(const std::string &resp);
-	void cmdResponsesClear();
+	void commandsCheck(uint32_t curTimeMs);
+	void cmdResponsesClear(uint32_t curTimeMs);
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
 	Success dataReceive();
@@ -164,6 +165,7 @@ private:
 	bool mContentIgnore;
 	std::list<CommandReqResp> *mpListCmdCurrent;
 	uint8_t mCntDelayPrioLow;
+	uint32_t mStartCmdMs;
 
 	/* static functions */
 
