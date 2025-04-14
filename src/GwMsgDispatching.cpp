@@ -112,8 +112,8 @@ Success GwMsgDispatching::process()
 
 		fprintf(stdout, "Listening on: %u, %u, %u\n",
 								mPortStart,
-								mPortStart + 2,
-								mPortStart + 4);
+								mPortStart + (uint16_t)2,
+								mPortStart + (uint16_t)4);
 
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");
