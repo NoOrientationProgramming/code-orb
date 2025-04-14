@@ -93,6 +93,11 @@ RefDeviceUart refUart;
 
 const size_t cNumRequestsCmdMax = 40;
 const size_t cCntHelpMax = 97;
+const uint32_t cTimeoutCmdReq = 5500;
+
+list<CommandReqResp> SingleWireControlling::requestsCmd[3];
+list<CommandReqResp> SingleWireControlling::responsesCmd;
+uint32_t SingleWireControlling::idReqCmdNext = 0;
 
 SingleWireControlling::SingleWireControlling()
 	: Processing("SingleWireControlling")
@@ -115,10 +120,8 @@ SingleWireControlling::SingleWireControlling()
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
 	, mContentIgnore(false)
-	, mIdReqCmdNext(0)
-	, mRequestsCmd()
-	, mIdReqCmdCurrent(0)
-	, mResponsesCmd()
+	, mpListCmdCurrent(NULL)
+	, mCntDelayPrioLow(0)
 {
 	responseReset();
 	mBufRcv[0] = 0;
@@ -151,6 +154,7 @@ Success SingleWireControlling::process()
 		cmdReg("timeoutToggle",    cmdTimeoutUartVirtToggle, "t", "Enable/Disable virtual UART timeout", "Virtual UART");
 		cmdReg("dataUartRcv",      cmdDataUartRcv,           "",  "Receive byte stream",                 "Virtual UART");
 		cmdReg("strUartRcv",       cmdStrUartRcv,            "",  "Receive string",                      "Virtual UART");
+		cmdReg("cmdSend",          cmdCommandSend,           "",  "Send command",                        "Commands");
 
 		mState = StUartInit;
 
@@ -292,7 +296,13 @@ Success SingleWireControlling::process()
 			break;
 		}
 
+		cmdResponsesClear();
+
 		// flow determine
+
+		ok = cmdQueueCheck();
+		if (ok)
+			break;
 
 		dataRequest();
 		mState = StContentReceiveWait;
@@ -337,6 +347,9 @@ Success SingleWireControlling::process()
 		if (mResp.idContent == IdContentLog)
 			ppEntriesLog.commit(mResp.content);
 
+		if (mResp.idContent == IdContentCmd)
+			cmdResponseReceived(mResp.content);
+
 		responseReset();
 
 		mState = StNextFlowDetermine;
@@ -365,6 +378,73 @@ bool SingleWireControlling::contentProcChanged()
 	return tmp;
 }
 
+bool SingleWireControlling::cmdQueueCheck()
+{
+	if (mpListCmdCurrent)
+		return false;
+
+	if (requestsCmd[PrioUser].size())
+		mpListCmdCurrent = &requestsCmd[PrioUser];
+	else
+	if (requestsCmd[PrioSysLow].size())
+	{
+		if (mCntDelayPrioLow)
+			return false;
+
+		mpListCmdCurrent = &requestsCmd[PrioSysLow];
+		mCntDelayPrioLow = 4;
+	}
+
+	if (!mpListCmdCurrent)
+		return false;
+
+	CommandReqResp *pReq = &mpListCmdCurrent->front();
+
+	cmdSend(pReq->str);
+
+	return true;
+}
+
+void SingleWireControlling::cmdResponseReceived(const string &resp)
+{
+	if (!mpListCmdCurrent)
+		return;
+
+	procWrnLog("command response received: %s",
+				resp.c_str());
+
+	uint32_t idReq = mpListCmdCurrent->front().idReq;
+
+	mpListCmdCurrent->pop_front();
+	mpListCmdCurrent = NULL;
+
+	responsesCmd.emplace_back(resp, idReq, millis());
+}
+
+void SingleWireControlling::cmdResponsesClear()
+{
+	list<CommandReqResp>::iterator iter;
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs;
+
+	iter = responsesCmd.begin();
+	while (iter != responsesCmd.end())
+	{
+		diffMs = curTimeMs - iter->startMs;
+
+		if (diffMs < cTimeoutCmdReq)
+		{
+			++iter;
+			continue;
+		}
+
+		procWrnLog("response timeout for: %u",
+					iter->idReq);
+
+		iter = responsesCmd.erase(iter);
+	}
+}
+
 void SingleWireControlling::cmdSend(const string &cmd)
 {
 	uartSend(mRefUart, FlowCtrlToTarget);
@@ -375,7 +455,7 @@ void SingleWireControlling::cmdSend(const string &cmd)
 
 	mStartMs = millis();
 
-	//procWrnLog("cmd sent: %s", cmd.c_str());
+	procWrnLog("cmd sent: %s", cmd.c_str());
 }
 
 void SingleWireControlling::dataRequest()
@@ -384,6 +464,12 @@ void SingleWireControlling::dataRequest()
 	mStartMs = millis();
 
 	//procWrnLog("data requested");
+
+	if (mCntDelayPrioLow)
+	{
+		--mCntDelayPrioLow;
+		procWrnLog("low prio delay: %u", mCntDelayPrioLow);
+	}
 }
 
 Success SingleWireControlling::dataReceive()
@@ -685,12 +771,16 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 #endif
 #if 1
 	dInfo("Command requests\n");
-	list<RequestCommand> *pList;
-	list<RequestCommand>::iterator iter;
+	dInfo("ID next\t\t\t%u\n", idReqCmdNext);
+
+	list<CommandReqResp> *pList;
+	list<CommandReqResp>::iterator iter;
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs;
 
 	for (size_t i = 0; i < 3; ++i)
 	{
-		pList = &mRequestsCmd[i];
+		pList = &requestsCmd[i];
 
 		dInfo("Priority %zu\n", i);
 
@@ -703,9 +793,33 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 		iter = pList->begin();
 		for (; iter != pList->end(); ++iter)
 		{
-			dInfo("  Cmd: %s\n", iter->cmd.c_str());
+			diffMs = curTimeMs - iter->startMs;
+
+			if (diffMs > cTimeoutCmdReq)
+				diffMs = cTimeoutCmdReq;
+
+			dInfo("  Req %u: %s (%u)\n",
+					iter->idReq,
+					iter->str.c_str(),
+					diffMs);
 		}
 	}
+
+	dInfo("Command responses\n");
+	iter = responsesCmd.begin();
+	for (; iter != responsesCmd.end(); ++iter)
+	{
+		diffMs = curTimeMs - iter->startMs;
+
+		if (diffMs > cTimeoutCmdReq)
+			diffMs = cTimeoutCmdReq;
+
+		dInfo("  Resp %u: %s (%u)\n",
+				iter->idReq,
+				iter->str.c_str(),
+				diffMs);
+	}
+
 #endif
 }
 
@@ -715,23 +829,40 @@ bool SingleWireControlling::commandSend(const string &cmd, uint32_t &idReq, Prio
 {
 	// optional mutex
 
-	list<RequestCommand> *pList = &mRequestsCmd[prio];
+	list<CommandReqResp> *pList = &requestsCmd[prio];
 
 	if (pList->size() > cNumRequestsCmdMax)
 		return false;
 
-	idReq = mIdReqCmdNext;
-	++mIdReqCmdNext;
+	if (responsesCmd.size() > cNumRequestsCmdMax)
+		return false;
+
+	idReq = idReqCmdNext;
+	++idReqCmdNext;
 
 	pList->emplace_back(cmd, idReq, millis());
 
 	return true;
 }
 
-bool SingleWireControlling::commandResponseGet(uint32_t idReq, const string &resp)
+bool SingleWireControlling::commandResponseGet(uint32_t idReq, string &resp)
 {
-	(void)idReq;
-	(void)resp;
+	list<CommandReqResp>::iterator iter;
+
+	iter = responsesCmd.begin();
+	while (iter != responsesCmd.end())
+	{
+		if (iter->idReq != idReq)
+		{
+			++iter;
+			continue;
+		}
+
+		resp = iter->str;
+		iter = responsesCmd.erase(iter);
+
+		return true;
+	}
 
 	return false;
 }
@@ -881,5 +1012,20 @@ void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, 
 
 	pFctSend(refUart, pArgs, strlen(pArgs));
 	dInfo("String moved");
+}
+
+void SingleWireControlling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	uint32_t idReq;
+	bool ok;
+
+	ok = SingleWireControlling::commandSend(pArgs, idReq);
+	if (!ok)
+	{
+		dInfo("Could not send command: %s", pArgs);
+		return;
+	}
+
+	dInfo("Command sent: %s", pArgs);
 }
 

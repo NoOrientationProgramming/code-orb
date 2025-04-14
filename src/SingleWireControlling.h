@@ -71,15 +71,15 @@ struct EntryHelp
 	std::string group;
 };
 
-struct RequestCommand
+struct CommandReqResp
 {
-	RequestCommand(std::string c, uint32_t i, uint32_t s)
-		: cmd(std::move(c))
-		, idReq(i)
-		, startMs(s)
+	CommandReqResp(std::string cmd, uint32_t id, uint32_t start)
+		: str(std::move(cmd))
+		, idReq(id)
+		, startMs(start)
 	{}
 
-	std::string cmd;
+	std::string str;
 	uint32_t idReq;
 	uint32_t startMs;
 };
@@ -102,10 +102,10 @@ public:
 
 	Pipe<std::string> ppEntriesLog;
 
-	bool commandSend(const std::string &cmd,
+	static bool commandSend(const std::string &cmd,
 					uint32_t &idReq,
 					PrioCmd prio = PrioUser);
-	bool commandResponseGet(uint32_t idReq, const std::string &resp);
+	static bool commandResponseGet(uint32_t idReq, std::string &resp);
 
 protected:
 
@@ -127,6 +127,9 @@ private:
 	Success shutdown();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	bool cmdQueueCheck();
+	void cmdResponseReceived(const std::string &resp);
+	void cmdResponsesClear();
 	void cmdSend(const std::string &cmd);
 	void dataRequest();
 	Success dataReceive();
@@ -159,10 +162,8 @@ private:
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
-	uint32_t mIdReqCmdNext;
-	std::list<RequestCommand> mRequestsCmd[3];
-	uint32_t mIdReqCmdCurrent;
-	std::map<uint32_t, std::string> mResponsesCmd;
+	std::list<CommandReqResp> *mpListCmdCurrent;
+	uint8_t mCntDelayPrioLow;
 
 	/* static functions */
 
@@ -182,7 +183,13 @@ private:
 	static void dataUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
 	static void strUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend);
 
+	// Commands
+	static void cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd);
+
 	/* static variables */
+	static std::list<CommandReqResp> requestsCmd[3];
+	static std::list<CommandReqResp> responsesCmd;
+	static uint32_t idReqCmdNext;
 
 	/* constants */
 
