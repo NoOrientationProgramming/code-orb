@@ -1,36 +1,36 @@
-./src/LibUart.cpp
-./src/main.cpp
-./src/RemoteCommanding.cpp
-./src/InfoGathering.cpp
-./src/TelnetFiltering.cpp
-./src/ColorTesting.cpp
-./src/GwMsgDispatching.cpp
-./src/SingleWireControlling.cpp
-./src/GwSupervising.cpp
-./deps/ProcessingCommon/MailSending.cpp
-./deps/ProcessingCommon/EventListening.cpp
-./deps/ProcessingCommon/EspLedPulsing.cpp
-./deps/ProcessingCommon/HttpRequesting.cpp
-./deps/ProcessingCommon/LibFilesys.cpp
-./deps/ProcessingCommon/ThreadPooling.cpp
-./deps/ProcessingCommon/widgets-term/Widget.cpp
-./deps/ProcessingCommon/widgets-term/TextBox.cpp
-./deps/ProcessingCommon/LibDspc.cpp
-./deps/ProcessingCommon/PhyAnimating.cpp
-./deps/ProcessingCommon/ListIdx.cpp
-./deps/ProcessingCommon/FileExecuting.cpp
-./deps/ProcessingCommon/DnsResolving.cpp
-./deps/ProcessingCommon/LibDriverPlatform.cpp
-./deps/ProcessingCommon/LibTime.cpp
-./deps/ProcessingCommon/MsWaiting.cpp
-./deps/ProcessingCommon/Res.cpp
-./deps/ProcessingCommon/KeyUser.cpp
-./deps/ProcessingCore/EspWifiConnecting.cpp
-./deps/ProcessingCore/Processing.cpp
-./deps/ProcessingCore/SystemDebugging.cpp
-./deps/ProcessingCore/SystemCommanding.cpp
-./deps/ProcessingCore/TcpTransfering.cpp
-./deps/ProcessingCore/Log.cpp
-./deps/ProcessingCore/TcpListening.cpp
-./deps/ProcessingCore/targets/stm32/SystemDebugging.cpp
-./deps/ProcessingCore/targets/stm32/SingleWireTransfering.cpp
+- ./src/LibUart.cpp
+- ./src/main.cpp
+- ./src/RemoteCommanding.cpp
+- ./src/InfoGathering.cpp
+- ./src/TelnetFiltering.cpp
+- ./src/ColorTesting.cpp
+- ./src/GwMsgDispatching.cpp
+- ./src/SingleWireControlling.cpp
+- ./src/GwSupervising.cpp
+- ./deps/ProcessingCommon/MailSending.cpp
+- ./deps/ProcessingCommon/EventListening.cpp
+- ./deps/ProcessingCommon/EspLedPulsing.cpp
+- ./deps/ProcessingCommon/HttpRequesting.cpp
+- ./deps/ProcessingCommon/LibFilesys.cpp
+- ./deps/ProcessingCommon/ThreadPooling.cpp
+- ./deps/ProcessingCommon/widgets-term/Widget.cpp
+- ./deps/ProcessingCommon/widgets-term/TextBox.cpp
+- ./deps/ProcessingCommon/LibDspc.cpp
+- ./deps/ProcessingCommon/PhyAnimating.cpp
+- ./deps/ProcessingCommon/ListIdx.cpp
+- ./deps/ProcessingCommon/FileExecuting.cpp
+- ./deps/ProcessingCommon/DnsResolving.cpp
+- ./deps/ProcessingCommon/LibDriverPlatform.cpp
+- ./deps/ProcessingCommon/LibTime.cpp
+- ./deps/ProcessingCommon/MsWaiting.cpp
+- ./deps/ProcessingCommon/Res.cpp
+- ./deps/ProcessingCommon/KeyUser.cpp
++ ./deps/ProcessingCore/EspWifiConnecting.cpp
++ ./deps/ProcessingCore/Processing.cpp
++ ./deps/ProcessingCore/SystemDebugging.cpp
++ ./deps/ProcessingCore/SystemCommanding.cpp
+- ./deps/ProcessingCore/TcpTransfering.cpp
+- ./deps/ProcessingCore/Log.cpp
+- ./deps/ProcessingCore/TcpListening.cpp
+- ./deps/ProcessingCore/targets/stm32/SystemDebugging.cpp
+- ./deps/ProcessingCore/targets/stm32/SingleWireTransfering.cpp

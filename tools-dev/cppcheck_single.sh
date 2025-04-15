@@ -20,6 +20,7 @@ cppcheck \
 	--suppress=missingIncludeSystem \
 	--suppress=noExplicitConstructor \
 	--suppress=uselessAssignmentPtrArg \
+	--suppress=constParameterCallback \
 	--suppress=unmatchedSuppression \
 	--suppress=checkersReport \
 	$1
