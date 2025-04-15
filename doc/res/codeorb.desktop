@@ -1,0 +1,14 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CodeOrb
+GenericName=Microcontroller Debugging Tool
+Comment=CodeOrb - Microcontroller Debugging
+Exec=codeorb
+Icon=codeorb
+Terminal=true
+Categories=Development;IDE;Electronics;
+Keywords=debugger;microcontroller;embedded;code;cli;
+MimeType=
+
