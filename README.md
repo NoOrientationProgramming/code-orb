@@ -45,21 +45,13 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
   </kbd>
 </p>
 
-### Process Tree
+### User Interface
 
 <p align="center">
   <kbd>
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-04-08%2022-40-02.png" style="width: 700px; max-width:100%"/>
   </kbd>
 </p>
-
-### Log
-
-TODO: Screenshot
-
-### Command Interface
-
-TODO: Screenshot
 
 ## How To Build
 
