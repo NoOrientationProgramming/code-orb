@@ -151,6 +151,12 @@ int main(int argc, char *argv[])
 	CmdLine cmd("Command description message", ' ', appVersion());
 
 	AppHelpOutput aho;
+#if 1
+	aho.package = dPackageName;
+	aho.version = dVersion;
+	aho.nameApp = dAppName;
+	aho.copyright = "(C) 2025 DSP-Crowd Electronics GmbH";
+#endif
 	cmd.setOutput(&aho);
 
 	ValueArg<int> argVerbosity("v", "verbosity", "Verbosity: high => more output", false, 0, "uint8");
