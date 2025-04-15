@@ -81,6 +81,21 @@ warningsLinux = [
 if host_machine.system() == 'windows'
 	args += '-D_WIN32_WINNT=_WIN32_WINNT_WIN10'
 	args += '-DWINVER=_WIN32_WINNT_WIN10'
+
+	if cxx.get_id() == 'msvc'
+		windres = find_program('rc', required: true)
+	else
+		windres = find_program('x86_64-w64-mingw32-windres', required: true)
+	endif
+
+	icon = custom_target('icon-resources',
+		input: 'src/codeorb.rc',
+		output: 'codeorb.res',
+		depend_files: 'src/codeorb.ico',
+		command: [windres, '-i', '@INPUT@', '-o', '@OUTPUT@']
+	)
+
+	srcs += icon
 else
 	args += '-std=gnu++11'
 endif
