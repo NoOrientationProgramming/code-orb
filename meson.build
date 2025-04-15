@@ -84,14 +84,11 @@ if host_machine.system() == 'windows'
 
 	if cxx.get_id() == 'msvc'
 		windres = find_program('rc', required: true)
+		optWindres = [windres, '/fo', '@OUTPUT@', '@INPUT@']
 	else
 		windres = find_program('x86_64-w64-mingw32-windres', required: true)
+		optWindres = [windres, '-i', '@INPUT@', '-O', 'coff', '-o', '@OUTPUT@']
 		args += '-D__STDCPP_THREADS__=1'
-	endif
-
-	optWindres = [windres, '-i', '@INPUT@', '-o', '@OUTPUT@']
-	if cxx.get_id() != 'msvc'
-		optWindres += ['-O', 'coff']
 	endif
 
 	icon = custom_target('icon-resources',
