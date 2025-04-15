@@ -131,8 +131,13 @@ endif
 
 # Application
 
+nameExe = 'codeorb'
+if host_machine.system() == 'windows'
+	nameExe = 'CodeOrb'
+endif
+
 myApp = executable(
-	'codeorb',
+	nameExe,
 	[
 		srcs,
 	],
