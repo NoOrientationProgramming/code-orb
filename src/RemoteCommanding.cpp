@@ -163,16 +163,16 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
-void RemoteCommanding::listCommandsUpdate(list<string> &listStr)
+void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 {
-	list<string>::iterator iter;
+	list<string>::const_iterator iter;
 
 	listCmds.clear();
 
 	iter = listStr.begin();
 	for (; iter != listStr.end(); ++iter)
 	{
-		string &str = *iter;
+		const string &str = *iter;
 
 		if (!str.size())
 			continue;
