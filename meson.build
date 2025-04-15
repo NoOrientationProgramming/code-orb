@@ -81,6 +81,7 @@ warningsLinux = [
 if host_machine.system() == 'windows'
 	args += '-D_WIN32_WINNT=_WIN32_WINNT_WIN10'
 	args += '-DWINVER=_WIN32_WINNT_WIN10'
+	args += '-D__STDCPP_THREADS__=1'
 
 	if cxx.get_id() == 'msvc'
 		windres = find_program('rc', required: true)
