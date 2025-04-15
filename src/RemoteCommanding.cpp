@@ -53,7 +53,6 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	//, mStartMs(0)
 	, mFdSocket(fd)
 	, mpFilt(NULL)
-	, mIdReq(0)
 {
 	mState = StStart;
 }

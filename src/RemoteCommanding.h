@@ -75,7 +75,6 @@ private:
 	//uint32_t mStartMs;
 	SOCKET mFdSocket;
 	TelnetFiltering *mpFilt;
-	uint32_t mIdReq;
 
 	/* static functions */
 
