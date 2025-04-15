@@ -349,7 +349,7 @@ bool SingleWireControlling::cmdQueueCheck()
 		return false;
 	mStartCmdMs = millis();
 
-	CommandReqResp *pReq = &mpListCmdCurrent->front();
+	const CommandReqResp *pReq = &mpListCmdCurrent->front();
 	cmdSend(pReq->str);
 
 	return true;
