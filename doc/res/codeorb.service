@@ -1,0 +1,14 @@
+
+[Unit]
+Description=CodeOrb - Microcontroller Debugging
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/codeorb --verbosity 2
+StandardOutput=journal
+StandardError=journal
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+
