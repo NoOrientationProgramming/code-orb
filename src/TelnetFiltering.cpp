@@ -434,7 +434,7 @@ Success TelnetFiltering::keyGet(uint8_t key)
 		break;
 	case StKeyEscO:
 
-		if (key >= 'A' || key <= 'D')
+		if (key >= 'A' && key <= 'D')
 		{
 			mModCtrl = true;
 
