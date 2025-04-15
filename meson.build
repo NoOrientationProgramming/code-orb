@@ -81,12 +81,12 @@ warningsLinux = [
 if host_machine.system() == 'windows'
 	args += '-D_WIN32_WINNT=_WIN32_WINNT_WIN10'
 	args += '-DWINVER=_WIN32_WINNT_WIN10'
-	args += '-D__STDCPP_THREADS__=1'
 
 	if cxx.get_id() == 'msvc'
 		windres = find_program('rc', required: true)
 	else
 		windres = find_program('x86_64-w64-mingw32-windres', required: true)
+		args += '-D__STDCPP_THREADS__=1'
 	endif
 
 	icon = custom_target('icon-resources',
