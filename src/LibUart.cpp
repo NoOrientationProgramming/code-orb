@@ -52,6 +52,8 @@ static uint8_t *pBufVirt = bufVirtual;
  */
 Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 {
+	refUart = RefDeviceUartInvalid;
+
 	if (uartVirtual)
 		return uartVirtualMounted ? Positive : Pending;
 
