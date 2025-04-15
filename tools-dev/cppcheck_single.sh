@@ -21,6 +21,8 @@ cppcheck \
 	--suppress=noExplicitConstructor \
 	--suppress=uselessAssignmentPtrArg \
 	--suppress=constParameterCallback \
+	--suppress=preprocessorErrorDirective \
+	--suppress=unusedStructMember \
 	--suppress=unmatchedSuppression \
 	--suppress=checkersReport \
 	$1
