@@ -130,6 +130,6 @@ Optional
        --core-dump                   Enable core dumps
        --version                     Displays version information and exits.
 
-(C) DSP-Crowd Electronics GmbH
+ © 2025 DSP-Crowd Electronics GmbH
 
 ```
