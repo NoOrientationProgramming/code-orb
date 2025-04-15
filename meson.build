@@ -98,7 +98,7 @@ if host_machine.system() == 'windows'
 		input: 'src/codeorb.rc',
 		output: 'codeorb.res',
 		depend_files: 'src/codeorb.ico',
-		command: [windres, '-i', '@INPUT@', '-O', 'coff', '-o', '@OUTPUT@']
+		command: optWindres
 	)
 
 	srcs += icon
