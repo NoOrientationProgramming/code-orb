@@ -47,7 +47,7 @@ public:
 		return new dNoThrow RemoteCommanding(fd);
 	}
 
-	static void listCommandsUpdate(std::list<std::string> &listStr);
+	static void listCommandsUpdate(const std::list<std::string> &listStr);
 
 protected:
 
