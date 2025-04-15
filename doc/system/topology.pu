@@ -16,10 +16,10 @@ component PC as pPc {
 
 	frame "CodeOrb" as pGw #orange
 
-	pTree <-- pGw
-	pLog <-- pGw
-	pCmd <--> pGw : "TCP/IP"
-	' pCustom <--> pGw
+	pTree <-[thickness=2]- pGw
+	pLog <-[thickness=2]- pGw
+	pCmd <-[thickness=2]-> pGw : "TCP/IP"
+	' pCustom <-[thickness=2]-> pGw
 }
 
 component "Microcontroller" {
