@@ -89,6 +89,11 @@ if host_machine.system() == 'windows'
 		args += '-D__STDCPP_THREADS__=1'
 	endif
 
+	optWindres = [windres, '-i', '@INPUT@', '-o', '@OUTPUT@']
+	if cxx.get_id() != 'msvc'
+		optWindres += ['-O', 'coff']
+	endif
+
 	icon = custom_target('icon-resources',
 		input: 'src/codeorb.rc',
 		output: 'codeorb.res',
