@@ -24,7 +24,7 @@
 */
 
 #include "RemoteCommanding.h"
-#include "SingleWireControlling.h"
+#include "SingleWireScheduling.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \

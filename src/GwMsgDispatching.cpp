@@ -99,7 +99,7 @@ Success GwMsgDispatching::process()
 		if (!ok)
 			return procErrLog(-1, "could not start services");
 
-		mpCtrl = SingleWireControlling::create();
+		mpCtrl = SingleWireScheduling::create();
 		if (!mpCtrl)
 			return procErrLog(-1, "could not create process");
 

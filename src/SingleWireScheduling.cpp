@@ -23,7 +23,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SingleWireControlling.h"
+#include "SingleWireScheduling.h"
 #include "SystemDebugging.h"
 #include "LibTime.h"
 #include "LibDspc.h"
@@ -93,12 +93,12 @@ const size_t cNumRequestsCmdMax = 40;
 const uint32_t cTimeoutCmduC = 100;
 const uint32_t cTimeoutCmdReq = 5500;
 
-list<CommandReqResp> SingleWireControlling::requestsCmd[3];
-list<CommandReqResp> SingleWireControlling::responsesCmd;
-uint32_t SingleWireControlling::idReqCmdNext = 0;
+list<CommandReqResp> SingleWireScheduling::requestsCmd[3];
+list<CommandReqResp> SingleWireScheduling::responsesCmd;
+uint32_t SingleWireScheduling::idReqCmdNext = 0;
 
-SingleWireControlling::SingleWireControlling()
-	: Processing("SingleWireControlling")
+SingleWireScheduling::SingleWireScheduling()
+	: Processing("SingleWireScheduling")
 	, mDevUartIsOnline(false)
 	, mTargetIsOnline(false)
 	, mContentProc("")
@@ -127,7 +127,7 @@ SingleWireControlling::SingleWireControlling()
 
 /* member functions */
 
-Success SingleWireControlling::process()
+Success SingleWireScheduling::process()
 {
 	uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
@@ -321,14 +321,14 @@ Success SingleWireControlling::process()
 	return Pending;
 }
 
-bool SingleWireControlling::contentProcChanged()
+bool SingleWireScheduling::contentProcChanged()
 {
 	bool tmp = mContentProcChanged;
 	mContentProcChanged = false;
 	return tmp;
 }
 
-bool SingleWireControlling::cmdQueueCheck()
+bool SingleWireScheduling::cmdQueueCheck()
 {
 	if (mpListCmdCurrent)
 		return false;
@@ -355,7 +355,7 @@ bool SingleWireControlling::cmdQueueCheck()
 	return true;
 }
 
-void SingleWireControlling::cmdResponseReceived(const string &resp)
+void SingleWireScheduling::cmdResponseReceived(const string &resp)
 {
 	if (!mpListCmdCurrent)
 		return;
@@ -370,7 +370,7 @@ void SingleWireControlling::cmdResponseReceived(const string &resp)
 	mpListCmdCurrent = NULL;
 }
 
-void SingleWireControlling::commandsCheck(uint32_t curTimeMs)
+void SingleWireScheduling::commandsCheck(uint32_t curTimeMs)
 {
 	cmdResponsesClear(curTimeMs);
 
@@ -383,7 +383,7 @@ void SingleWireControlling::commandsCheck(uint32_t curTimeMs)
 		mpListCmdCurrent = NULL;
 }
 
-void SingleWireControlling::cmdResponsesClear(uint32_t curTimeMs)
+void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 {
 	list<CommandReqResp>::iterator iter;
 	uint32_t diffMs;
@@ -406,7 +406,7 @@ void SingleWireControlling::cmdResponsesClear(uint32_t curTimeMs)
 	}
 }
 
-void SingleWireControlling::cmdSend(const string &cmd)
+void SingleWireScheduling::cmdSend(const string &cmd)
 {
 	uartSend(mRefUart, FlowCtrlToTarget);
 	uartSend(mRefUart, IdContentOutCmd);
@@ -419,7 +419,7 @@ void SingleWireControlling::cmdSend(const string &cmd)
 	//procWrnLog("cmd sent: %s", cmd.c_str());
 }
 
-void SingleWireControlling::dataRequest()
+void SingleWireScheduling::dataRequest()
 {
 	uartSend(mRefUart, FlowTargetToCtrl);
 	mStartMs = millis();
@@ -433,7 +433,7 @@ void SingleWireControlling::dataRequest()
 	}
 }
 
-Success SingleWireControlling::dataReceive()
+Success SingleWireScheduling::dataReceive()
 {
 	if (mLenDone > 0)
 		mStartMs = millis();
@@ -483,7 +483,7 @@ Success SingleWireControlling::dataReceive()
 	return Pending;
 }
 
-Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
+Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 {
 	uint32_t diffMs = curTimeMs - mLastProcTreeRcvdMs;
 #if 0
@@ -578,7 +578,7 @@ Success SingleWireControlling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 	return Pending;
 }
 
-Success SingleWireControlling::shutdown()
+Success SingleWireScheduling::shutdown()
 {
 
 	if (mRefUart != RefDeviceUartInvalid)
@@ -590,7 +590,7 @@ Success SingleWireControlling::shutdown()
 	return Positive;
 }
 
-void SingleWireControlling::fragmentAppend(uint8_t ch)
+void SingleWireScheduling::fragmentAppend(uint8_t ch)
 {
 	if (!ch)
 		return;
@@ -613,7 +613,7 @@ void SingleWireControlling::fragmentAppend(uint8_t ch)
 	mFragments[idContent] += string(1, ch);
 }
 
-void SingleWireControlling::fragmentFinish()
+void SingleWireScheduling::fragmentFinish()
 {
 	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
@@ -626,7 +626,7 @@ void SingleWireControlling::fragmentFinish()
 	mFragments.erase(idContent);
 }
 
-void SingleWireControlling::fragmentDelete()
+void SingleWireScheduling::fragmentDelete()
 {
 	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
@@ -638,7 +638,7 @@ void SingleWireControlling::fragmentDelete()
 	mFragments.erase(idContent);
 }
 
-void SingleWireControlling::targetOnlineSet(bool online)
+void SingleWireScheduling::targetOnlineSet(bool online)
 {
 	mTargetIsOnline = online;
 
@@ -657,13 +657,13 @@ void SingleWireControlling::targetOnlineSet(bool online)
 	mContentProcChanged = true;
 }
 
-void SingleWireControlling::responseReset(uint8_t idContent)
+void SingleWireScheduling::responseReset(uint8_t idContent)
 {
 	mResp.idContent = idContent;
 	mResp.content = "";
 }
 
-void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
+void SingleWireScheduling::processInfo(char *pBuf, char *pBufEnd)
 {
 	dInfo("Manual control\t\t%sabled\n", env.ctrlManual ? "En" : "Dis");
 #if 1
@@ -751,7 +751,7 @@ void SingleWireControlling::processInfo(char *pBuf, char *pBufEnd)
 
 /* static functions */
 
-bool SingleWireControlling::commandSend(const string &cmd, uint32_t &idReq, PrioCmd prio)
+bool SingleWireScheduling::commandSend(const string &cmd, uint32_t &idReq, PrioCmd prio)
 {
 	// optional mutex
 
@@ -771,7 +771,7 @@ bool SingleWireControlling::commandSend(const string &cmd, uint32_t &idReq, Prio
 	return true;
 }
 
-bool SingleWireControlling::commandResponseGet(uint32_t idReq, string &resp)
+bool SingleWireScheduling::commandResponseGet(uint32_t idReq, string &resp)
 {
 	list<CommandReqResp>::iterator iter;
 
@@ -793,7 +793,7 @@ bool SingleWireControlling::commandResponseGet(uint32_t idReq, string &resp)
 	return false;
 }
 
-void SingleWireControlling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
@@ -801,7 +801,7 @@ void SingleWireControlling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *p
 	dInfo("Manual control %sabled", env.ctrlManual ? "en" : "dis");
 }
 
-void SingleWireControlling::cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (!env.ctrlManual)
 	{
@@ -812,7 +812,7 @@ void SingleWireControlling::cmdDataUartSend(char *pArgs, char *pBuf, char *pBufE
 	dataUartSend(pArgs, pBuf, pBufEnd, uartSend);
 }
 
-void SingleWireControlling::cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (!env.ctrlManual)
 	{
@@ -823,7 +823,7 @@ void SingleWireControlling::cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEn
 	strUartSend(pArgs, pBuf, pBufEnd, uartSend);
 }
 
-void SingleWireControlling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
@@ -855,7 +855,7 @@ void SingleWireControlling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufE
 	hexDumpPrint(pBuf, pBufEnd, buf, lenReq, NULL, 8);
 }
 
-void SingleWireControlling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	if (pArgs && *pArgs == 'u')
 		uartVirtualMode = 1;
@@ -865,7 +865,7 @@ void SingleWireControlling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pB
 	dInfo("Virtual UART mode: %s", uartVirtualMode ? "uart" : "swart");
 }
 
-void SingleWireControlling::cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
@@ -873,7 +873,7 @@ void SingleWireControlling::cmdUartVirtToggle(char *pArgs, char *pBuf, char *pBu
 	dInfo("Virtual UART %sabled", uartVirtual ? "en" : "dis");
 }
 
-void SingleWireControlling::cmdMountedUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdMountedUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
@@ -881,7 +881,7 @@ void SingleWireControlling::cmdMountedUartVirtToggle(char *pArgs, char *pBuf, ch
 	dInfo("Virtual UART %smounted", uartVirtualMounted ? "" : "un");
 }
 
-void SingleWireControlling::cmdTimeoutUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdTimeoutUartVirtToggle(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	(void)pArgs;
 
@@ -889,17 +889,17 @@ void SingleWireControlling::cmdTimeoutUartVirtToggle(char *pArgs, char *pBuf, ch
 	dInfo("Virtual UART timeout %s", uartVirtualTimeout ? "set" : "cleared");
 }
 
-void SingleWireControlling::cmdDataUartRcv(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdDataUartRcv(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	dataUartSend(pArgs, pBuf, pBufEnd, uartVirtRcv);
 }
 
-void SingleWireControlling::cmdStrUartRcv(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdStrUartRcv(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	strUartSend(pArgs, pBuf, pBufEnd, uartVirtRcv);
 }
 
-void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
+void SingleWireScheduling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
 {
 	if (!pArgs)
 	{
@@ -928,7 +928,7 @@ void SingleWireControlling::dataUartSend(char *pArgs, char *pBuf, char *pBufEnd,
 	dInfo("Data moved");
 }
 
-void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
+void SingleWireScheduling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, FuncUartSend pFctSend)
 {
 	if (!pArgs)
 	{
@@ -941,12 +941,12 @@ void SingleWireControlling::strUartSend(char *pArgs, char *pBuf, char *pBufEnd, 
 }
 
 // TEMP
-void SingleWireControlling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd)
+void SingleWireScheduling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd)
 {
 	uint32_t idReq;
 	bool ok;
 
-	ok = SingleWireControlling::commandSend(pArgs, idReq);
+	ok = SingleWireScheduling::commandSend(pArgs, idReq);
 	if (!ok)
 	{
 		dInfo("Could not send command: %s", pArgs);

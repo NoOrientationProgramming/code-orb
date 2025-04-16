@@ -23,8 +23,8 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SINGLE_WIRE_CONTROLLING_H
-#define SINGLE_WIRE_CONTROLLING_H
+#ifndef SINGLE_WIRE_SCHEDULING_H
+#define SINGLE_WIRE_SCHEDULING_H
 
 #include <string>
 #include <map>
@@ -76,14 +76,14 @@ struct CommandReqResp
 	uint32_t startMs;
 };
 
-class SingleWireControlling : public Processing
+class SingleWireScheduling : public Processing
 {
 
 public:
 
-	static SingleWireControlling *create()
+	static SingleWireScheduling *create()
 	{
-		return new dNoThrow SingleWireControlling;
+		return new dNoThrow SingleWireScheduling;
 	}
 
 	bool mDevUartIsOnline;
@@ -101,13 +101,13 @@ public:
 
 protected:
 
-	SingleWireControlling();
-	virtual ~SingleWireControlling() {}
+	SingleWireScheduling();
+	virtual ~SingleWireScheduling() {}
 
 private:
 
-	SingleWireControlling(const SingleWireControlling &) = delete;
-	SingleWireControlling &operator=(const SingleWireControlling &) = delete;
+	SingleWireScheduling(const SingleWireScheduling &) = delete;
+	SingleWireScheduling &operator=(const SingleWireScheduling &) = delete;
 
 	/*
 	 * Naming of functions:  objectVerb()

@@ -24,7 +24,7 @@
 */
 
 #include "InfoGathering.h"
-#include "SingleWireControlling.h"
+#include "SingleWireScheduling.h"
 
 #include "LibTime.h"
 
@@ -79,7 +79,7 @@ Success InfoGathering::process()
 		break;
 	case StCmdSend:
 
-		ok = SingleWireControlling::commandSend("infoHelp", mIdReq, PrioSysLow);
+		ok = SingleWireScheduling::commandSend("infoHelp", mIdReq, PrioSysLow);
 		if (!ok)
 			return procErrLog(-1, "could not send command");
 
@@ -139,7 +139,7 @@ Success InfoGathering::entryNewGet()
 	string resp;
 	bool ok;
 
-	ok = SingleWireControlling::commandResponseGet(mIdReq, resp);
+	ok = SingleWireScheduling::commandResponseGet(mIdReq, resp);
 	if (!ok)
 		return Pending;
 

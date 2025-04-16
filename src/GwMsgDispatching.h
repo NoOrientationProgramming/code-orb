@@ -29,7 +29,7 @@
 #include "Processing.h"
 #include "TcpListening.h"
 #include "TcpTransfering.h"
-#include "SingleWireControlling.h"
+#include "SingleWireScheduling.h"
 #include "RemoteCommanding.h"
 #include "InfoGathering.h"
 
@@ -93,7 +93,7 @@ private:
 	TcpListening *mpLstProc;
 	TcpListening *mpLstLog;
 	TcpListening *mpLstCmd;
-	SingleWireControlling *mpCtrl;
+	SingleWireScheduling *mpCtrl;
 	InfoGathering *mpGather;
 	bool mCursorHidden;
 	bool mDevUartIsOnline;
