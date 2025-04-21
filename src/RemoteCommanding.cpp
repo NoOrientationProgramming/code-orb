@@ -23,6 +23,8 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
+
 #include "RemoteCommanding.h"
 #include "SingleWireScheduling.h"
 #include "LibTime.h"
@@ -50,7 +52,10 @@ const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
 
-list<EntryHelp> RemoteCommanding::listCmds;
+const string cInternalCmdCls = "dbg";
+const int cSizeCmdIdMax = 16;
+
+list<EntryHelp> RemoteCommanding::cmds;
 
 RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
@@ -60,6 +65,8 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mTxtPrompt()
 	, mIdReq(0)
 {
+	mBuf[0] = 0;
+
 	mState = StStart;
 }
 
@@ -73,7 +80,6 @@ Success RemoteCommanding::process()
 	PipeEntry<KeyUser> entKey;
 	KeyUser key;
 	string msg;
-	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -105,8 +111,9 @@ Success RemoteCommanding::process()
 		if (!mpFilt->mSendReady)
 			break;
 
-		mTxtPrompt.widthSet(31);
+		mTxtPrompt.widthSet(13);
 		mTxtPrompt.lenMaxSet(51);
+		mTxtPrompt.cursorBoundSet(2);
 		mTxtPrompt.focusSet(true);
 
 		mTxtPrompt.frameEnabledSet(false);
@@ -133,8 +140,11 @@ Success RemoteCommanding::process()
 
 		if (key == keyEnter)
 		{
-			ok = commandSend();
-			if (!ok)
+			success = commandSend();
+			if (success == Positive)
+				break;
+
+			if (success != Pending)
 				break;
 
 			lineAck();
@@ -184,24 +194,36 @@ Success RemoteCommanding::process()
 	return Pending;
 }
 
-bool RemoteCommanding::commandSend()
+Success RemoteCommanding::commandSend()
 {
 	bool ok;
 
 	mTxtPrompt.focusSet(false);
 	string str = mTxtPrompt;
-	mTxtPrompt.focusSet(true);
 
-	procWrnLog("sending command: %s", str.c_str());
-
-	ok = SingleWireScheduling::commandSend(mTxtPrompt, mIdReq);
-	if (!ok)
+	if (str == "help" || str == "h")
 	{
-		procWrnLog("could not send command");
-		return false;
+		cmdHelpPrint(NULL, mBuf, mBuf + sizeof(mBuf));
+
+		string msg = "\r\n";
+
+		msg += string(mBuf);
+		msg += "\r\n";
+
+		mpFilt->send(msg.c_str(), msg.size());
+
+		lineAck();
+
+		return Positive;
 	}
 
-	return true;
+	//procWrnLog("sending command: %s", str.c_str());
+
+	ok = SingleWireScheduling::commandSend(str, mIdReq);
+	if (!ok)
+		return procErrLog(-1, "could not send command");
+
+	return Pending;
 }
 
 Success RemoteCommanding::responseReceive()
@@ -213,7 +235,12 @@ Success RemoteCommanding::responseReceive()
 	if (!ok)
 		return Pending;
 
-	procWrnLog("response received: %s", resp.c_str());
+	//procWrnLog("response received: %s", resp.c_str());
+
+	resp += "\r\n";
+	mpFilt->send(resp.c_str(), resp.size());
+
+	promptSend();
 
 	return Positive;
 }
@@ -221,6 +248,9 @@ Success RemoteCommanding::responseReceive()
 void RemoteCommanding::lineAck()
 {
 	promptSend(false, false, true);
+
+	mTxtPrompt = "";
+	mTxtPrompt.focusSet(true);
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
@@ -236,15 +266,53 @@ void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine
 	msg += "~"; // directory
 	msg += "# ";
 
-	(void)cursor;
-	//mTxtPrompt.focusSet(not cursor);
+	mTxtPrompt.cursorShow(cursor);
 	mTxtPrompt.print(msg);
-	//mTxtPrompt.focusSet(true);
 
 	if (postNewLine)
 		msg += "\r\n";
 
 	mpFilt->send(msg.c_str(), msg.size());
+}
+
+void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	list<EntryHelp>::iterator iter;
+	EntryHelp cmd;
+	string group = "";
+
+	(void)pArgs;
+
+	dInfo("\r\nAvailable commands\r\n");
+
+	iter = cmds.begin();
+	for (; iter != cmds.end(); ++iter)
+	{
+		cmd = *iter;
+
+		if (cmd.group != group)
+		{
+			dInfo("\r\n");
+
+			if (cmd.group.size() && cmd.group != cInternalCmdCls)
+				dInfo("%s\r\n", cmd.group.c_str());
+			group = cmd.group;
+		}
+
+		dInfo("  ");
+
+		if (cmd.shortcut != "")
+			dInfo("%s, ", cmd.shortcut.c_str());
+		else
+			dInfo("   ");
+
+		dInfo("%-*s", cSizeCmdIdMax + 2, cmd.id.c_str());
+
+		if (cmd.desc.size())
+			dInfo(".. %s", cmd.desc.c_str());
+
+		dInfo("\r\n");
+	}
 }
 
 void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
@@ -259,8 +327,10 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 {
 	list<string>::const_iterator iter;
+	vector<string> partsEntry;
+	EntryHelp entry;
 
-	listCmds.clear();
+	cmds.clear();
 
 	iter = listStr.begin();
 	for (; iter != listStr.end(); ++iter)
@@ -273,8 +343,66 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 		if (str == "infoHelp|||")
 			continue;
 
-		wrnLog("Entry received: %s", str.c_str());
-		// TODO: Parse
+		//wrnLog("entry received: %s", str.c_str());
+
+		partsEntry = split(str, '|');
+		if (partsEntry.size() != 4)
+		{
+			wrnLog("wrong number of parts for entry: %zu", partsEntry.size());
+			continue;
+		}
+
+		entry.id = partsEntry[0];
+		entry.shortcut = partsEntry[1];
+		entry.desc = partsEntry[2];
+		entry.group = partsEntry[3];
+
+		cmds.push_back(entry);
 	}
+
+	entry.id = "help";
+	entry.shortcut = "h";
+	entry.desc = "This help screen";
+	entry.group = cInternalCmdCls;
+
+	cmds.push_back(entry);
+	cmds.sort(commandSort);
+}
+
+bool RemoteCommanding::commandSort(const EntryHelp &cmdFirst, const EntryHelp &cmdSecond)
+{
+	if (cmdFirst.group == cInternalCmdCls && cmdSecond.group != cInternalCmdCls)
+		return true;
+	if (cmdFirst.group != cInternalCmdCls && cmdSecond.group == cInternalCmdCls)
+		return false;
+
+	if (cmdFirst.group < cmdSecond.group)
+		return true;
+	if (cmdFirst.group > cmdSecond.group)
+		return false;
+
+	if (cmdFirst.shortcut != "" && cmdSecond.shortcut == "")
+		return true;
+	if (cmdFirst.shortcut == "" && cmdSecond.shortcut != "")
+		return false;
+
+	if (cmdFirst.id < cmdSecond.id)
+		return true;
+	if (cmdFirst.id > cmdSecond.id)
+		return false;
+
+	return true;
+}
+
+vector<string> RemoteCommanding::split(const string &str, char delimiter)
+{
+	vector<string> result;
+	stringstream ss(str);
+	string item;
+
+	while (getline(ss, item, delimiter))
+		result.push_back(item);
+
+	return result;
 }
 

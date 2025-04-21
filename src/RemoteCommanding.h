@@ -26,6 +26,9 @@
 #ifndef REMOTE_COMMANDING_H
 #define REMOTE_COMMANDING_H
 
+#include <vector>
+#include <list>
+
 #include "Processing.h"
 #include "TelnetFiltering.h"
 #include "TextBox.h"
@@ -70,7 +73,7 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	bool commandSend();
+	Success commandSend();
 	Success responseReceive();
 	void lineAck();
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
@@ -81,11 +84,15 @@ private:
 	TelnetFiltering *mpFilt;
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
+	char mBuf[1023];
 
 	/* static functions */
+	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);
+	static bool commandSort(const EntryHelp &cmdFirst, const EntryHelp &cmdSecond);
+	static std::vector<std::string> split(const std::string &str, char delimiter);
 
 	/* static variables */
-	static std::list<EntryHelp> listCmds;
+	static std::list<EntryHelp> cmds;
 
 	/* constants */
 
