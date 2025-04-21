@@ -185,6 +185,8 @@ private:
 	static uint32_t idReqCmdNext;
 
 	/* constants */
+	static const size_t cSizeFragmentMax;
+	static const uint32_t cTimeoutCmduC;
 	static const uint32_t cTimeoutCmdReq;
 
 };

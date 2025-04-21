@@ -63,17 +63,17 @@ dProcessStateStr(SwtState);
 using namespace std;
 
 #define dTimeoutTargetInitMs	35
-const size_t cSizeFragmentMax = 4095;
 const uint8_t cKeyEscape = 0x1B;
 const uint8_t cKeyTab = '\t';
 const uint8_t cKeyCr = '\r';
 const uint8_t cKeyLf = '\n';
 
+const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
+const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
+const uint32_t SingleWireScheduling::cTimeoutCmdReq = 5500;
+
 uint8_t SingleWireScheduling::uartVirtualTimeout = 0;
 RefDeviceUart SingleWireScheduling::refUart;
-
-const uint32_t cTimeoutCmduC = 100;
-const uint32_t SingleWireScheduling::cTimeoutCmdReq = 5500;
 
 list<CommandReqResp> SingleWireScheduling::requestsCmd[3];
 list<CommandReqResp> SingleWireScheduling::responsesCmd;
