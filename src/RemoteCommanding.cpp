@@ -25,12 +25,14 @@
 
 #include "RemoteCommanding.h"
 #include "SingleWireScheduling.h"
+#include "LibTime.h"
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
 		gen(StSendReadyWait) \
 		gen(StWelcomeSend) \
 		gen(StMain) \
+		gen(StResponseRcvdWait) \
 
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
@@ -42,6 +44,8 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
+const uint32_t cTimeoutResponseMs = 300;
+
 const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
@@ -50,9 +54,11 @@ list<EntryHelp> RemoteCommanding::listCmds;
 
 RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
-	//, mStartMs(0)
+	, mStartMs(0)
 	, mFdSocket(fd)
 	, mpFilt(NULL)
+	, mTxtPrompt()
+	, mIdReq(0)
 {
 	mState = StStart;
 }
@@ -61,12 +67,13 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 
 Success RemoteCommanding::process()
 {
-	//uint32_t curTimeMs = millis();
-	//uint32_t diffMs = curTimeMs - mStartMs;
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
 	PipeEntry<KeyUser> entKey;
 	KeyUser key;
 	string msg;
+	bool ok;
 #if 0
 	dStateTrace;
 #endif
@@ -98,6 +105,13 @@ Success RemoteCommanding::process()
 		if (!mpFilt->mSendReady)
 			break;
 
+		mTxtPrompt.widthSet(31);
+		mTxtPrompt.lenMaxSet(51);
+		mTxtPrompt.focusSet(true);
+
+		mTxtPrompt.frameEnabledSet(false);
+		mTxtPrompt.paddingEnabledSet(false);
+
 		mState = StWelcomeSend;
 
 		break;
@@ -115,9 +129,47 @@ Success RemoteCommanding::process()
 			break;
 		key = entKey.particle;
 
-		procWrnLog("Got key: %s", key.str().c_str());
+		//procWrnLog("Got key: %s", key.str().c_str());
+
+		if (key == keyEnter)
+		{
+			ok = commandSend();
+			if (!ok)
+				break;
+
+			lineAck();
+
+			mStartMs = curTimeMs;
+			mState = StResponseRcvdWait;
+			break;
+		}
+
+		if (mTxtPrompt.keyProcess(key))
+		{
+			promptSend();
+			break;
+		}
 
 		// TODO: Implement 'Done' on empty string
+
+		break;
+	case StResponseRcvdWait:
+
+		if (diffMs > cTimeoutResponseMs)
+		{
+			procWrnLog("timeout sending command");
+
+			// TODO: Prompt
+
+			mState = StMain;
+			break;
+		}
+
+		success = responseReceive();
+		if (success == Pending)
+			break;
+
+		mState = StMain;
 
 		break;
 	default:
@@ -130,6 +182,45 @@ Success RemoteCommanding::process()
 	mpFilt->send(msg.c_str(), msg.size());
 
 	return Pending;
+}
+
+bool RemoteCommanding::commandSend()
+{
+	bool ok;
+
+	mTxtPrompt.focusSet(false);
+	string str = mTxtPrompt;
+	mTxtPrompt.focusSet(true);
+
+	procWrnLog("sending command: %s", str.c_str());
+
+	ok = SingleWireScheduling::commandSend(mTxtPrompt, mIdReq);
+	if (!ok)
+	{
+		procWrnLog("could not send command");
+		return false;
+	}
+
+	return true;
+}
+
+Success RemoteCommanding::responseReceive()
+{
+	string resp;
+	bool ok;
+
+	ok = SingleWireScheduling::commandResponseGet(mIdReq, resp);
+	if (!ok)
+		return Pending;
+
+	procWrnLog("response received: %s", resp.c_str());
+
+	return Positive;
+}
+
+void RemoteCommanding::lineAck()
+{
+	promptSend(false, false, true);
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
@@ -146,6 +237,9 @@ void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine
 	msg += "# ";
 
 	(void)cursor;
+	//mTxtPrompt.focusSet(not cursor);
+	mTxtPrompt.print(msg);
+	//mTxtPrompt.focusSet(true);
 
 	if (postNewLine)
 		msg += "\r\n";

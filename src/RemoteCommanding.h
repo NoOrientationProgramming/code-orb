@@ -28,6 +28,7 @@
 
 #include "Processing.h"
 #include "TelnetFiltering.h"
+#include "TextBox.h"
 
 struct EntryHelp
 {
@@ -69,12 +70,17 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	bool commandSend();
+	Success responseReceive();
+	void lineAck();
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 
 	/* member variables */
-	//uint32_t mStartMs;
+	uint32_t mStartMs;
 	SOCKET mFdSocket;
 	TelnetFiltering *mpFilt;
+	TextBox mTxtPrompt;
+	uint32_t mIdReq;
 
 	/* static functions */
 
