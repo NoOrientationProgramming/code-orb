@@ -26,6 +26,7 @@ srcs = [
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
 	'src/SingleWireScheduling.cpp',
+	'src/LibSingleWireScheduling.cpp',
 	'src/RemoteCommanding.cpp',
 	'src/LibUart.cpp',
 	'src/TelnetFiltering.cpp',

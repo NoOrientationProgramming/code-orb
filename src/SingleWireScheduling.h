@@ -118,6 +118,8 @@ private:
 	Success process();
 	Success shutdown();
 	void processInfo(char *pBuf, char *pBufEnd);
+	void fragmentsPrint(char *pBuf, char *pBufEnd);
+	void queuesCmdPrint(char *pBuf, char *pBufEnd);
 
 	bool cmdQueueCheck();
 	void cmdResponseReceived(const std::string &resp);
@@ -127,12 +129,11 @@ private:
 	void dataRequest();
 	Success dataReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
+	void targetOnlineSet(bool online = true);
+	void responseReset(uint8_t idContent = IdContentNone);
 	void fragmentAppend(uint8_t ch);
 	void fragmentFinish();
 	void fragmentDelete();
-
-	void targetOnlineSet(bool online = true);
-	void responseReset(uint8_t idContent = IdContentNone);
 
 	/* member variables */
 	uint32_t mStateSwt;
@@ -157,6 +158,7 @@ private:
 	/* static functions */
 
 	// Manual Control
+	static void commandsRegister();
 	static void cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd);
@@ -176,11 +178,14 @@ private:
 	static void cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd);
 
 	/* static variables */
+	static uint8_t uartVirtualTimeout;
+	static RefDeviceUart refUart;
 	static std::list<CommandReqResp> requestsCmd[3];
 	static std::list<CommandReqResp> responsesCmd;
 	static uint32_t idReqCmdNext;
 
 	/* constants */
+	static const uint32_t cTimeoutCmdReq;
 
 };
 
