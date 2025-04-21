@@ -22,6 +22,9 @@ srcs = [
 	'deps/ProcessingCommon/LibDspc.cpp',
 	'deps/ProcessingCommon/KeyUser.cpp',
 	'deps/ProcessingCommon/ThreadPooling.cpp',
+	'deps/ProcessingCommon/ListIdx.cpp',
+	'deps/ProcessingCommon/widgets-term/Widget.cpp',
+	'deps/ProcessingCommon/widgets-term/TextBox.cpp',
 	'src/main.cpp',
 	'src/GwSupervising.cpp',
 	'src/GwMsgDispatching.cpp',
@@ -145,6 +148,7 @@ myApp = executable(
 	include_directories : include_directories([
 		'./deps/ProcessingCore',
 		'./deps/ProcessingCommon',
+		'./deps/ProcessingCommon/widgets-term',
 		'./src',
 	]),
 	dependencies : [
