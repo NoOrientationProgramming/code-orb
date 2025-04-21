@@ -24,6 +24,7 @@
 */
 
 #include "SingleWireScheduling.h"
+#include "SingleWire.h"
 #include "SystemDebugging.h"
 #include "LibTime.h"
 #include "LibDspc.h"
@@ -61,23 +62,6 @@ dProcessStateStr(SwtState);
 #endif
 
 using namespace std;
-
-enum SwtFlowDirection
-{
-	FlowCtrlToTarget = 0x0B,
-	FlowTargetToCtrl = 0x0C
-};
-
-enum SwtContentIdOut
-{
-	IdContentOutCmd = 0x1A,
-};
-
-enum SwtContentEnd
-{
-	IdContentCut = 0x0F,
-	IdContentEnd = 0x17,
-};
 
 #define dTimeoutTargetInitMs	35
 const size_t cSizeFragmentMax = 4095;
@@ -408,8 +392,8 @@ void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 
 void SingleWireScheduling::cmdSend(const string &cmd)
 {
-	uartSend(mRefUart, FlowCtrlToTarget);
-	uartSend(mRefUart, IdContentOutCmd);
+	uartSend(mRefUart, FlowSchedToTarget);
+	uartSend(mRefUart, IdContentScToTaCmd);
 	uartSend(mRefUart, cmd.data(), cmd.size());
 	uartSend(mRefUart, 0x00);
 	uartSend(mRefUart, IdContentEnd);
@@ -421,7 +405,7 @@ void SingleWireScheduling::cmdSend(const string &cmd)
 
 void SingleWireScheduling::dataRequest()
 {
-	uartSend(mRefUart, FlowTargetToCtrl);
+	uartSend(mRefUart, FlowTargetToSched);
 	mStartMs = millis();
 
 	//procWrnLog("data requested");
