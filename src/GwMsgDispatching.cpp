@@ -463,6 +463,7 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 				continue;
 			}
 
+			pCmd->procTreeDisplaySet(false);
 			whenFinishedRepel(start(pCmd));
 
 			continue;
