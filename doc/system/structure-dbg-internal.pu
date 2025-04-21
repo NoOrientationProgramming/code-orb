@@ -5,10 +5,10 @@
 
 frame "SingleWireTransfering()" as pSwt
 
-component "Line\nController to\nTarget" as pLineCtt
-component "Line\nTarget to\nController" as pLineTtc
+component "Line\nScheduler to\nTarget" as pLineCtt
+component "Line\nTarget to\nScheduler" as pLineTtc
 
-frame "SingleWireControlling()" as pGw {
+frame "SingleWireScheduling()" as pGw {
 
 	rectangle "Controlling()" as pCtrl {
 
@@ -59,7 +59,7 @@ pLineTtc <.> pLineCtt
 pLineCtt --> pSwt
 pLineTtc <-- pSwt
 
-footer **SingleWireControlling()** - Internal control & debug structure\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireScheduling()** - Internal control & debug structure\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

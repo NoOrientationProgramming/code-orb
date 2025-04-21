@@ -46,7 +46,7 @@ sTcp is 0
 
 @200
 
-footer **SingleWireControlling()** - Flow Pressure\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireScheduling()** - Flow Pressure\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 

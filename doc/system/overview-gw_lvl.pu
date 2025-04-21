@@ -16,7 +16,7 @@ frame "CodeOrb\nLevel: 0" as pGw {
 	frame "TcpTransfering()\nLevel: 0.1" as pTrans
 	frame "RemoteCommanding()\nLevel: 0.1" as pCmdRemote
 	frame "InfoGathering()\nLevel: 0.1" as pGather
-	frame "<<SingleWireControlling()>>\nLevel: 0.0" as pSwc
+	frame "<<SingleWireScheduling()>>\nLevel: 0.0" as pSwc
 }
 
 component "Target" as pTarget {

@@ -12,7 +12,7 @@ rectangle "Your Tools" as gTools {
 
 frame "CodeOrb" as pGw {
 
-	frame "<<SingleWireControlling()>>" as pSwc
+	frame "<<SingleWireScheduling()>>" as pSwc
 	frame "<<TcpListening()>>" as pList
 	frame "TcpTransfering()" as pTrans
 	frame "RemoteCommanding()" as pCmdRemote
