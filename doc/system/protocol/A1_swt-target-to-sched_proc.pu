@@ -3,7 +3,7 @@
 
 hide time-axis
 
-concise "UART TX\nData from\nController (GW)" as ctrl
+concise "UART TX\nData from\nScheduler (GW)" as ctrl
 concise "UART RX\nData from\nTarget" as tar
 
 @0
@@ -19,10 +19,10 @@ ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "13"
+tar is "11"
 
 @+20
-tar is "Command Response"
+tar is "Process Tree"
 
 @+80
 tar is "17"
@@ -36,7 +36,7 @@ ctrl is "0C"
 @+20
 ctrl is {-}
 
-footer **SingleWireControling()** - Target to Controller - Command Response\n(C) DSP-Crowd Electronics GmbH
+footer **SingleWireScheduling()** - Target to Scheduler - Process Tree\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 
