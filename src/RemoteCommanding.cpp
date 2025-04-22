@@ -65,7 +65,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mTxtPrompt()
 	, mIdReq(0)
 {
-	mBuf[0] = 0;
+	mBufOut[0] = 0;
 
 	mState = StStart;
 }
@@ -203,16 +203,18 @@ Success RemoteCommanding::commandSend()
 
 	if (str == "help" || str == "h")
 	{
-		cmdHelpPrint(NULL, mBuf, mBuf + sizeof(mBuf));
+		mBufOut[0] = 0;
+		cmdHelpPrint(NULL, mBufOut, mBufOut + sizeof(mBufOut));
 
-		string msg = "\r\n";
+		string msg;
+		lfToCrLf(mBufOut, msg);
 
-		msg += string(mBuf);
-		msg += "\r\n";
-
-		mpFilt->send(msg.c_str(), msg.size());
+		if (msg.size())
+			msg += "\r\n";
 
 		lineAck();
+		mpFilt->send(msg.c_str(), msg.size());
+		promptSend();
 
 		return Positive;
 	}
@@ -237,9 +239,13 @@ Success RemoteCommanding::responseReceive()
 
 	//procWrnLog("response received: %s", resp.c_str());
 
-	resp += "\r\n";
-	mpFilt->send(resp.c_str(), resp.size());
+	string msg;
+	lfToCrLf(resp.data(), msg);
 
+	if (msg.size())
+		msg += "\r\n";
+
+	mpFilt->send(msg.c_str(), msg.size());
 	promptSend();
 
 	return Positive;
@@ -283,7 +289,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 
 	(void)pArgs;
 
-	dInfo("\r\nAvailable commands\r\n");
+	dInfo("\nAvailable commands\n");
 
 	iter = cmds.begin();
 	for (; iter != cmds.end(); ++iter)
@@ -292,10 +298,10 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 
 		if (cmd.group != group)
 		{
-			dInfo("\r\n");
+			dInfo("\n");
 
 			if (cmd.group.size() && cmd.group != cInternalCmdCls)
-				dInfo("%s\r\n", cmd.group.c_str());
+				dInfo("%s\n", cmd.group.c_str());
 			group = cmd.group;
 		}
 
@@ -311,7 +317,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 		if (cmd.desc.size())
 			dInfo(".. %s", cmd.desc.c_str());
 
-		dInfo("\r\n");
+		dInfo("\n");
 	}
 }
 
@@ -404,5 +410,43 @@ vector<string> RemoteCommanding::split(const string &str, char delimiter)
 		result.push_back(item);
 
 	return result;
+}
+
+void RemoteCommanding::lfToCrLf(const char *pBuf, string &str)
+{
+	const char *pBufLineStart, *pBufIter;
+	const char *pBufEnd;
+	size_t lenBuf;
+
+	str.clear();
+
+	if (!pBuf || !*pBuf)
+		return;
+
+	lenBuf = strlen(pBuf);
+	str.reserve(lenBuf << 1);
+
+	pBufEnd = pBuf + lenBuf;
+	pBufLineStart = pBufIter = pBuf;
+
+	while (1)
+	{
+		if (pBufIter >= pBufEnd)
+			break;
+
+		if (*pBufIter != '\n')
+		{
+			++pBufIter;
+			continue;
+		}
+
+		str += string(pBufLineStart, pBufIter - pBufLineStart);
+		str += "\r\n";
+
+		++pBufIter;
+		pBufLineStart = pBufIter;
+	}
+
+	str += pBufLineStart;
 }
 

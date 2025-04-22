@@ -84,12 +84,13 @@ private:
 	TelnetFiltering *mpFilt;
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
-	char mBuf[1023];
+	char mBufOut[1023];
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);
 	static bool commandSort(const EntryHelp &cmdFirst, const EntryHelp &cmdSecond);
 	static std::vector<std::string> split(const std::string &str, char delimiter);
+	static void lfToCrLf(const char *pBuf, std::string &str);
 
 	/* static variables */
 	static std::list<EntryHelp> cmds;
