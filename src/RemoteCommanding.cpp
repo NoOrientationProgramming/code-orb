@@ -292,12 +292,18 @@ Success RemoteCommanding::responseReceive()
 	if (!ok)
 		return Pending;
 
-	// TODO: Implement 'Done' on empty string
-
 	//procWrnLog("response received: %s", resp.c_str());
 
 	string msg;
-	lfToCrLf(resp.data(), msg);
+
+	if (!resp.size())
+	{
+		msg += dColorGrey;
+		msg += "<done>";
+		msg += dColorClear;
+	}
+	else
+		lfToCrLf(resp.data(), msg);
 
 	if (msg.size())
 		msg += "\r\n";
