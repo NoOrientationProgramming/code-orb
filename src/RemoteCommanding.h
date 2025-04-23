@@ -80,6 +80,7 @@ private:
 	Success commandSend();
 	Success responseReceive();
 	void lineAck();
+	bool historyNavigate(KeyUser &key);
 	void historyUpdate();
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 

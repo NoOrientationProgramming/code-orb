@@ -163,6 +163,12 @@ Success RemoteCommanding::process()
 
 		//procWrnLog("Got key: %s", key.str().c_str());
 
+		if (historyNavigate(key))
+		{
+			promptSend();
+			break;
+		}
+
 		if (key == keyEnter)
 		{
 			success = commandSend();
@@ -325,6 +331,30 @@ void RemoteCommanding::historyUpdate()
 
 	while (mHistory.size() > dSizeHistoryMax)
 		mHistory.pop_front();
+}
+
+bool RemoteCommanding::historyNavigate(KeyUser &key)
+{
+	if (key != keyUp && key != keyDown)
+		return false;
+
+	if (!mHistory.size())
+		return false;
+
+	if (key == keyUp && miEntryHist != mHistory.begin())
+		--miEntryHist;
+
+	if (key == keyDown && miEntryHist != mHistory.end())
+		++miEntryHist;
+
+	if (miEntryHist == mHistory.end())
+		mTxtPrompt = "";
+	else
+		mTxtPrompt = *miEntryHist;
+
+	mTxtPrompt.focusSet(true);
+
+	return true;
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
