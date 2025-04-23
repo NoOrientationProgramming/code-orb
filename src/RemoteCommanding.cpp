@@ -239,14 +239,14 @@ Success RemoteCommanding::commandSend()
 	mTxtPrompt.focusSet(false);
 	string str = mTxtPrompt;
 
-	mCmdLast = str;
-
 	if (!str.size())
 	{
 		lineAck();
 		promptSend();
 		return Positive;
 	}
+
+	mCmdLast = str;
 
 	if (str == "help" || str == "h")
 	{
