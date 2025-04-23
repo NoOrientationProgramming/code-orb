@@ -116,7 +116,7 @@ Success RemoteCommanding::process()
 		if (!mpFilt->mSendReady)
 			break;
 
-		mTxtPrompt.widthSet(13);
+		mTxtPrompt.widthSet(25);
 		mTxtPrompt.lenMaxSet(51);
 		mTxtPrompt.cursorBoundSet(2);
 		mTxtPrompt.focusSet(true);
