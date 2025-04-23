@@ -34,7 +34,6 @@ srcs = [
 	'src/LibUart.cpp',
 	'src/TelnetFiltering.cpp',
 	'src/InfoGathering.cpp',
-	'src/ColorTesting.cpp',
 ]
 
 # Arguments
