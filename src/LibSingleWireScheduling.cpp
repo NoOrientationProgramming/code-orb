@@ -112,7 +112,7 @@ void SingleWireScheduling::fragmentsPrint(char *pBuf, char *pBufEnd)
 
 	if (!mFragments.size())
 	{
-		dInfo("  None\n");
+		dInfo("  <none>\n");
 		return;
 	}
 
@@ -141,7 +141,7 @@ void SingleWireScheduling::queuesCmdPrint(char *pBuf, char *pBufEnd)
 
 		if (!pList->size())
 		{
-			dInfo("  None\n");
+			dInfo("  <none>\n");
 			continue;
 		}
 
