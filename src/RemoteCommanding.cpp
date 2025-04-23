@@ -345,11 +345,16 @@ bool RemoteCommanding::historyNavigate(KeyUser &key)
 	if (!mHistory.size())
 		return false;
 
+	list<string>::iterator iter = miEntryHist;
+
 	if (key == keyUp && miEntryHist != mHistory.begin())
 		--miEntryHist;
 
 	if (key == keyDown && miEntryHist != mHistory.end())
 		++miEntryHist;
+
+	if (iter == miEntryHist)
+		return false;
 
 	if (miEntryHist == mHistory.end())
 		mTxtPrompt = "";
