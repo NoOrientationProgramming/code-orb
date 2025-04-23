@@ -190,7 +190,7 @@ Success RemoteCommanding::process()
 
 		if (diffMs > cTimeoutResponseMs)
 		{
-			procWrnLog("timeout sending command");
+			procWrnLog("timeout receiving command response");
 
 			// TODO: Prompt
 
