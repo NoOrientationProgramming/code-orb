@@ -461,7 +461,7 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 	dInfo("Last command\t\t%s\n",
 			mCmdLast.size() ? mCmdLast.c_str() : "<none>");
 	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
-#if 1
+#if 0
 	list<string>::iterator iter;
 
 	dInfo("Command history\n");
