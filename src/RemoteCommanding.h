@@ -80,6 +80,7 @@ private:
 	Success commandSend();
 	Success responseReceive();
 	void lineAck();
+	void historyUpdate();
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 
 	/* member variables */
@@ -92,6 +93,9 @@ private:
 	bool mTargetIsOnline;
 	uint32_t mStartCmdMs;
 	uint32_t mDelayResponseCmdMs;
+	std::string mCmdLast;
+	std::list<std::string> mHistory;
+	std::list<std::string>::iterator miEntryHist;
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);

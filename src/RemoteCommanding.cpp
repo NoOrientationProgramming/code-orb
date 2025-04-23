@@ -54,6 +54,9 @@ const uint32_t cTimeoutResponseMs = 300;
 #define dColorGrey "\033[38;5;240m"
 #define dColorClear "\033[0m"
 
+//#define dSizeHistoryMax 31
+#define dSizeHistoryMax 5
+
 const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
@@ -74,6 +77,8 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mTargetIsOnline(false)
 	, mStartCmdMs(0)
 	, mDelayResponseCmdMs(0)
+	, mCmdLast("")
+	, mHistory()
 {
 	mBufOut[0] = 0;
 
@@ -234,6 +239,8 @@ Success RemoteCommanding::commandSend()
 	mTxtPrompt.focusSet(false);
 	string str = mTxtPrompt;
 
+	mCmdLast = str;
+
 	if (!str.size())
 	{
 		lineAck();
@@ -299,6 +306,24 @@ void RemoteCommanding::lineAck()
 
 	mTxtPrompt = "";
 	mTxtPrompt.focusSet(true);
+
+	historyUpdate();
+}
+
+void RemoteCommanding::historyUpdate()
+{
+	if (!mCmdLast.size())
+		return;
+
+	// ignore duplicate
+	if (mHistory.size() && mCmdLast == mHistory.back())
+		return;
+
+	miEntryHist = mHistory.end();
+	mHistory.push_back(mCmdLast);
+
+	while (mHistory.size() > dSizeHistoryMax)
+		mHistory.pop_front();
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
@@ -387,7 +412,25 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
+	dInfo("Last command\t\t%s\n",
+			mCmdLast.size() ? mCmdLast.c_str() : "<none>");
 	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
+#if 1
+	list<string>::iterator iter;
+
+	dInfo("Command history\n");
+
+	if (!mHistory.size())
+		dInfo("  <none>\n");
+
+	iter = mHistory.begin();
+	for (; iter != mHistory.end(); ++iter)
+	{
+		dInfo("%c %s\n",
+				iter == miEntryHist ? '>' : ' ',
+				iter->c_str());
+	}
+#endif
 }
 
 /* static functions */
