@@ -89,7 +89,6 @@ Success RemoteCommanding::process()
 	Success success;
 	PipeEntry<KeyUser> entKey;
 	KeyUser key;
-	string msg;
 #if 0
 	dStateTrace;
 #endif
@@ -208,11 +207,6 @@ Success RemoteCommanding::process()
 	default:
 		break;
 	}
-
-	if (!msg.size())
-		return Pending;
-
-	mpFilt->send(msg.c_str(), msg.size());
 
 	return Pending;
 }
