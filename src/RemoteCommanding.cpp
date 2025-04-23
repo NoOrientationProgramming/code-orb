@@ -81,6 +81,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mHistory()
 {
 	mBufOut[0] = 0;
+	miEntryHist = mHistory.end();
 
 	mState = StStart;
 }
