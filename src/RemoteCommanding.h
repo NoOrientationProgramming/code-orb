@@ -90,6 +90,8 @@ private:
 	uint32_t mIdReq;
 	char mBufOut[1023];
 	bool mTargetIsOnline;
+	uint32_t mStartCmdMs;
+	uint32_t mDelayResponseCmdMs;
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);

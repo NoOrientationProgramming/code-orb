@@ -66,6 +66,8 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mTxtPrompt()
 	, mIdReq(0)
 	, mTargetIsOnline(false)
+	, mStartCmdMs(0)
+	, mDelayResponseCmdMs(0)
 {
 	mBufOut[0] = 0;
 
@@ -155,6 +157,8 @@ Success RemoteCommanding::process()
 				break;
 
 			lineAck();
+
+			mStartCmdMs = curTimeMs;
 
 			mStartMs = curTimeMs;
 			mState = StResponseRcvdWait;
@@ -263,6 +267,8 @@ Success RemoteCommanding::responseReceive()
 	mpFilt->send(msg.c_str(), msg.size());
 	promptSend();
 
+	mDelayResponseCmdMs = millis() - mStartCmdMs;
+
 	return Positive;
 }
 
@@ -341,6 +347,7 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
+	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
 }
 
 /* static functions */
