@@ -302,7 +302,7 @@ bool GwMsgDispatching::servicesStart()
 
 	pPool->workerCntSet(3);
 
-	//pPool->procTreeDisplaySet(false);
+	pPool->procTreeDisplaySet(false);
 	start(pPool);
 
 	return true;
