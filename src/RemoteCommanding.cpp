@@ -197,8 +197,6 @@ Success RemoteCommanding::process()
 			break;
 		}
 
-		// TODO: Implement 'Done' on empty string
-
 		break;
 	case StResponseRcvdWait:
 
@@ -293,6 +291,8 @@ Success RemoteCommanding::responseReceive()
 	ok = SingleWireScheduling::commandResponseGet(mIdReq, resp);
 	if (!ok)
 		return Pending;
+
+	// TODO: Implement 'Done' on empty string
 
 	//procWrnLog("response received: %s", resp.c_str());
 
