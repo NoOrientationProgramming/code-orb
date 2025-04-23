@@ -189,9 +189,15 @@ Success RemoteCommanding::process()
 
 		if (diffMs > cTimeoutResponseMs)
 		{
-			procWrnLog("timeout receiving command response");
+			string msg;
 
-			// TODO: Prompt
+			msg += dColorGrey;
+			msg += "<command response timeout>";
+			msg += dColorClear;
+			msg += "\r\n";
+
+			mpFilt->send(msg.c_str(), msg.size());
+			promptSend();
 
 			mState = StMain;
 			break;
