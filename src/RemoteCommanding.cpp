@@ -220,6 +220,13 @@ Success RemoteCommanding::commandSend()
 	mTxtPrompt.focusSet(false);
 	string str = mTxtPrompt;
 
+	if (!str.size())
+	{
+		lineAck();
+		promptSend();
+		return Positive;
+	}
+
 	if (str == "help" || str == "h")
 	{
 		mBufOut[0] = 0;
