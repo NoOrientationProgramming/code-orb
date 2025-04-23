@@ -51,6 +51,8 @@ public:
 		return new dNoThrow RemoteCommanding(fd);
 	}
 
+	bool *mpTargetIsOnline;
+
 	static void listCommandsUpdate(const std::list<std::string> &listStr);
 
 protected:
@@ -73,6 +75,8 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	void stateOnlineCheck();
+
 	Success commandSend();
 	Success responseReceive();
 	void lineAck();
@@ -85,6 +89,7 @@ private:
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
 	char mBufOut[1023];
+	bool mTargetIsOnline;
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);

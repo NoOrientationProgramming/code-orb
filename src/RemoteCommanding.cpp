@@ -59,11 +59,13 @@ list<EntryHelp> RemoteCommanding::cmds;
 
 RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
+	, mpTargetIsOnline(NULL)
 	, mStartMs(0)
 	, mFdSocket(fd)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
+	, mTargetIsOnline(false)
 {
 	mBufOut[0] = 0;
 
@@ -89,6 +91,9 @@ Success RemoteCommanding::process()
 
 		if (mFdSocket == INVALID_SOCKET)
 			return procErrLog(-1, "socket file descriptor not set");
+
+		if (!mpTargetIsOnline)
+			return procErrLog(-1, "target online pointer not set");
 
 		mpFilt = TelnetFiltering::create(mFdSocket);
 		if (!mpFilt)
@@ -118,6 +123,8 @@ Success RemoteCommanding::process()
 
 		mTxtPrompt.frameEnabledSet(false);
 		mTxtPrompt.paddingEnabledSet(false);
+
+		mTargetIsOnline = not *mpTargetIsOnline;
 
 		mState = StWelcomeSend;
 
@@ -192,6 +199,14 @@ Success RemoteCommanding::process()
 	mpFilt->send(msg.c_str(), msg.size());
 
 	return Pending;
+}
+
+void RemoteCommanding::stateOnlineCheck()
+{
+	if (*mpTargetIsOnline == mTargetIsOnline)
+		return;
+
+	mTargetIsOnline = *mpTargetIsOnline;
 }
 
 Success RemoteCommanding::commandSend()

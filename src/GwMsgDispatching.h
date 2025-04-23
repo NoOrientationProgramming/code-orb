@@ -93,7 +93,7 @@ private:
 	TcpListening *mpLstProc;
 	TcpListening *mpLstLog;
 	TcpListening *mpLstCmd;
-	SingleWireScheduling *mpCtrl;
+	SingleWireScheduling *mpSched;
 	InfoGathering *mpGather;
 	bool mCursorHidden;
 	bool mDevUartIsOnline;

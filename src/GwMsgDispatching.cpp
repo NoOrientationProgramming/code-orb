@@ -65,7 +65,7 @@ GwMsgDispatching::GwMsgDispatching()
 	, mpLstProc(NULL)
 	, mpLstLog(NULL)
 	, mpLstCmd(NULL)
-	, mpCtrl(NULL)
+	, mpSched(NULL)
 	, mpGather(NULL)
 	, mCursorHidden(false)
 	, mDevUartIsOnline(true)
@@ -96,15 +96,15 @@ Success GwMsgDispatching::process()
 		if (!ok)
 			return procErrLog(-1, "could not start services");
 
-		mpCtrl = SingleWireScheduling::create();
-		if (!mpCtrl)
+		mpSched = SingleWireScheduling::create();
+		if (!mpSched)
 			return procErrLog(-1, "could not create process");
 
-		//mpCtrl->procTreeDisplaySet(false);
+		mpSched->procTreeDisplaySet(false);
 #if 1
-		start(mpCtrl);
+		start(mpSched);
 #else
-		start(mpCtrl, DrivenByNewInternalDriver);
+		start(mpSched, DrivenByNewInternalDriver);
 #endif
 		fprintf(stdout, "CodeOrb-25.04-1\n");
 		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
@@ -212,18 +212,17 @@ Success GwMsgDispatching::shutdown()
 		mCursorHidden = false;
 	}
 #endif
-
 	return Positive;
 }
 
 void GwMsgDispatching::stateOnlineCheckAndPrint()
 {
-	if (mpCtrl->mDevUartIsOnline == mDevUartIsOnline &&
-			mpCtrl->mTargetIsOnline == mTargetIsOnline)
+	if (mpSched->mDevUartIsOnline == mDevUartIsOnline &&
+			mpSched->mTargetIsOnline == mTargetIsOnline)
 		return;
 
-	mDevUartIsOnline = mpCtrl->mDevUartIsOnline;
-	mTargetIsOnline = mpCtrl->mTargetIsOnline;
+	mDevUartIsOnline = mpSched->mDevUartIsOnline;
+	mTargetIsOnline = mpSched->mTargetIsOnline;
 
 	if (env.verbosity)
 		return;
@@ -322,10 +321,10 @@ void GwMsgDispatching::peerListUpdate()
 void GwMsgDispatching::contentDistribute()
 {
 	// proc tree
-	if (mpCtrl->contentProcChanged())
+	if (mpSched->contentProcChanged())
 	{
 		string str(dScreenClear);
-		str += mpCtrl->mContentProc;
+		str += mpSched->mContentProc;
 		contentSend(str, RemotePeerProc);
 	}
 
@@ -334,7 +333,7 @@ void GwMsgDispatching::contentDistribute()
 
 	while (1)
 	{
-		if (mpCtrl->ppEntriesLog.get(entryLog) < 1)
+		if (mpSched->ppEntriesLog.get(entryLog) < 1)
 			break;
 
 		contentSend(entryLog.particle, RemotePeerLog);
@@ -456,7 +455,9 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 				continue;
 			}
 
-			pCmd->procTreeDisplaySet(false);
+			pCmd->mpTargetIsOnline = &mTargetIsOnline;
+
+			//pCmd->procTreeDisplaySet(false);
 			whenFinishedRepel(start(pCmd));
 
 			continue;
@@ -475,7 +476,7 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 		if (peerType == RemotePeerProc)
 		{
 			string str(dScreenClear);
-			str += mpCtrl->mContentProc;
+			str += mpSched->mContentProc;
 			pTrans->send(str.data(), str.size());
 		}
 
