@@ -312,6 +312,8 @@ void RemoteCommanding::lineAck()
 
 void RemoteCommanding::historyUpdate()
 {
+	miEntryHist = mHistory.end();
+
 	if (!mCmdLast.size())
 		return;
 
@@ -319,7 +321,6 @@ void RemoteCommanding::historyUpdate()
 	if (mHistory.size() && mCmdLast == mHistory.back())
 		return;
 
-	miEntryHist = mHistory.end();
 	mHistory.push_back(mCmdLast);
 
 	while (mHistory.size() > dSizeHistoryMax)
