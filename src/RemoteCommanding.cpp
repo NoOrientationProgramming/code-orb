@@ -74,11 +74,19 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
+	// target online check
 	, mTargetIsOnline(false)
+	// command response measurement
 	, mStartCmdMs(0)
 	, mDelayResponseCmdMs(0)
+	// command history
 	, mCmdLast("")
 	, mHistory()
+	// auto completion
+	, mLastKeyWasTab(false)
+	, mCursorEditLow(0)
+	, mCursorEditHigh(0)
+	, mStrEdit("")
 {
 	mBufOut[0] = 0;
 	miEntryHist = mHistory.end();
@@ -163,6 +171,14 @@ Success RemoteCommanding::process()
 		key = entKey.particle;
 
 		//procWrnLog("Got key: %s", key.str().c_str());
+
+		if (key == keyTab)
+		{
+			tabProcess();
+			break;
+		}
+
+		mLastKeyWasTab = false;
 
 		if (historyNavigate(key))
 		{
@@ -370,6 +386,164 @@ bool RemoteCommanding::historyNavigate(KeyUser &key)
 	mTxtPrompt.focusSet(true);
 
 	return true;
+}
+
+void RemoteCommanding::tabProcess()
+{
+	uint32_t cursorFront = mTxtPrompt.cursorAbsFront();
+	uint32_t cursorBack = mTxtPrompt.cursorAbsBack();
+
+	mCursorEditLow = cursorFront > cursorBack
+					? cursorBack : cursorFront;
+	mCursorEditHigh = cursorFront > cursorBack
+					? cursorFront : cursorBack;
+
+	mTxtPrompt.focusSet(false);
+	mStrEdit = mTxtPrompt;
+	mTxtPrompt.focusSet(true);
+
+	procWrnLog("String        '%s'", mStrEdit.c_str());
+	procWrnLog("Cursor low    %u", mCursorEditLow);
+	procWrnLog("Cursor high   %u", mCursorEditHigh);
+
+	if (!mStrEdit.size())
+		return;
+
+	if (mLastKeyWasTab)
+	{
+		cmdCandidatesShow();
+		return;
+	}
+
+	cmdAutoComplete();
+	mLastKeyWasTab = true;
+}
+
+void RemoteCommanding::cmdAutoComplete()
+{
+#if 0
+	list<const char *> candidates;
+	list<const char *>::const_iterator iter;
+	const char *pNext;
+	const char *pCandidateEnd;
+	uint16_t idxEnd = mIdxColCursor;
+	bool ok;
+
+	cmdCandidatesGet(candidates);
+
+	while (true)
+	{
+		pNext = NULL;
+
+		iter = candidates.begin();
+		for (; iter != candidates.end(); ++iter)
+		{
+			pCandidateEnd = *iter + idxEnd;
+
+			if (!pNext)
+			{
+				pNext = pCandidateEnd;
+				continue;
+			}
+
+			if (*pCandidateEnd == *pNext)
+				continue;
+
+			pNext = NULL;
+			break;
+		}
+
+		if (!pNext)
+			break;
+
+		if (!*pNext)
+		{
+			chInsert(' ');
+			break;
+		}
+
+		ok = chInsert(*pNext);
+		if (!ok)
+			break;
+
+		++idxEnd;
+	}
+#endif
+
+	promptSend();
+}
+
+void RemoteCommanding::cmdCandidatesShow()
+{
+#if 0
+	list<const char *> candidates;
+	list<const char *>::const_iterator iter;
+	size_t widthNameCmdMax = 20;
+	uint8_t idxColCmdMax = 1;
+	uint8_t idxColCmd = 0;
+	string str, str2, msg;
+
+	cmdCandidatesGet(candidates);
+
+	if (!candidates.size())
+		return;
+
+	promptSend(false, false, true);
+
+	iter = candidates.begin();
+	for (; iter != candidates.end(); ++iter)
+	{
+		str2 = *iter;
+		str = str2.substr(0, widthNameCmdMax);
+
+		if (str.size() < widthNameCmdMax)
+			str += string(widthNameCmdMax - str.size(), ' ');
+
+		str += "  ";
+		msg += str;
+
+		if (idxColCmd < idxColCmdMax)
+		{
+			++idxColCmd;
+			continue;
+		}
+
+		msg += "\r\n";
+		mpTrans->send(msg.c_str(), msg.size());
+
+		idxColCmd = 0;
+		msg = "";
+	}
+
+	if (msg.size())
+	{
+		msg += "\r\n";
+		mpTrans->send(msg.c_str(), msg.size());
+	}
+#endif
+
+	promptSend();
+}
+
+void RemoteCommanding::cmdCandidatesGet(list<const char *> &listCandidates)
+{
+	(void)listCandidates;
+#if 0
+	const char *pEdit = mCmdInBuf[mIdxLineEdit];
+	list<SystemCommand>::const_iterator iter;
+	const char *pId;
+
+	iter = cmds.begin();
+	for (; iter != cmds.end(); ++iter)
+	{
+		pId = iter->id.c_str();
+
+		if (strncmp(pEdit, pId, mIdxColCursor))
+			continue;
+
+		listCandidates.push_back(pId);
+	}
+#endif
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)

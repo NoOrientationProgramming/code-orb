@@ -82,6 +82,10 @@ private:
 	void lineAck();
 	bool historyNavigate(KeyUser &key);
 	void historyUpdate();
+	void tabProcess();
+	void cmdAutoComplete();
+	void cmdCandidatesShow();
+	void cmdCandidatesGet(std::list<const char *> &listCandidates);
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 
 	/* member variables */
@@ -91,12 +95,24 @@ private:
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
 	char mBufOut[1023];
+
+	// target online check
 	bool mTargetIsOnline;
+
+	// command response measurement
 	uint32_t mStartCmdMs;
 	uint32_t mDelayResponseCmdMs;
+
+	// command history
 	std::string mCmdLast;
 	std::list<std::string> mHistory;
 	std::list<std::string>::iterator miEntryHist;
+
+	// auto completion
+	bool mLastKeyWasTab;
+	uint32_t mCursorEditLow;
+	uint32_t mCursorEditHigh;
+	std::string mStrEdit;
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);
