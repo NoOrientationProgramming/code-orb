@@ -25,7 +25,6 @@
 
 #include "SingleWireScheduling.h"
 #include "SingleWire.h"
-#include "SystemDebugging.h"
 #include "LibTime.h"
 
 #include "env.h"
@@ -123,9 +122,6 @@ Success SingleWireScheduling::process()
 	case StStart:
 
 		commandsRegister();
-		// TEMP
-		cmdReg("cmdSend",          cmdCommandSend,           "",  "Send command",                        "Commands");
-		// TEMP END
 
 		mState = StUartInit;
 
@@ -591,21 +587,4 @@ void SingleWireScheduling::processInfo(char *pBuf, char *pBufEnd)
 }
 
 /* static functions */
-
-// TEMP
-void SingleWireScheduling::cmdCommandSend(char *pArgs, char *pBuf, char *pBufEnd)
-{
-	uint32_t idReq;
-	bool ok;
-
-	ok = SingleWireScheduling::commandSend(pArgs, idReq);
-	if (!ok)
-	{
-		dInfo("Could not send command: %s", pArgs);
-		return;
-	}
-
-	dInfo("Command sent: %s", pArgs);
-}
-// TEMP END
 
