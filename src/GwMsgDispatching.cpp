@@ -156,7 +156,9 @@ Success GwMsgDispatching::process()
 			break;
 		}
 
-		start(mpGather);
+		//mpGather->procTreeDisplaySet(false);
+		start(mpGather, DrivenByExternalDriver);
+		ThreadPooling::procAdd(mpGather);
 
 		mState = StTargetOnline;
 
@@ -292,16 +294,18 @@ bool GwMsgDispatching::servicesStart()
 
 	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
-#if 0
+
 	ThreadPooling *pPool;
 
 	pPool = ThreadPooling::create();
 	if (!pPool)
 		return procErrLog(-1, "could not create process");
 
-	pPool->procTreeDisplaySet(false);
+	pPool->workerCntSet(3);
+
+	//pPool->procTreeDisplaySet(false);
 	start(pPool);
-#endif
+
 	return true;
 }
 
