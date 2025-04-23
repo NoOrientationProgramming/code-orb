@@ -188,6 +188,9 @@ Success RemoteCommanding::process()
 			break;
 		}
 
+		if (key == keyUp || key == keyDown)
+			break;
+
 		if (mTxtPrompt.keyProcess(key))
 		{
 			promptSend();
