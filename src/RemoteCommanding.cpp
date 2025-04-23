@@ -48,6 +48,12 @@ using namespace std;
 
 const uint32_t cTimeoutResponseMs = 300;
 
+// https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+#define dColorGreen "\033[38;5;46m"
+#define dColorOrange "\033[38;5;220m"
+#define dColorGrey "\033[38;5;240m"
+#define dColorClear "\033[0m"
+
 const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
@@ -141,6 +147,12 @@ Success RemoteCommanding::process()
 		break;
 	case StMain:
 
+		if (stateOnlineChanged())
+		{
+			promptSend();
+			break;
+		}
+
 		if (mpFilt->ppKeys.get(entKey) < 1)
 			break;
 		key = entKey.particle;
@@ -205,12 +217,14 @@ Success RemoteCommanding::process()
 	return Pending;
 }
 
-void RemoteCommanding::stateOnlineCheck()
+bool RemoteCommanding::stateOnlineChanged()
 {
 	if (*mpTargetIsOnline == mTargetIsOnline)
-		return;
+		return false;
 
 	mTargetIsOnline = *mpTargetIsOnline;
+
+	return true;
 }
 
 Success RemoteCommanding::commandSend()
@@ -295,13 +309,32 @@ void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine
 		msg += "\r\n";
 
 	msg += "\rcore@";
+
+	if (!mTargetIsOnline && !postNewLine)
+		msg += dColorOrange;
+
+	if (mTargetIsOnline && !postNewLine)
+		msg += dColorGreen;
+
 	msg += "remote";
+	msg += dColorClear;
+
 	msg += ":";
 	msg += "~"; // directory
 	msg += "# ";
 
-	mTxtPrompt.cursorShow(cursor);
-	mTxtPrompt.print(msg);
+	if (!mTargetIsOnline && !postNewLine &&
+			!mTxtPrompt.sizeDisplayed())
+	{
+		msg += dColorGrey;
+		msg += "<target offline>";
+		msg += dColorClear;
+	}
+	else
+	{
+		mTxtPrompt.cursorShow(cursor);
+		mTxtPrompt.print(msg);
+	}
 
 	if (postNewLine)
 		msg += "\r\n";
