@@ -85,6 +85,7 @@ private:
 	bool disconnectRequestedCheck(TcpTransfering *pTrans);
 	void peerCheck();
 	void peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc);
+	void msgProcHdr(std::string &msg, size_t sz);
 
 	/* member variables */
 	//uint32_t mStartMs;

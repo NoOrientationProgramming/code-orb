@@ -25,6 +25,7 @@
 
 #include "GwMsgDispatching.h"
 #include "ThreadPooling.h"
+#include "LibTime.h"
 
 #include "env.h"
 
@@ -43,14 +44,15 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
-#define dColorGreen "\033[38;5;46m"
-#define dColorOrange "\033[38;5;220m"
-#define dColorRed "\033[38;5;196m"
-#define dColorClear "\033[0m"
+#define dColorGreen		"\033[38;5;46m"
+#define dColorOrange	"\033[38;5;220m"
+#define dColorRed		"\033[38;5;196m"
+#define dColorGrey		"\033[38;5;240m"
+#define dColorClear		"\033[0m"
 
-#define dCursorHide "\033[?25l"
-#define dCursorShow "\033[?25h"
-#define dScreenClear "\033[2J\033[H"
+#define dCursorHide		"\033[?25l"
+#define dCursorShow		"\033[?25h"
+#define dScreenClear	"\033[2J\033[H"
 
 typedef list<struct RemoteDebuggingPeer>::iterator PeerIter;
 
@@ -323,9 +325,13 @@ void GwMsgDispatching::contentDistribute()
 	// proc tree
 	if (mpSched->contentProcChanged())
 	{
-		string str(dScreenClear);
-		str += mpSched->mContentProc;
-		contentSend(str, RemotePeerProc);
+		const string &str = mpSched->mContentProc;
+		string msg;
+
+		msgProcHdr(msg, str.size());
+		msg += str;
+
+		contentSend(msg, RemotePeerProc);
 	}
 
 	// log
@@ -475,9 +481,13 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 
 		if (peerType == RemotePeerProc)
 		{
-			string str(dScreenClear);
-			str += mpSched->mContentProc;
-			pTrans->send(str.data(), str.size());
+			const string &str = mpSched->mContentProc;
+			string msg;
+
+			msgProcHdr(msg, str.size());
+			msg += str;
+
+			pTrans->send(msg.data(), msg.size());
 		}
 
 		procDbgLog("adding %s peer. process: %p", pTypeDesc, pTrans);
@@ -488,6 +498,20 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 
 		mListPeers.push_back(peer);
 	}
+}
+
+void GwMsgDispatching::msgProcHdr(string &msg, size_t sz)
+{
+	msg = dScreenClear;
+
+	msg += dColorGrey;
+	msg += "{CodeOrb -- ";
+	msg += nowToStr("%Y-%m-%d  %H:%M:%S");
+	msg += " -- Size: ";
+	msg += to_string(sz);
+	msg += "}";
+	msg += dColorClear;
+	msg += "\r\n\r\n";
 }
 
 void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)
