@@ -54,8 +54,7 @@ const uint32_t cTimeoutResponseMs = 300;
 #define dColorGrey "\033[38;5;240m"
 #define dColorClear "\033[0m"
 
-//#define dSizeHistoryMax 31
-#define dSizeHistoryMax 5
+#define dSizeHistoryMax 41
 
 const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"Remote Terminal\r\n\r\n" \
