@@ -346,7 +346,11 @@ void GwMsgDispatching::contentDistribute()
 		if (mpSched->ppEntriesLog.get(entryLog) < 1)
 			break;
 
-		msg = entryLog.particle;
+		msg += dColorGrey;
+		msg += nowToStr("%Y-%m-%d  %H:%M:%S  ");
+		msg += dColorClear;
+
+		msg += entryLog.particle;
 		msg += "\r\n";
 
 		contentSend(msg, RemotePeerLog);
