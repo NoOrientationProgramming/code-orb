@@ -303,8 +303,7 @@ Success RemoteCommanding::commandSend()
 		msg += "abled>";
 		msg += dColorClear;
 
-		if (msg.size())
-			msg += "\r\n";
+		msg += "\r\n";
 
 		lineAck();
 		mpFilt->send(msg.c_str(), msg.size());
