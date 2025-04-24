@@ -411,13 +411,13 @@ void RemoteCommanding::tabProcess()
 
 void RemoteCommanding::cmdAutoComplete()
 {
-#if 0
-	list<const char *> candidates;
-	list<const char *>::const_iterator iter;
-	const char *pNext;
-	const char *pCandidateEnd;
-	uint16_t idxEnd = mIdxColCursor;
-	bool ok;
+	list<const char32_t *> candidates;
+	list<const char32_t *>::const_iterator iter;
+	const char32_t *pNext;
+	const char32_t *pCandidateEnd;
+	uint16_t idxEnd = mCursorEditLow;
+	u32string ustrPatch;
+	string strPatch;
 
 	cmdCandidatesGet(candidates);
 
@@ -448,30 +448,30 @@ void RemoteCommanding::cmdAutoComplete()
 
 		if (!*pNext)
 		{
-			chInsert(' ');
+			ustrPatch.push_back(U' ');
 			break;
 		}
 
-		ok = chInsert(*pNext);
-		if (!ok)
-			break;
+		ustrPatch.push_back(*pNext);
 
 		++idxEnd;
 	}
-#endif
+
+	utfToStr(ustrPatch, strPatch);
+	mTxtPrompt.paste(strPatch);
 
 	promptSend();
 }
 
 void RemoteCommanding::cmdCandidatesShow()
 {
-#if 0
-	list<const char *> candidates;
-	list<const char *>::const_iterator iter;
+	list<const char32_t *> candidates;
+	list<const char32_t *>::const_iterator iter;
 	size_t widthNameCmdMax = 20;
 	uint8_t idxColCmdMax = 1;
 	uint8_t idxColCmd = 0;
-	string str, str2, msg;
+	u32string ustr, ustr2;
+	string str, msg;
 
 	cmdCandidatesGet(candidates);
 
@@ -483,13 +483,15 @@ void RemoteCommanding::cmdCandidatesShow()
 	iter = candidates.begin();
 	for (; iter != candidates.end(); ++iter)
 	{
-		str2 = *iter;
-		str = str2.substr(0, widthNameCmdMax);
+		ustr2 = *iter;
+		ustr = ustr2.substr(0, widthNameCmdMax);
 
-		if (str.size() < widthNameCmdMax)
-			str += string(widthNameCmdMax - str.size(), ' ');
+		if (ustr.size() < widthNameCmdMax)
+			ustr += u32string(widthNameCmdMax - ustr.size(), U' ');
 
-		str += "  ";
+		ustr += U"  ";
+
+		utfToStr(ustr, str);
 		msg += str;
 
 		if (idxColCmd < idxColCmdMax)
@@ -499,7 +501,7 @@ void RemoteCommanding::cmdCandidatesShow()
 		}
 
 		msg += "\r\n";
-		mpTrans->send(msg.c_str(), msg.size());
+		mpFilt->send(msg.c_str(), msg.size());
 
 		idxColCmd = 0;
 		msg = "";
@@ -508,32 +510,32 @@ void RemoteCommanding::cmdCandidatesShow()
 	if (msg.size())
 	{
 		msg += "\r\n";
-		mpTrans->send(msg.c_str(), msg.size());
+		mpFilt->send(msg.c_str(), msg.size());
 	}
-#endif
 
 	promptSend();
 }
 
-void RemoteCommanding::cmdCandidatesGet(list<const char *> &listCandidates)
+void RemoteCommanding::cmdCandidatesGet(list<const char32_t *> &listCandidates)
 {
-	(void)listCandidates;
-#if 0
-	const char *pEdit = mCmdInBuf[mIdxLineEdit];
-	list<SystemCommand>::const_iterator iter;
-	const char *pId;
+	list<EntryHelp>::const_iterator iter;
+	const char32_t *pEdit, *pId;
+
+	u32string ustr = mTxtPrompt.ustrWork();
+	pEdit = &ustr[0];
+
+	size_t numBytesCheck = mCursorEditLow * sizeof(char32_t);
 
 	iter = cmds.begin();
 	for (; iter != cmds.end(); ++iter)
 	{
-		pId = iter->id.c_str();
+		pId = &iter->id[0];
 
-		if (strncmp(pEdit, pId, mIdxColCursor))
+		if (memcmp(pEdit, pId, numBytesCheck))
 			continue;
 
 		listCandidates.push_back(pId);
 	}
-#endif
 }
 
 void RemoteCommanding::promptSend(bool cursor, bool preNewLine, bool postNewLine)
@@ -582,6 +584,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 	list<EntryHelp>::iterator iter;
 	EntryHelp cmd;
 	string group = "";
+	string str;
 
 	(void)pArgs;
 
@@ -608,7 +611,8 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 		else
 			dInfo("   ");
 
-		dInfo("%-*s", cSizeCmdIdMax + 2, cmd.id.c_str());
+		utfToStr(cmd.id, str);
+		dInfo("%-*s", cSizeCmdIdMax + 2, str.c_str());
 
 		if (cmd.desc.size())
 			dInfo(".. %s", cmd.desc.c_str());
@@ -660,6 +664,7 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 	list<string>::const_iterator iter;
 	vector<string> partsEntry;
 	EntryHelp entry;
+	u32string ustr;
 
 	cmds.clear();
 
@@ -683,7 +688,9 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 			continue;
 		}
 
-		entry.id = partsEntry[0];
+		strToUtf(partsEntry[0], ustr);
+		entry.id = ustr;
+
 		entry.shortcut = partsEntry[1];
 		entry.desc = partsEntry[2];
 		entry.group = partsEntry[3];
@@ -691,7 +698,7 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 		cmds.push_back(entry);
 	}
 
-	entry.id = "help";
+	entry.id = U"help";
 	entry.shortcut = "h";
 	entry.desc = "This help screen";
 	entry.group = cInternalCmdCls;

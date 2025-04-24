@@ -35,7 +35,7 @@
 
 struct EntryHelp
 {
-	std::string id;
+	std::u32string id;
 	std::string shortcut;
 	std::string desc;
 	std::string group;
@@ -85,7 +85,7 @@ private:
 	void tabProcess();
 	void cmdAutoComplete();
 	void cmdCandidatesShow();
-	void cmdCandidatesGet(std::list<const char *> &listCandidates);
+	void cmdCandidatesGet(std::list<const char32_t *> &listCandidates);
 	void promptSend(bool cursor = true, bool preNewLine = false, bool postNewLine = false);
 
 	/* member variables */
