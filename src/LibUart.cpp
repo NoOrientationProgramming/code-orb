@@ -57,6 +57,7 @@ static uint8_t *pBufVirt = bufVirtual;
  * - https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcommstate
  * - https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcommstate
  * - https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
+ * - https://learn.microsoft.com/sr-cyrl-rs/windows/win32/api/winbase/nf-winbase-setcommtimeouts
  */
 Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 {
@@ -128,6 +129,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	}
 #else
 	DCB dcbSerialParams = {};
+	//COMMTIMEOUTS timeouts = {};
 	BOOL ok;
 
 	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
@@ -158,6 +160,21 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		success = errLog(-1, "could not set serial port state");
 		goto errInit;
 	}
+#if 0
+	// optional: timeouts
+	timeouts.ReadIntervalTimeout = 50;
+	timeouts.ReadTotalTimeoutConstant = 50;
+	timeouts.ReadTotalTimeoutMultiplier = 10;
+	timeouts.WriteTotalTimeoutConstant = 50;
+	timeouts.WriteTotalTimeoutMultiplier = 10;
+
+	ok = SetCommTimeouts(refUart, &timeouts);
+	if (!ok)
+	{
+		success = errLog(-1, "could not set serial port timeouts");
+		goto errInit;
+	}
+#endif
 #endif
 	return Positive;
 
