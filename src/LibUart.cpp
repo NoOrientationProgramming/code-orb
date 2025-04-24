@@ -70,11 +70,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	string fileUart;
 
 	// create reference
-#if defined(__unix__)
-	fileUart = deviceUart;
-
-	refUart = open(fileUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-#else
+#if defined(_WIN32)
 	fileUart += "\\\\.\\";
 	fileUart += deviceUart;
 
@@ -87,6 +83,10 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		0,
 		NULL
 	);
+#else
+	fileUart = deviceUart;
+
+	refUart = open(fileUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 #endif
 	if (refUart == RefDeviceUartInvalid)
 		return Pending; // no error!
