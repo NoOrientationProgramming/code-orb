@@ -399,10 +399,6 @@ void RemoteCommanding::tabProcess()
 
 	mStrEdit = mTxtPrompt.ustrWork();
 
-	procWrnLog("String        '%s'", mStrEdit.c_str());
-	procWrnLog("Cursor low    %u", mCursorEditLow);
-	procWrnLog("Cursor high   %u", mCursorEditHigh);
-
 	if (!mStrEdit.size())
 		return;
 
