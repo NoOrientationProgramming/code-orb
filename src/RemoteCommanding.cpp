@@ -49,10 +49,10 @@ using namespace std;
 const uint32_t cTimeoutResponseMs = 300;
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-#define dColorGreen "\033[38;5;46m"
-#define dColorOrange "\033[38;5;220m"
-#define dColorGrey "\033[38;5;240m"
-#define dColorClear "\033[0m"
+#define dColorGreen		"\033[38;5;46m"
+#define dColorOrange	"\033[38;5;220m"
+#define dColorGrey		"\033[38;5;240m"
+#define dColorClear		"\033[0m"
 
 #define dSizeHistoryMax 41
 
