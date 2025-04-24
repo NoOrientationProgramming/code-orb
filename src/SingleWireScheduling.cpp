@@ -167,9 +167,20 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
-		cmdSend(env.codeUart);
+		ok = cmdSend(env.codeUart);
+		if (!ok)
+		{
+			mState = StUartInit;
+			break;
+		}
 
-		dataRequest();
+		ok = dataRequest();
+		if (!ok)
+		{
+			mState = StUartInit;
+			break;
+		}
+
 		mState = StTargetInitDoneWait;
 
 		break;
@@ -225,7 +236,13 @@ Success SingleWireScheduling::process()
 		if (ok)
 			break;
 
-		dataRequest();
+		ok = dataRequest();
+		if (!ok)
+		{
+			mState = StUartInit;
+			break;
+		}
+
 		mState = StContentReceiveWait;
 
 		break;
@@ -320,8 +337,12 @@ bool SingleWireScheduling::cmdQueueCheck()
 		return false;
 	mStartCmdMs = millis();
 
+	bool ok;
+
 	const CommandReqResp *pReq = &mpListCmdCurrent->front();
-	cmdSend(pReq->str);
+	ok = cmdSend(pReq->str);
+	if (!ok)
+		return false;
 
 	return true;
 }
@@ -377,9 +398,14 @@ void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 	}
 }
 
-void SingleWireScheduling::cmdSend(const string &cmd)
+bool SingleWireScheduling::cmdSend(const string &cmd)
 {
-	uartSend(mRefUart, FlowSchedToTarget);
+	ssize_t lenWritten;
+
+	lenWritten = uartSend(mRefUart, FlowSchedToTarget);
+	if (lenWritten < 0)
+		return false;
+
 	uartSend(mRefUart, IdContentScToTaCmd);
 	uartSend(mRefUart, cmd.data(), cmd.size());
 	uartSend(mRefUart, 0x00);
@@ -388,11 +414,18 @@ void SingleWireScheduling::cmdSend(const string &cmd)
 	mStartMs = millis();
 
 	//procWrnLog("cmd sent: %s", cmd.c_str());
+
+	return true;
 }
 
-void SingleWireScheduling::dataRequest()
+bool SingleWireScheduling::dataRequest()
 {
-	uartSend(mRefUart, FlowTargetToSched);
+	ssize_t lenWritten;
+
+	lenWritten = uartSend(mRefUart, FlowTargetToSched);
+	if (lenWritten < 0)
+		return false;
+
 	mStartMs = millis();
 
 	//procWrnLog("data requested");
@@ -402,6 +435,8 @@ void SingleWireScheduling::dataRequest()
 		--mCntDelayPrioLow;
 		//procWrnLog("low prio delay: %u", mCntDelayPrioLow);
 	}
+
+	return true;
 }
 
 Success SingleWireScheduling::dataReceive()

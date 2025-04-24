@@ -125,8 +125,8 @@ private:
 	void cmdResponseReceived(const std::string &resp);
 	void commandsCheck(uint32_t curTimeMs);
 	void cmdResponsesClear(uint32_t curTimeMs);
-	void cmdSend(const std::string &cmd);
-	void dataRequest();
+	bool cmdSend(const std::string &cmd);
+	bool dataRequest();
 	Success dataReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
