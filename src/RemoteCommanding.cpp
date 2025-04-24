@@ -73,7 +73,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
-	, mTimestamps(false)
+	, mTimestamps(true)
 	// target online check
 	, mTargetIsOnline(false)
 	// command response measurement
