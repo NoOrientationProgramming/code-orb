@@ -260,6 +260,9 @@ Success RemoteCommanding::commandSend()
 
 	u32string ustr = mTxtPrompt.ustrWork();
 
+	if (ustr.size() && ustr.back() == U' ')
+		ustr.pop_back();
+
 	if (!ustr.size())
 	{
 		lineAck();
