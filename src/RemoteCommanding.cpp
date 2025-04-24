@@ -144,7 +144,7 @@ Success RemoteCommanding::process()
 		mTxtPrompt.frameEnabledSet(false);
 		mTxtPrompt.paddingEnabledSet(false);
 
-		mTargetIsOnline = not *mpTargetIsOnline;
+		mTargetIsOnline = !*mpTargetIsOnline;
 
 		mState = StWelcomeSend;
 
@@ -295,7 +295,7 @@ Success RemoteCommanding::commandSend()
 
 	if (str == "timestampsToggle")
 	{
-		mTimestamps = not mTimestamps;
+		mTimestamps = !mTimestamps;
 
 		msg += dColorGrey;
 		msg += "<timestamps ";
