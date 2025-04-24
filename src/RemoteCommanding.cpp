@@ -73,6 +73,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
+	, mTimestamps(false)
 	// target online check
 	, mTargetIsOnline(false)
 	// command response measurement
@@ -256,6 +257,7 @@ bool RemoteCommanding::stateOnlineChanged()
 
 Success RemoteCommanding::commandSend()
 {
+	string str, msg;
 	bool ok;
 
 	u32string ustr = mTxtPrompt.ustrWork();
@@ -270,7 +272,6 @@ Success RemoteCommanding::commandSend()
 		return Positive;
 	}
 
-	string str;
 	utfToStr(ustr, str);
 
 	mCmdLast = ustr;
@@ -280,8 +281,27 @@ Success RemoteCommanding::commandSend()
 		mBufOut[0] = 0;
 		cmdHelpPrint(NULL, mBufOut, mBufOut + sizeof(mBufOut));
 
-		string msg;
 		lfToCrLf(mBufOut, msg);
+
+		if (msg.size())
+			msg += "\r\n";
+
+		lineAck();
+		mpFilt->send(msg.c_str(), msg.size());
+		promptSend();
+
+		return Positive;
+	}
+
+	if (str == "timestampsToggle")
+	{
+		mTimestamps = not mTimestamps;
+
+		msg += dColorGrey;
+		msg += "<timestamps ";
+		msg += mTimestamps ? "en" : "dis";
+		msg += "abled>";
+		msg += dColorClear;
 
 		if (msg.size())
 			msg += "\r\n";
@@ -304,7 +324,7 @@ Success RemoteCommanding::commandSend()
 
 Success RemoteCommanding::responseReceive()
 {
-	string resp;
+	string resp, str, msg;
 	bool ok;
 
 	ok = SingleWireScheduling::commandResponseGet(mIdReq, resp);
@@ -313,7 +333,12 @@ Success RemoteCommanding::responseReceive()
 
 	//procWrnLog("response received: %s", resp.c_str());
 
-	string msg;
+	if (mTimestamps)
+	{
+		msg += dColorGrey;
+		msg += nowToStr("%H:%M:%S ");
+		msg += dColorClear;
+	}
 
 	if (!resp.size())
 	{
@@ -322,7 +347,10 @@ Success RemoteCommanding::responseReceive()
 		msg += dColorClear;
 	}
 	else
-		lfToCrLf(resp.data(), msg);
+	{
+		lfToCrLf(resp.data(), str);
+		msg += str;
+	}
 
 	if (msg.size())
 		msg += "\r\n";
@@ -708,8 +736,14 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 	entry.shortcut = "h";
 	entry.desc = "This help screen";
 	entry.group = cInternalCmdCls;
-
 	cmds.push_back(entry);
+
+	entry.id = U"timestampsToggle";
+	entry.shortcut = "";
+	entry.desc = "Print timestamps";
+	entry.group = cInternalCmdCls;
+	cmds.push_back(entry);
+
 	cmds.sort(commandSort);
 }
 

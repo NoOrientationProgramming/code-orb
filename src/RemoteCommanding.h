@@ -95,6 +95,7 @@ private:
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
 	char mBufOut[1023];
+	bool mTimestamps;
 
 	// target online check
 	bool mTargetIsOnline;
