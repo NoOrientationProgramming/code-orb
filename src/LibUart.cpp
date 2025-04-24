@@ -308,6 +308,9 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 
 		return -2;
 	}
+
+	if (!lenRead)
+		return -2;
 #else
 	DWORD lenReadWin;
 	BOOL ok;
@@ -327,9 +330,6 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 
 	lenRead = (ssize_t)lenReadWin;
 #endif
-	if (!lenRead)
-		return -2;
-
 	return lenRead;
 }
 
