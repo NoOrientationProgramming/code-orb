@@ -322,11 +322,12 @@ void GwMsgDispatching::peerListUpdate()
 
 void GwMsgDispatching::contentDistribute()
 {
+	string msg;
+
 	// proc tree
 	if (mpSched->contentProcChanged())
 	{
 		const string &str = mpSched->mContentProc;
-		string msg;
 
 		msgProcHdr(msg, str.size());
 		msg += str;
@@ -342,7 +343,10 @@ void GwMsgDispatching::contentDistribute()
 		if (mpSched->ppEntriesLog.get(entryLog) < 1)
 			break;
 
-		contentSend(entryLog.particle, RemotePeerLog);
+		msg = entryLog.particle;
+		msg += "\r\n";
+
+		contentSend(msg, RemotePeerLog);
 	}
 }
 
