@@ -111,7 +111,6 @@ private:
 	// auto completion
 	bool mLastKeyWasTab;
 	uint32_t mCursorEditLow;
-	uint32_t mCursorEditHigh;
 	std::u32string mStrEdit;
 
 	/* static functions */

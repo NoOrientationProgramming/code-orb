@@ -85,7 +85,6 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	// auto completion
 	, mLastKeyWasTab(false)
 	, mCursorEditLow(0)
-	, mCursorEditHigh(0)
 	, mStrEdit(U"")
 {
 	mBufOut[0] = 0;
@@ -394,8 +393,6 @@ void RemoteCommanding::tabProcess()
 
 	mCursorEditLow = cursorFront > cursorBack
 					? cursorBack : cursorFront;
-	mCursorEditHigh = cursorFront > cursorBack
-					? cursorFront : cursorBack;
 
 	mStrEdit = mTxtPrompt.ustrWork();
 
