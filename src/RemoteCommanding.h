@@ -104,15 +104,15 @@ private:
 	uint32_t mDelayResponseCmdMs;
 
 	// command history
-	std::string mCmdLast;
-	std::list<std::string> mHistory;
-	std::list<std::string>::iterator miEntryHist;
+	std::u32string mCmdLast;
+	std::list<std::u32string> mHistory;
+	std::list<std::u32string>::iterator miEntryHist;
 
 	// auto completion
 	bool mLastKeyWasTab;
 	uint32_t mCursorEditLow;
 	uint32_t mCursorEditHigh;
-	std::string mStrEdit;
+	std::u32string mStrEdit;
 
 	/* static functions */
 	static void cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd);

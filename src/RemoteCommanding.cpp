@@ -80,13 +80,13 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mStartCmdMs(0)
 	, mDelayResponseCmdMs(0)
 	// command history
-	, mCmdLast("")
+	, mCmdLast(U"")
 	, mHistory()
 	// auto completion
 	, mLastKeyWasTab(false)
 	, mCursorEditLow(0)
 	, mCursorEditHigh(0)
-	, mStrEdit("")
+	, mStrEdit(U"")
 {
 	mBufOut[0] = 0;
 	miEntryHist = mHistory.end();
@@ -260,17 +260,19 @@ Success RemoteCommanding::commandSend()
 {
 	bool ok;
 
-	mTxtPrompt.focusSet(false);
-	string str = mTxtPrompt;
+	u32string ustr = mTxtPrompt.ustrWork();
 
-	if (!str.size())
+	if (!ustr.size())
 	{
 		lineAck();
 		promptSend();
 		return Positive;
 	}
 
-	mCmdLast = str;
+	string str;
+	utfToStr(ustr, str);
+
+	mCmdLast = ustr;
 
 	if (str == "help" || str == "h")
 	{
@@ -336,8 +338,7 @@ void RemoteCommanding::lineAck()
 {
 	promptSend(false, false, true);
 
-	mTxtPrompt = "";
-	mTxtPrompt.focusSet(true);
+	mTxtPrompt.ustrWorkSet(U"");
 
 	historyUpdate();
 }
@@ -367,7 +368,7 @@ bool RemoteCommanding::historyNavigate(KeyUser &key)
 	if (!mHistory.size())
 		return false;
 
-	list<string>::iterator iter = miEntryHist;
+	list<u32string>::iterator iter = miEntryHist;
 
 	if (key == keyUp && miEntryHist != mHistory.begin())
 		--miEntryHist;
@@ -379,11 +380,9 @@ bool RemoteCommanding::historyNavigate(KeyUser &key)
 		return false;
 
 	if (miEntryHist == mHistory.end())
-		mTxtPrompt = "";
+		mTxtPrompt.ustrWorkSet(U"");
 	else
-		mTxtPrompt = *miEntryHist;
-
-	mTxtPrompt.focusSet(true);
+		mTxtPrompt.ustrWorkSet(*miEntryHist);
 
 	return true;
 }
@@ -398,9 +397,7 @@ void RemoteCommanding::tabProcess()
 	mCursorEditHigh = cursorFront > cursorBack
 					? cursorFront : cursorBack;
 
-	mTxtPrompt.focusSet(false);
-	mStrEdit = mTxtPrompt;
-	mTxtPrompt.focusSet(true);
+	mStrEdit = mTxtPrompt.ustrWork();
 
 	procWrnLog("String        '%s'", mStrEdit.c_str());
 	procWrnLog("Cursor low    %u", mCursorEditLow);
@@ -632,11 +629,20 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
-	dInfo("Last command\t\t%s\n",
-			mCmdLast.size() ? mCmdLast.c_str() : "<none>");
+	string str;
+
+	dInfo("Last command\t\t");
+	if (mCmdLast.size())
+	{
+		utfToStr(mCmdLast, str);
+		dInfo("%s\n", str.c_str());
+	}
+	else
+		dInfo("<none>\n");
+
 	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
 #if 0
-	list<string>::iterator iter;
+	list<u32string>::iterator iter;
 
 	dInfo("Command history\n");
 
@@ -646,9 +652,10 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 	iter = mHistory.begin();
 	for (; iter != mHistory.end(); ++iter)
 	{
+		utfToStr(*iter, str);
 		dInfo("%c %s\n",
 				iter == miEntryHist ? '>' : ' ',
-				iter->c_str());
+				str.c_str());
 	}
 #endif
 }
