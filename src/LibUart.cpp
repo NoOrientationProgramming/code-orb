@@ -88,7 +88,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		NULL
 	);
 #endif
-	if (refUart == INVALID_HANDLE_VALUE)
+	if (refUart == RefDeviceUartInvalid)
 		return Pending; // no error!
 
 	// configuration
