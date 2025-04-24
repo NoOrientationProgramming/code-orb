@@ -23,13 +23,12 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(__unix__)
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
-#endif
 #if defined(_WIN32)
 #include <winsock2.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
 #endif
 
 #include "LibUart.h"
