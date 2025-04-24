@@ -14,6 +14,7 @@ ninja && \
 valgrind \
 	--leak-check=full \
 	--show-leak-kinds=all \
+	--track-fds=yes \
 	--suppressions=${dRelTargetToTool}/valgrind_suppressions.txt \
 ./codeorb \
 	$@
