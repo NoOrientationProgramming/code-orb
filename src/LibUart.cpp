@@ -224,15 +224,12 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 	return uartSend(refUart, &ch, sizeof(ch));
 }
 
-static int errGet()
-{
-#ifdef _WIN32
-	return WSAGetLastError();
-#else
-	return errno;
-#endif
-}
-
+/*
+ * Literature
+ *
+ * Windows
+ * - https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
+ */
 ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 {
 	if (!lenReq)
@@ -243,18 +240,18 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 		if (!uartVirtualMounted)
 			return -1;
 
-		size_t lenRead;
+		size_t lenReadVirt;
 
-		lenRead = PMIN(lenReq, lenWritten);
-		if (!lenRead)
+		lenReadVirt = PMIN(lenReq, lenWritten);
+		if (!lenReadVirt)
 			return 0;
 
-		memcpy(pBuf, pBufVirt, lenRead);
+		memcpy(pBuf, pBufVirt, lenReadVirt);
 
-		lenWritten -= lenRead;
-		pBufVirt += lenRead;
+		lenWritten -= lenReadVirt;
+		pBufVirt += lenReadVirt;
 
-		return lenRead;
+		return lenReadVirt;
 	}
 
 	if (refUart == RefDeviceUartInvalid)
@@ -264,29 +261,38 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 
 #if defined(__unix__)
 	lenRead = read(refUart, pBuf, lenReq);
-	if (!lenRead)
-		return -2;
-#else
-	lenRead = -1;
-	return lenRead;
-#endif
 	if (lenRead < 0)
 	{
-		int numErr = errGet();
-#ifdef _WIN32
-		if (numErr == WSAEWOULDBLOCK || numErr == WSAEINPROGRESS)
+		int numErr = errno;
+
+		if (numErr == EWOULDBLOCK ||
+				numErr == EINPROGRESS ||
+				numErr == EAGAIN)
 			return 0; // std case and ok
 
-		if (numErr == WSAECONNRESET)
-			return -2;
-#else
-		if (numErr == EWOULDBLOCK || numErr == EINPROGRESS || numErr == EAGAIN)
-			return 0; // std case and ok
-
-		if (numErr == ECONNRESET)
-			return -2;
-#endif
+		return -2;
 	}
+#else
+	DWORD lenReadWin;
+	BOOL ok;
+
+	ok = ReadFile(refUart, pBuf, (DWORD)lenReq, &lenReadWin, NULL);
+	if (!ok)
+	{
+		int numErr = errno;
+
+		if (numErr == ERROR_IO_PENDING ||
+				numErr == WSAEWOULDBLOCK ||
+				numErr == WSAEINPROGRESS)
+			return 0; // std case and ok
+
+		return -2;
+	}
+
+	lenRead = (ssize_t)lenReadWin;
+#endif
+	if (!lenRead)
+		return -2;
 
 	return lenRead;
 }
