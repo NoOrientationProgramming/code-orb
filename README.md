@@ -30,7 +30,7 @@ The task viewer provides a detailed insight into the entire system, whereas the 
 
 ## Status
 
-- Pre alpha
+- Beta
 - ETA: June 2025
 
 ## How To Use
