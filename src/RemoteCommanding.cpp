@@ -360,7 +360,7 @@ void RemoteCommanding::historyUpdate()
 		mHistory.pop_front();
 }
 
-bool RemoteCommanding::historyNavigate(KeyUser &key)
+bool RemoteCommanding::historyNavigate(const KeyUser &key)
 {
 	if (key != keyUp && key != keyDown)
 		return false;

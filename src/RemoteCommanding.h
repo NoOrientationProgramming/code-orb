@@ -80,7 +80,7 @@ private:
 	Success commandSend();
 	Success responseReceive();
 	void lineAck();
-	bool historyNavigate(KeyUser &key);
+	bool historyNavigate(const KeyUser &key);
 	void historyUpdate();
 	void tabProcess();
 	void cmdAutoComplete();
