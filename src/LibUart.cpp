@@ -129,7 +129,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	}
 #else
 	DCB dcbSerialParams = {};
-	//COMMTIMEOUTS timeouts = {};
+	COMMTIMEOUTS timeouts = {};
 	BOOL ok;
 
 	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
@@ -160,13 +160,13 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		success = errLog(-1, "could not set serial port state");
 		goto errInit;
 	}
-#if 0
-	// optional: timeouts
-	timeouts.ReadIntervalTimeout = 50;
-	timeouts.ReadTotalTimeoutConstant = 50;
-	timeouts.ReadTotalTimeoutMultiplier = 10;
-	timeouts.WriteTotalTimeoutConstant = 50;
-	timeouts.WriteTotalTimeoutMultiplier = 10;
+
+	// set non-blocking
+	timeouts.ReadIntervalTimeout = MAXDWORD;
+	timeouts.ReadTotalTimeoutConstant = 0;
+	timeouts.ReadTotalTimeoutMultiplier = 0;
+	timeouts.WriteTotalTimeoutConstant = 0;
+	timeouts.WriteTotalTimeoutMultiplier = 0;
 
 	ok = SetCommTimeouts(refUart, &timeouts);
 	if (!ok)
@@ -174,7 +174,6 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		success = errLog(-1, "could not set serial port timeouts");
 		goto errInit;
 	}
-#endif
 #endif
 	return Positive;
 
