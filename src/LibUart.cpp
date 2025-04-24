@@ -183,6 +183,15 @@ void devUartDeInit(RefDeviceUart &refUart)
 	refUart = RefDeviceUartInvalid;
 }
 
+/*
+ * Literature
+ *
+ * Linux
+ * - https://man7.org/linux/man-pages/man2/write.2.html
+ *
+ * Windows
+ * - https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+ */
 ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 {
 	if (!lenReq)
@@ -213,8 +222,16 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 #if defined(__unix__)
 	lenWritten = write(refUart, pBuf, lenReq);
 #else
-	(void)pBuf;
-	(void)lenReq;
+	DWORD lenWrittenWin;
+	BOOL ok;
+
+	lenWritten = 0;
+
+	ok = WriteFile(refUart, pBuf, (DWORD)lenReq, &lenWrittenWin, NULL);
+	if (!ok)
+		return -1;
+
+	lenWritten = (size_t)lenWrittenWin;
 #endif
 	return lenWritten;
 }
