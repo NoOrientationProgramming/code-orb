@@ -227,6 +227,9 @@ ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
 /*
  * Literature
  *
+ * Linux
+ * - https://man7.org/linux/man-pages/man2/read.2.html
+ *
  * Windows
  * - https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile
  */
