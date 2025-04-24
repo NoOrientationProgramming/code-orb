@@ -406,10 +406,10 @@ bool SingleWireScheduling::cmdSend(const string &cmd)
 	if (lenWritten < 0)
 		return false;
 
-	uartSend(mRefUart, IdContentScToTaCmd);
-	uartSend(mRefUart, cmd.data(), cmd.size());
-	uartSend(mRefUart, 0x00);
-	uartSend(mRefUart, IdContentEnd);
+	(void)uartSend(mRefUart, IdContentScToTaCmd);
+	(void)uartSend(mRefUart, cmd.data(), cmd.size());
+	(void)uartSend(mRefUart, 0x00);
+	(void)uartSend(mRefUart, IdContentEnd);
 
 	mStartMs = millis();
 
