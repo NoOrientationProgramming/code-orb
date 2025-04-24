@@ -92,42 +92,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		return Pending; // no error!
 
 	// configuration
-#if defined(__unix__)
-	struct termios toOld, toNew;
-	int res;
-
-	res = tcgetattr(refUart, &toOld);
-	if (res < 0)
-	{
-		success = errLog(-1, "could not get terminal options");
-		goto errInit;
-	}
-
-	toNew = toOld;
-
-	// Disable CR to NL translation
-	toNew.c_iflag &= ~ICRNL;
-
-	// Disable flow control
-	toNew.c_iflag &= ~(IXON | IXOFF | IXANY);
-
-	// Disable NL to CR translation
-	toNew.c_oflag &= ~ONLCR;
-
-	// Disable echo and canonical mode
-	toNew.c_lflag &= ~(ECHO | ICANON);
-
-	// Set baud rate to 115200
-	cfsetispeed(&toNew, B115200);
-	cfsetospeed(&toNew, B115200);
-
-	res = tcsetattr(refUart, TCSANOW, &toNew);
-	if (res < 0)
-	{
-		success = errLog(-1, "could not set terminal options");
-		goto errInit;
-	}
-#else
+#if defined(_WIN32)
 	DCB dcbSerialParams = {};
 	COMMTIMEOUTS timeouts = {};
 	BOOL ok;
@@ -174,16 +139,51 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		success = errLog(-1, "could not set serial port timeouts");
 		goto errInit;
 	}
+#else
+	struct termios toOld, toNew;
+	int res;
+
+	res = tcgetattr(refUart, &toOld);
+	if (res < 0)
+	{
+		success = errLog(-1, "could not get terminal options");
+		goto errInit;
+	}
+
+	toNew = toOld;
+
+	// Disable CR to NL translation
+	toNew.c_iflag &= ~ICRNL;
+
+	// Disable flow control
+	toNew.c_iflag &= ~(IXON | IXOFF | IXANY);
+
+	// Disable NL to CR translation
+	toNew.c_oflag &= ~ONLCR;
+
+	// Disable echo and canonical mode
+	toNew.c_lflag &= ~(ECHO | ICANON);
+
+	// Set baud rate to 115200
+	cfsetispeed(&toNew, B115200);
+	cfsetospeed(&toNew, B115200);
+
+	res = tcsetattr(refUart, TCSANOW, &toNew);
+	if (res < 0)
+	{
+		success = errLog(-1, "could not set terminal options");
+		goto errInit;
+	}
 #endif
 	return Positive;
 
 errInit:
 	if (refUart == RefDeviceUartInvalid)
 		return success;
-#if defined(__unix__)
-	close(refUart);
-#else
+#if defined(_WIN32)
 	CloseHandle(refUart);
+#else
+	close(refUart);
 #endif
 	return success;
 }
@@ -193,7 +193,9 @@ void devUartDeInit(RefDeviceUart &refUart)
 	if (refUart == RefDeviceUartInvalid)
 		return;
 
-#if defined(__unix__)
+#if defined(_WIN32)
+	CloseHandle(refUart);
+#else
 	close(refUart);
 #endif
 	refUart = RefDeviceUartInvalid;
@@ -235,9 +237,7 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 	if (refUart == RefDeviceUartInvalid)
 		return -1;
 
-#if defined(__unix__)
-	lenWritten = write(refUart, pBuf, lenReq);
-#else
+#if defined(_WIN32)
 	DWORD lenWrittenWin;
 	BOOL ok;
 
@@ -248,6 +248,8 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 		return -1;
 
 	lenWritten = (size_t)lenWrittenWin;
+#else
+	lenWritten = write(refUart, pBuf, lenReq);
 #endif
 	return lenWritten;
 }
@@ -295,23 +297,7 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 
 	ssize_t lenRead;
 
-#if defined(__unix__)
-	lenRead = read(refUart, pBuf, lenReq);
-	if (lenRead < 0)
-	{
-		int numErr = errno;
-
-		if (numErr == EWOULDBLOCK ||
-				numErr == EINPROGRESS ||
-				numErr == EAGAIN)
-			return 0; // std case and ok
-
-		return -2;
-	}
-
-	if (!lenRead)
-		return -2;
-#else
+#if defined(_WIN32)
 	DWORD lenReadWin;
 	BOOL ok;
 
@@ -329,6 +315,22 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 	}
 
 	lenRead = (ssize_t)lenReadWin;
+#else
+	lenRead = read(refUart, pBuf, lenReq);
+	if (lenRead < 0)
+	{
+		int numErr = errno;
+
+		if (numErr == EWOULDBLOCK ||
+				numErr == EINPROGRESS ||
+				numErr == EAGAIN)
+			return 0; // std case and ok
+
+		return -2;
+	}
+
+	if (!lenRead)
+		return -2;
 #endif
 	return lenRead;
 }
