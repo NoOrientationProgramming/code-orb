@@ -128,7 +128,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	}
 #else
 	DCB dcbSerialParams = {};
-	bool ok;
+	BOOL ok;
 
 	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
