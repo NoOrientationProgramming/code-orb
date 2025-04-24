@@ -457,7 +457,7 @@ void GwMsgDispatching::peerAdd(TcpListening *pListener, enum RemotePeerType peer
 
 			pCmd->mpTargetIsOnline = &mTargetIsOnline;
 
-			//pCmd->procTreeDisplaySet(false);
+			pCmd->procTreeDisplaySet(false);
 			whenFinishedRepel(start(pCmd));
 
 			continue;
