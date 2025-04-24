@@ -637,11 +637,10 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 		dInfo("<none>\n");
 
 	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
+	dInfo("Command history\t\t%zu\n", mHistory.size());
 #if 0
 	list<u32string>::iterator iter;
 	size_t idxHist = 0;
-
-	dInfo("Command history\n");
 
 	if (!mHistory.size())
 		dInfo("  <none>\n");
