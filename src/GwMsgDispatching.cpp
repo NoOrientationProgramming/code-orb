@@ -73,6 +73,7 @@ GwMsgDispatching::GwMsgDispatching()
 	, mDevUartIsOnline(true)
 	, mTargetIsOnline(false)
 	, mListPeers()
+	, mHdrDate("")
 {
 	mState = StStart;
 }
@@ -329,6 +330,8 @@ void GwMsgDispatching::contentDistribute()
 	{
 		const string &str = mpSched->mContentProc;
 
+		mHdrDate = nowToStr("%Y-%m-%d  %H:%M:%S");
+
 		msgProcHdr(msg, str.size());
 		msg += str;
 
@@ -510,7 +513,7 @@ void GwMsgDispatching::msgProcHdr(string &msg, size_t sz)
 
 	msg += dColorGrey;
 	msg += "{CodeOrb -- ";
-	msg += nowToStr("%Y-%m-%d  %H:%M:%S");
+	msg += mHdrDate;
 	msg += " -- Size: ";
 	msg += to_string(sz);
 	msg += "}";

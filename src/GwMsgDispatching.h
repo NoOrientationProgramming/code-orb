@@ -100,6 +100,7 @@ private:
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
 	std::list<struct RemoteDebuggingPeer> mListPeers;
+	std::string mHdrDate;
 
 	/* static functions */
 
