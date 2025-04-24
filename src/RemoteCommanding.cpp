@@ -640,6 +640,7 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 	dInfo("Command delay\t\t%u [ms]\n", mDelayResponseCmdMs);
 #if 0
 	list<u32string>::iterator iter;
+	size_t idxHist = 0;
 
 	dInfo("Command history\n");
 
@@ -653,6 +654,10 @@ void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 		dInfo("%c %s\n",
 				iter == miEntryHist ? '>' : ' ',
 				str.c_str());
+
+		if (idxHist >= 4)
+			break;
+		++idxHist;
 	}
 #endif
 }
