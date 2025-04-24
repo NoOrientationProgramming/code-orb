@@ -46,9 +46,17 @@ static uint8_t *pBufVirt = bufVirtual;
 
 /*
  * Literature
+ *
+ * Linux
  * - https://man7.org/linux/man-pages/man3/tcgetattr.3p.html
  * - https://man7.org/linux/man-pages/man2/write.2.html
  * - https://man7.org/linux/man-pages/man2/read.2.html
+ *
+ * Windows
+ * - https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
+ * - https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcommstate
+ * - https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcommstate
+ * - https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
  */
 Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 {
@@ -58,12 +66,32 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		return uartVirtualMounted ? Positive : Pending;
 
 	Success success;
+	string fileUart;
 
+	// create reference
 #if defined(__unix__)
-	refUart = open(deviceUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-	if (refUart < 0)
+	fileUart = deviceUart;
+
+	refUart = open(fileUart.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+#else
+	fileUart += "\\\\.\\";
+	fileUart += deviceUart;
+
+	refUart = CreateFileA(
+		fileUart.c_str(),
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL
+	);
+#endif
+	if (refUart == INVALID_HANDLE_VALUE)
 		return Pending; // no error!
 
+	// configuration
+#if defined(__unix__)
 	struct termios toOld, toNew;
 	int res;
 
@@ -95,23 +123,51 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	res = tcsetattr(refUart, TCSANOW, &toNew);
 	if (res < 0)
 	{
-		(void)tcsetattr(refUart, TCSANOW, &toOld); // Restore old settings on failure
-
 		success = errLog(-1, "could not set terminal options");
 		goto errInit;
 	}
 #else
-	(void)deviceUart;
-	(void)refUart;
+	DCB dcbSerialParams = {};
+	bool ok;
 
-	success = errLog(-1, "not implemented");
-	goto errInit;
+	dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+	ok = GetCommState(refUart, &dcbSerialParams);
+	if (!ok)
+	{
+		success = errLog(-1, "could not get serial port state");
+		goto errInit;
+	}
+
+	dcbSerialParams.BaudRate = CBR_115200;
+	dcbSerialParams.ByteSize = 8;
+	dcbSerialParams.StopBits = ONESTOPBIT;
+	dcbSerialParams.Parity = NOPARITY;
+	dcbSerialParams.fDtrControl = DTR_CONTROL_DISABLE;
+	dcbSerialParams.fRtsControl = RTS_CONTROL_DISABLE;
+	dcbSerialParams.fOutxCtsFlow = FALSE;
+	dcbSerialParams.fOutxDsrFlow = FALSE;
+	dcbSerialParams.fDsrSensitivity = FALSE;
+	dcbSerialParams.fTXContinueOnXoff = TRUE;
+	dcbSerialParams.fOutX = FALSE;
+	dcbSerialParams.fInX = FALSE;
+
+	ok = SetCommState(refUart, &dcbSerialParams);
+	if (!ok)
+	{
+		success = errLog(-1, "could not set serial port state");
+		goto errInit;
+	}
 #endif
 	return Positive;
 
 errInit:
+	if (refUart == RefDeviceUartInvalid)
+		return success;
 #if defined(__unix__)
 	close(refUart);
+#else
+	CloseHandle(refUart);
 #endif
 	return success;
 }
