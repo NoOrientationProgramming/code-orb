@@ -64,17 +64,12 @@ Check the instructions for your OS on how to install these tools.
 
 Clone repo
 ```
-git clone https://github.com/NoOrientationProgramming/code-orb.git
+git clone https://github.com/NoOrientationProgramming/code-orb.git --recursive
 ```
 
 Enter the directory
 ```
 cd code-orb
-```
-
-Initialize GIT submodules
-```
-git submodule update --init --recursive
 ```
 
 Setup build directory
