@@ -14,8 +14,8 @@
 ## The Microcontroller Debugger
 
 When working with small targets, simple log outputs are often the only feedback available.
-With [CodeOrb](https://github.com/NoOrientationProgramming/code-orb#codeorb-start) on the PC and
-[Processing()](https://github.com/NoOrientationProgramming/ProcessingCore#processing-start) on the target,
+With [CodeOrb](https://github.com/NoOrientationProgramming/code-orb#codeorb-start) on the PC and the
+[Processing() C++ class](https://github.com/NoOrientationProgramming/ProcessingCore#processing-start) on the target,
 we have two additional channels: a task viewer and a command interface.
 The task viewer provides a detailed insight into the entire system, whereas the command interface gives full control over the microcontroller.
 
