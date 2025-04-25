@@ -3,7 +3,7 @@
 
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic)
 
-[![Windows](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml) [![Linux](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml) [![MacOS](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml) [![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/arm-and-mingw.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/arm-and-mingw.yml)
+[![Windows](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml) [![Linux](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml) [![MacOS](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml) [![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml)
 
 <p align="center">
   <kbd>
