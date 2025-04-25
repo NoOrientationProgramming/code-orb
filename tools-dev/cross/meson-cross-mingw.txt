@@ -1,3 +1,6 @@
+
+# meson setup --cross-file tools-dev/cross/meson-cross-win64.txt build-meson-win64
+
 [binaries]
 c = 'x86_64-w64-mingw32-gcc'
 cpp = 'x86_64-w64-mingw32-g++'
