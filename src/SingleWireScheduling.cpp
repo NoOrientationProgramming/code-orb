@@ -417,16 +417,16 @@ void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 
 bool SingleWireScheduling::cmdSend(const string &cmd)
 {
-	ssize_t lenWritten;
+	bool failed = false;
 
-	lenWritten = uartSend(mRefUart, FlowSchedToTarget);
-	if (lenWritten < 0)
+	failed |= uartSend(mRefUart, FlowSchedToTarget) < 0;
+	failed |= uartSend(mRefUart, IdContentScToTaCmd) < 0;
+	failed |= uartSend(mRefUart, cmd.data(), cmd.size()) < 0;
+	failed |= uartSend(mRefUart, 0x00) < 0;
+	failed |= uartSend(mRefUart, IdContentEnd) < 0;
+
+	if (failed)
 		return false;
-
-	(void)uartSend(mRefUart, IdContentScToTaCmd);
-	(void)uartSend(mRefUart, cmd.data(), cmd.size());
-	(void)uartSend(mRefUart, 0x00);
-	(void)uartSend(mRefUart, IdContentEnd);
 
 	mStartMs = millis();
 
