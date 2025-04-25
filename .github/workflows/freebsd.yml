@@ -19,7 +19,7 @@ jobs:
 
       - name: FreeBSD image download
         run: |
-          curl -LO https://ftp.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/13.2-RELEASE/amd64/Latest/FreeBSD-13.2-RELEASE-amd64.qcow2.xz
+          curl -LO https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64.qcow2.xz
           xz -d FreeBSD-13.2-RELEASE-amd64.qcow2.xz
           mv FreeBSD-13.2-RELEASE-amd64.qcow2 freebsd.qcow2
 
