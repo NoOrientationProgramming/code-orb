@@ -308,6 +308,9 @@ bool GwMsgDispatching::servicesStart()
 	pPool->procTreeDisplaySet(false);
 	start(pPool);
 
+	list<string> mEntriesDummy;
+	RemoteCommanding::listCommandsUpdate(mEntriesDummy);
+
 	return true;
 }
 
