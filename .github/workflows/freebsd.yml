@@ -10,42 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Update apt
-        run: sudo apt update
-
-      - name: Install QEMU and Tools
-        run: |
-          sudo apt install -y qemu-system-x86 xz-utils expect
-
-      - name: FreeBSD image download
-        run: |
-          curl -LO https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64.qcow2.xz
-          xz -d FreeBSD-14.2-RELEASE-amd64.qcow2.xz
-          mv FreeBSD-14.2-RELEASE-amd64.qcow2 freebsd.qcow2
-
-      - name: Run Expect script for FreeBSD Build
-        run: |
-          cat > run.expect <<'EOF'
-          #!/usr/bin/expect -f
-          set timeout 300
-          spawn qemu-system-x86_64 -m 2048 -drive file=freebsd.qcow2,format=qcow2 -nographic -net none
-          expect "login:"
-          send "root\r"
-          expect "#"
-          send "pkg install -y python py39-pip git meson ninja\r"
-          expect "#"
-          send "git clone https://github.com/NoOrientationProgramming/code-orb.git --recursive\r"
-          expect "#"
-          send "meson setup build-meson-native\r"
-          expect "#"
-          send "ninja -C build-meson-native\r"
-          expect "#"
-          send "./build-meson-native/codeorb --help\r"
-          expect "#"
-          send "poweroff\r"
-          expect eof
-          EOF
-          
-          chmod +x run.expect
-          ./run.expect
+      - name: Build in FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y python py39-pip git meson ninja
+          run: |
+            git clone https://github.com/NoOrientationProgramming/code-orb.git --recursive
+            meson setup build-meson-native
+            ninja -C build-meson-native
+            ./build-meson-native/codeorb --help
 
