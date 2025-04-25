@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -LO https://download.freebsd.org/releases/VM-IMAGES/14.2-RELEASE/amd64/Latest/FreeBSD-14.2-RELEASE-amd64.qcow2.xz
           xz -d FreeBSD-14.2-RELEASE-amd64.qcow2.xz
-          mv FreeBSD-14.2-RELEASE-amd64.qcow2.xz freebsd.qcow2
+          mv FreeBSD-14.2-RELEASE-amd64.qcow2 freebsd.qcow2
 
       - name: Run Expect script for FreeBSD Build
         run: |
