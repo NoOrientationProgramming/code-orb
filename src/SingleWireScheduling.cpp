@@ -77,6 +77,8 @@ RefDeviceUart SingleWireScheduling::refUart;
 list<CommandReqResp> SingleWireScheduling::requestsCmd[3];
 list<CommandReqResp> SingleWireScheduling::responsesCmd;
 uint32_t SingleWireScheduling::idReqCmdNext = 0;
+mutex SingleWireScheduling::mtxRequests;
+mutex SingleWireScheduling::mtxResponses;
 
 SingleWireScheduling::SingleWireScheduling()
 	: Processing("SingleWireScheduling")
@@ -321,6 +323,8 @@ bool SingleWireScheduling::cmdQueueCheck()
 	if (mpListCmdCurrent)
 		return false;
 
+	Guard lock(mtxRequests);
+
 	if (requestsCmd[PrioUser].size())
 		mpListCmdCurrent = &requestsCmd[PrioUser];
 	else
@@ -355,9 +359,20 @@ void SingleWireScheduling::cmdResponseReceived(const string &resp)
 	procWrnLog("command response received: %s",
 				resp.c_str());
 #endif
-	uint32_t idReq = mpListCmdCurrent->front().idReq;
-	mpListCmdCurrent->pop_front();
-	responsesCmd.emplace_back(resp, idReq, millis());
+	uint32_t idReq;
+
+	{
+		Guard lock(mtxRequests);
+
+		idReq = mpListCmdCurrent->front().idReq;
+		mpListCmdCurrent->pop_front();
+	}
+
+	{
+		Guard lock(mtxResponses);
+
+		responsesCmd.emplace_back(resp, idReq, millis());
+	}
 
 	mpListCmdCurrent = NULL;
 }
@@ -377,6 +392,8 @@ void SingleWireScheduling::commandsCheck(uint32_t curTimeMs)
 
 void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 {
+	Guard lock(mtxResponses);
+
 	list<CommandReqResp>::iterator iter;
 	uint32_t diffMs;
 

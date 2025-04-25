@@ -125,6 +125,14 @@ void SingleWireScheduling::fragmentsPrint(char *pBuf, char *pBufEnd)
 
 void SingleWireScheduling::queuesCmdPrint(char *pBuf, char *pBufEnd)
 {
+	requestsCmdPrint(pBuf, pBufEnd);
+	responsesCmdPrint(pBuf, pBufEnd);
+}
+
+void SingleWireScheduling::requestsCmdPrint(char * &pBuf, char *pBufEnd)
+{
+	Guard lock(mtxRequests);
+
 	dInfo("Command requests\n");
 	dInfo("ID next\t\t\t%u\n", idReqCmdNext);
 
@@ -159,6 +167,15 @@ void SingleWireScheduling::queuesCmdPrint(char *pBuf, char *pBufEnd)
 					diffMs);
 		}
 	}
+}
+
+void SingleWireScheduling::responsesCmdPrint(char * &pBuf, char *pBufEnd)
+{
+	Guard lock(mtxResponses);
+
+	list<CommandReqResp>::iterator iter;
+	uint32_t curTimeMs = millis();
+	uint32_t diffMs;
 
 	dInfo("Command responses\n");
 	iter = responsesCmd.begin();
@@ -178,14 +195,18 @@ void SingleWireScheduling::queuesCmdPrint(char *pBuf, char *pBufEnd)
 
 bool SingleWireScheduling::commandSend(const string &cmd, uint32_t &idReq, PrioCmd prio)
 {
-	// optional mutex
+	{
+		Guard lock(mtxResponses);
+
+		if (responsesCmd.size() > cNumRequestsCmdMax)
+			return false;
+	}
+
+	Guard lock(mtxRequests);
 
 	list<CommandReqResp> *pList = &requestsCmd[prio];
 
 	if (pList->size() > cNumRequestsCmdMax)
-		return false;
-
-	if (responsesCmd.size() > cNumRequestsCmdMax)
 		return false;
 
 	idReq = idReqCmdNext;
@@ -198,6 +219,8 @@ bool SingleWireScheduling::commandSend(const string &cmd, uint32_t &idReq, PrioC
 
 bool SingleWireScheduling::commandResponseGet(uint32_t idReq, string &resp)
 {
+	Guard lock(mtxResponses);
+
 	list<CommandReqResp>::iterator iter;
 
 	iter = responsesCmd.begin();

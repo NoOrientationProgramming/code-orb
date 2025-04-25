@@ -120,6 +120,8 @@ private:
 	void processInfo(char *pBuf, char *pBufEnd);
 	void fragmentsPrint(char *pBuf, char *pBufEnd);
 	void queuesCmdPrint(char *pBuf, char *pBufEnd);
+	void requestsCmdPrint(char * &pBuf, char *pBufEnd);
+	void responsesCmdPrint(char * &pBuf, char *pBufEnd);
 
 	bool cmdQueueCheck();
 	void cmdResponseReceived(const std::string &resp);
@@ -183,6 +185,8 @@ private:
 	static std::list<CommandReqResp> requestsCmd[3];
 	static std::list<CommandReqResp> responsesCmd;
 	static uint32_t idReqCmdNext;
+	static std::mutex mtxRequests;
+	static std::mutex mtxResponses;
 
 	/* constants */
 	static const size_t cSizeFragmentMax;
