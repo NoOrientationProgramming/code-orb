@@ -1,5 +1,5 @@
 
-# apt install gcc-riscv64-linux-gnu g++-riscv64-linux-gnu gdb-multiarch
+# apt install gdb-multiarch gcc-riscv64-linux-gnu g++-riscv64-linux-gnu
 # meson setup --cross-file tools-dev/cross/meson-cross-riscv.txt build-meson-riscv
 
 [binaries]

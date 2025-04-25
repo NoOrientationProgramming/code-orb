@@ -1,4 +1,5 @@
 
+# apt install gdb-multiarch mingw-w64
 # meson setup --cross-file tools-dev/cross/meson-cross-win64.txt build-meson-win64
 
 [binaries]

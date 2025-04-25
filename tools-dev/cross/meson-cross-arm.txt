@@ -1,4 +1,5 @@
 
+# apt install gdb-multiarch gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 # meson setup --cross-file tools-dev/cross/meson-cross-rpi.txt build-meson-rpi
 
 [binaries]
