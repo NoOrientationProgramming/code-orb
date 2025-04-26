@@ -718,6 +718,7 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 		if (partsEntry.size() != 4)
 		{
 			wrnLog("wrong number of parts for entry: %zu", partsEntry.size());
+			wrnLog("entry: %s", str.c_str());
 			continue;
 		}
 
