@@ -58,10 +58,10 @@ void SingleWireScheduling::responseReset(uint8_t idContent)
 	mResp.content = "";
 }
 
-bool SingleWireScheduling::fragmentAppend(uint8_t ch)
+void SingleWireScheduling::fragmentAppend(uint8_t ch)
 {
 	if (!ch)
-		return false;
+		return;
 
 	uint8_t idContent = mResp.idContent;
 	bool fragmentFound =
@@ -70,17 +70,17 @@ bool SingleWireScheduling::fragmentAppend(uint8_t ch)
 	if (!fragmentFound)
 	{
 		mFragments[idContent] = string(1, ch);
-		return true;
+		return;
 	}
 
 	const string &str = mFragments[idContent];
 
 	if (str.size() > cSizeFragmentMax)
-		return false;
+		return;
 
 	mFragments[idContent] += string(1, ch);
 
-	return true;
+	return;
 }
 
 void SingleWireScheduling::fragmentFinish()

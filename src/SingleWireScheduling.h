@@ -45,7 +45,6 @@ enum SwtErrRcv
 {
 	SwtErrRcvNoUart = -3,
 	SwtErrRcvNoTarget,
-	SwtErrRcvProtocol,
 };
 
 enum PrioCmd
@@ -133,7 +132,7 @@ private:
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
 	void responseReset(uint8_t idContent = IdContentNone);
-	bool fragmentAppend(uint8_t ch);
+	void fragmentAppend(uint8_t ch);
 	void fragmentFinish();
 	void fragmentDelete();
 
