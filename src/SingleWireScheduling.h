@@ -133,7 +133,7 @@ private:
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
 	void responseReset(uint8_t idContent = IdContentNone);
-	void fragmentAppend(uint8_t ch);
+	bool fragmentAppend(uint8_t ch);
 	void fragmentFinish();
 	void fragmentDelete();
 

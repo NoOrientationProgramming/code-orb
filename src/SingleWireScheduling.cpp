@@ -509,6 +509,7 @@ Success SingleWireScheduling::dataReceive()
 Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 {
 	uint32_t diffMs = curTimeMs - mLastProcTreeRcvdMs;
+	bool ok;
 #if 0
 	procInfLog("received byte in %s: 0x%02X '%c'",
 				SwtStateString[mStateSwt], ch, ch);
@@ -576,16 +577,12 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 		if (!ch)
 			break;
 
-		if (isprint(ch) ||
-			ch == cKeyEscape ||
-			ch == cKeyTab ||
-			ch == cKeyCr ||
-			ch == cKeyLf)
-		{
-			if (!mContentIgnore)
-				fragmentAppend(ch);
+		if (mContentIgnore)
 			break;
-		}
+
+		ok = fragmentAppend(ch);
+		if (ok)
+			break;
 
 		if (!mContentIgnore)
 			fragmentDelete();
