@@ -366,6 +366,8 @@ void SingleWireScheduling::cmdResponseReceived(const string &resp)
 
 		idReq = mpListCmdCurrent->front().idReq;
 		mpListCmdCurrent->pop_front();
+
+		mpListCmdCurrent = NULL;
 	}
 
 	{
@@ -373,8 +375,6 @@ void SingleWireScheduling::cmdResponseReceived(const string &resp)
 
 		responsesCmd.emplace_back(resp, idReq, millis());
 	}
-
-	mpListCmdCurrent = NULL;
 }
 
 void SingleWireScheduling::commandsCheck(uint32_t curTimeMs)
