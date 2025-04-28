@@ -109,7 +109,7 @@ Success GwMsgDispatching::process()
 #else
 		start(mpSched, DrivenByNewInternalDriver);
 #endif
-		fprintf(stdout, "CodeOrb-25.04-1\n");
+		fprintf(stdout, "CodeOrb_1.25.4.1\n");
 		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
 
 		fprintf(stdout, "Listening on: %u, %u, %u\n",
