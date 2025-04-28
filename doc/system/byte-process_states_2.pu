@@ -5,7 +5,6 @@
 
 database "Input Set R" as sIn
 database "Positive" as sPos
-database "Error" as sErrorOut
 
 frame "byteProcess()" as pRcv {
 
@@ -13,8 +12,7 @@ frame "byteProcess()" as pRcv {
 
   database "Data\nreceive" as sRcv
   database "Save" as sSave
-  database "Fragment" as sFrag
-  database "Error" as sError
+  database "Fragment\nsave" as sFrag
 }
 
 sIn -> sMain
@@ -31,11 +29,6 @@ sRcv --> sSave : 17
 sRcv --> sRcv : P
 
 sSave --> sPos
-
-sMain <--> sError
-sRcv --> sError
-
-sError --> sErrorOut
 
 footer **dataReceive()** - States\n(C) DSP-Crowd Electronics GmbH
 
