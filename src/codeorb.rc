@@ -21,8 +21,8 @@ BEGIN
 			VALUE "ProductName", "CodeOrb\0"
 			VALUE "InternalName", "CodeOrb.exe\0"
 			VALUE "OriginalFilename", "CodeOrb.exe\0"
-			VALUE "FileVersion", "1.0.0.0\0"
-			VALUE "ProductVersion", "1.0.0.0\0"
+			VALUE "FileVersion", "1.25.4.1\0"
+			VALUE "ProductVersion", "1.25.4.1\0"
 			VALUE "CompanyName", "DSP-Crowd Electronics GmbH\0"
 			VALUE "LegalCopyright", "(C) 2025 DSP-Crowd Electronics GmbH\0"
 		END
