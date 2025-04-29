@@ -69,7 +69,7 @@ GwMsgDispatching::GwMsgDispatching()
 	, mpLstCmd(NULL)
 	, mpSched(NULL)
 	, mpGather(NULL)
-	, mCursorHidden(false)
+	, mCursorVisible(true)
 	, mDevUartIsOnline(true)
 	, mTargetIsOnline(false)
 	, mListPeers()
@@ -120,14 +120,9 @@ Success GwMsgDispatching::process()
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");
 
-#ifndef _WIN32
 		if (!env.verbosity)
-		{
-			fprintf(stdout, dCursorHide);
-			fflush(stdout);
-			mCursorHidden = true;
-		}
-#endif
+			cursorShow(false);
+
 		stateOnlineCheckAndPrint();
 
 		mState = StTargetOffline;
@@ -207,14 +202,10 @@ Success GwMsgDispatching::shutdown()
 #ifdef _WIN32
 	fprintf(stdout, "\r\n");
 	fflush(stdout);
-#else
-	if (mCursorHidden)
-	{
-		fprintf(stdout, dCursorShow);
-		fflush(stdout);
-		mCursorHidden = false;
-	}
 #endif
+	if (!mCursorVisible)
+		cursorShow();
+
 	return Positive;
 }
 
@@ -526,6 +517,23 @@ void GwMsgDispatching::msgProcHdr(string &msg, size_t sz)
 	msg += "}";
 	msg += dColorClear;
 	msg += "\r\n\r\n";
+}
+
+void GwMsgDispatching::cursorShow(bool val)
+{
+#ifdef _WIN32
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO infoCursor;
+
+	GetConsoleCursorInfo(hOut, &infoCursor);
+
+	infoCursor.bVisible = val ? TRUE : FALSE;
+	SetConsoleCursorInfo(hOut, &infoCursor);
+#else
+	fprintf(stdout, val ? dCursorShow : dCursorHide);
+	fflush(stdout);
+#endif
+	mCursorVisible = val;
 }
 
 void GwMsgDispatching::processInfo(char *pBuf, char *pBufEnd)

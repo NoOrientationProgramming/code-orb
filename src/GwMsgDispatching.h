@@ -86,6 +86,7 @@ private:
 	void peerCheck();
 	void peerAdd(TcpListening *pListener, enum RemotePeerType peerType, const char *pTypeDesc);
 	void msgProcHdr(std::string &msg, size_t sz);
+	void cursorShow(bool val = true);
 
 	/* member variables */
 	//uint32_t mStartMs;
@@ -96,7 +97,7 @@ private:
 	TcpListening *mpLstCmd;
 	SingleWireScheduling *mpSched;
 	InfoGathering *mpGather;
-	bool mCursorHidden;
+	bool mCursorVisible;
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
 	std::list<struct RemoteDebuggingPeer> mListPeers;
