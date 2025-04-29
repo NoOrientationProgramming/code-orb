@@ -7,3 +7,9 @@
 [submodule "deps/tclap_loc"]
 	path = deps/tclap_loc
 	url = https://github.com/mirror/tclap.git
+[submodule "deps/SystemCore"]
+	path = deps/SystemCore
+	url = https://github.com/NoOrientationProgramming/SystemCore.git
+[submodule "deps/LibNaegCommon"]
+	path = deps/LibNaegCommon
+	url = https://github.com/NoOrientationProgramming/LibNaegCommon.git
