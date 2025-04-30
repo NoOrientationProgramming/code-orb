@@ -62,10 +62,6 @@ dProcessStateStr(SwtState);
 using namespace std;
 
 #define dTimeoutTargetInitMs	65
-const uint8_t cKeyEscape = 0x1B;
-const uint8_t cKeyTab = '\t';
-const uint8_t cKeyCr = '\r';
-const uint8_t cKeyLf = '\n';
 
 const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
