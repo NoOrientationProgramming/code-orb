@@ -381,7 +381,7 @@ bool GwMsgDispatching::disconnectRequestedCheck(TcpTransfering *pTrans)
 	lenDone = pTrans->read(buf, lenPlanned);
 	if (!lenDone)
 		return false;
-
+#if 0
 	if (lenDone < 0)
 		return true;
 
@@ -400,6 +400,9 @@ bool GwMsgDispatching::disconnectRequestedCheck(TcpTransfering *pTrans)
 	}
 
 	return false;
+#else
+	return true;
+#endif
 }
 
 void GwMsgDispatching::peerCheck()
