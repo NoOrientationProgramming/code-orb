@@ -103,7 +103,7 @@ Success GwMsgDispatching::process()
 		if (!mpSched)
 			return procErrLog(-1, "could not create process");
 
-		mpSched->procTreeDisplaySet(false);
+		//mpSched->procTreeDisplaySet(false);
 #if 1
 		start(mpSched);
 #else
