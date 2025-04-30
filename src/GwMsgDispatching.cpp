@@ -199,10 +199,6 @@ Success GwMsgDispatching::process()
 
 Success GwMsgDispatching::shutdown()
 {
-#ifdef _WIN32
-	userInfLog("\r\n");
-	fflush(stdout);
-#endif
 	if (!mCursorVisible)
 		cursorShow();
 
