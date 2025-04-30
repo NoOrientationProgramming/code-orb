@@ -101,7 +101,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	ok = GetCommState(refUart, &dcbSerialParams);
 	if (!ok)
 	{
-		wrnLog("could not get serial port state");
+		//wrnLog("could not get serial port state");
 
 		success = -1;
 		goto errInit;
@@ -123,7 +123,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	ok = SetCommState(refUart, &dcbSerialParams);
 	if (!ok)
 	{
-		wrnLog("could not set serial port state");
+		//wrnLog("could not set serial port state");
 
 		success = -1;
 		goto errInit;
@@ -139,7 +139,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	ok = SetCommTimeouts(refUart, &timeouts);
 	if (!ok)
 	{
-		wrnLog("could not set serial port timeouts");
+		//wrnLog("could not set serial port timeouts");
 
 		success = -1;
 		goto errInit;
@@ -151,7 +151,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	res = tcgetattr(refUart, &toOld);
 	if (res < 0)
 	{
-		wrnLog("could not get terminal options");
+		//wrnLog("could not get terminal options");
 
 		success = -1;
 		goto errInit;
@@ -178,7 +178,7 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	res = tcsetattr(refUart, TCSANOW, &toNew);
 	if (res < 0)
 	{
-		wrnLog("could not set terminal options");
+		//wrnLog("could not set terminal options");
 
 		success = -1;
 		goto errInit;
