@@ -145,7 +145,10 @@ Success SingleWireScheduling::process()
 			break;
 
 		if (success != Positive)
-			return procErrLog(-1, "could not initalize UART device");
+		{
+			mState = StUartInit;
+			break;
+		}
 
 		// clear UART device buffer?
 
