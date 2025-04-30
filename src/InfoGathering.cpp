@@ -55,7 +55,7 @@ InfoGathering::InfoGathering()
 	mState = StStart;
 }
 
-const uint32_t cTimeoutResponseMs = 300;
+const uint32_t cTimeoutResponseMs = 700;
 
 /* member functions */
 
