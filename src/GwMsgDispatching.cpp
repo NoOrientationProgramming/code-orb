@@ -109,7 +109,7 @@ Success GwMsgDispatching::process()
 #else
 		start(mpSched, DrivenByNewInternalDriver);
 #endif
-		userInfLog("CodeOrb_1.25.4.1\n");
+		userInfLog("%s\n", dVersion);
 		userInfLog("Using device: %s\n", env.deviceUart.c_str());
 
 		userInfLog("Listening on: %u, %u, %u\n",
