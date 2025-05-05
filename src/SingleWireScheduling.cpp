@@ -235,6 +235,16 @@ Success SingleWireScheduling::process()
 
 		targetOnlineSet();
 
+		{
+			Guard lock(mtxRequests);
+			for (size_t i = 0; i < sizeof(requestsCmd) / sizeof(*requestsCmd); ++i)
+				requestsCmd[i].clear();
+		}
+		{
+			Guard lock(mtxResponses);
+			responsesCmd.clear();
+		}
+
 		mpListCmdCurrent = NULL;
 		mStartCmdMs = 0;
 
