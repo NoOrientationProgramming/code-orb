@@ -17,29 +17,23 @@ frame "byteProcess()" as pRcv {
   database "Save" as sCmdSave
   database "Fragment\nsave" as sCmdFrag
 
-  database "Save" as sProcSave
+  database "Save P" as sProcSave
   database "Fragment\nsave" as sProcFrag
 }
 
 sMain -u-> sMain
-
 sMain -u-> sProc : 11
-sMain <-u- sProc
-
 sMain -u-> sLog : 12
-sMain <-u- sLog
-
 sMain -d-> sCmd : 13
-sMain <-d- sCmd
 
-sProc -r-> sLogSave : 17
-sProc -d-> sLogFrag : 0F
+sProc -r-> sProcSave : 17
+sProc -d-> sProcFrag : 0F
 
 sCmd -l-> sCmdSave : 17
 sCmd -r-> sCmdFrag : 0F
 
-sLog -l-> sProcSave : 17
-sLog -d-> sProcFrag : 0F
+sLog -l-> sLogSave : 17
+sLog -d-> sLogFrag : 0F
 
 sLogSave -d-> sMain
 sProcSave -d-> sMain

@@ -6,7 +6,7 @@
 database "Input Set R" as sIn
 database "State" as sState
 
-database "Error\n- Protocol\n- NoTarget\n- NoUart" as sErr
+database "Error\n- NoTarget\n- NoUart" as sErr
 database "Pending" as sPending
 database "Positive" as sPositive
 
