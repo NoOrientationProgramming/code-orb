@@ -805,6 +805,9 @@ vector<string> RemoteCommanding::split(const string &str, char delimiter)
 	while (getline(ss, item, delimiter))
 		result.push_back(item);
 
+	if (str.size() && str.back() == '|')
+		result.push_back("");
+
 	return result;
 }
 
