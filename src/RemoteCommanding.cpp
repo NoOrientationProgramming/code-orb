@@ -759,15 +759,15 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 	entry.group = cInternalCmdCls;
 	cmds.push_back(entry);
 
-	entry.id = U"levelLogSys";
-	entry.shortcut = U"";
-	entry.desc = "Set the log level";
-	entry.group = cInternalCmdCls;
-	cmds.push_back(entry);
-
 	entry.id = U"timestampsToggle";
 	entry.shortcut = U"";
 	entry.desc = "Print timestamps";
+	entry.group = cInternalCmdCls;
+	cmds.push_back(entry);
+
+	entry.id = U"levelLogSys";
+	entry.shortcut = U"";
+	entry.desc = "Set the log level";
 	entry.group = cInternalCmdCls;
 	cmds.push_back(entry);
 
