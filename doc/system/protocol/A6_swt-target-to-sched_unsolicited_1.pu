@@ -1,0 +1,43 @@
+
+@startuml
+
+hide time-axis
+
+concise "UART TX\nData from\nScheduler (GW)" as ctrl
+concise "UART RX\nData from\nTarget" as tar
+
+@0
+ctrl is {-}
+tar is {-}
+
+@+60
+ctrl is {-}
+tar is {-}
+
+@+20
+ctrl is "0C"
+
+@+20
+ctrl is {-}
+tar is "15"
+
+@+20
+tar is {-}
+
+@+20
+ctrl is {-}
+tar is "12"
+
+@+20
+tar is "Log Entry"
+
+@+80
+tar is "17"
+
+@+20
+tar is {-}
+
+footer **SingleWireScheduling()** - Target to Scheduler - None and unsolicited\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
