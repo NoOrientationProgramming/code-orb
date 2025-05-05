@@ -381,7 +381,7 @@ bool GwMsgDispatching::disconnectRequestedCheck(TcpTransfering *pTrans)
 	lenDone = pTrans->read(buf, lenPlanned);
 	if (!lenDone)
 		return false;
-#if 0
+#if 1
 	if (lenDone < 0)
 		return true;
 
