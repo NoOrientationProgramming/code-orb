@@ -26,7 +26,7 @@ sMain -> sRcv : "\t11, 12, 13"
 
 sMain <-- sSave
 sRcv --> sSave : 17
-sRcv --> sRcv : D
+sRcv --> sRcv
 
 sSave --> sPos
 
