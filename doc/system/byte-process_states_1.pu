@@ -17,7 +17,7 @@ frame "byteProcess()" as pRcv {
   database "Save" as sCmdSave
   database "Fragment\nsave" as sCmdFrag
 
-  database "Save P" as sProcSave
+  database "Save" as sProcSave
   database "Fragment\nsave" as sProcFrag
 }
 
