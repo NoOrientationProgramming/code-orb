@@ -36,7 +36,7 @@
 struct EntryHelp
 {
 	std::u32string id;
-	std::string shortcut;
+	std::u32string shortcut;
 	std::string desc;
 	std::string group;
 };

@@ -61,7 +61,7 @@ const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 			"type 'help' or just 'h' for a list of available commands\r\n\r\n";
 
 const string cInternalCmdCls = "dbg";
-const int cSizeCmdIdMax = 16;
+const size_t cSizeColCmdMax = 22;
 
 list<EntryHelp> RemoteCommanding::cmds;
 
@@ -614,6 +614,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 	EntryHelp cmd;
 	string group = "";
 	string str;
+	size_t szColCmd = 0;
 
 	(void)pArgs;
 
@@ -635,13 +636,28 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 
 		dInfo("  ");
 
-		if (cmd.shortcut != "")
-			dInfo("%s, ", cmd.shortcut.c_str());
+		szColCmd = cmd.shortcut.size();
+
+		if (szColCmd)
+		{
+			utfToStr(cmd.shortcut, str);
+			dInfo("%s, ", str.c_str());
+
+			szColCmd += 2;
+		}
 		else
+		{
 			dInfo("   ");
+			szColCmd = 3;
+		}
+
+		szColCmd += cmd.id.size();
 
 		utfToStr(cmd.id, str);
-		dInfo("%-*s", cSizeCmdIdMax + 2, str.c_str());
+		dInfo("%s ", str.c_str());
+
+		for (size_t i = szColCmd; i < cSizeColCmdMax; ++i)
+			dInfo(" ");
 
 		if (cmd.desc.size())
 			dInfo(".. %s", cmd.desc.c_str());
@@ -725,7 +741,9 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 		strToUtf(partsEntry[0], ustr);
 		entry.id = ustr;
 
-		entry.shortcut = partsEntry[1];
+		strToUtf(partsEntry[1], ustr);
+		entry.shortcut = ustr;
+
 		entry.desc = partsEntry[2];
 		entry.group = partsEntry[3];
 
@@ -733,13 +751,13 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 	}
 
 	entry.id = U"help";
-	entry.shortcut = "h";
+	entry.shortcut = U"h";
 	entry.desc = "This help screen";
 	entry.group = cInternalCmdCls;
 	cmds.push_back(entry);
 
 	entry.id = U"timestampsToggle";
-	entry.shortcut = "";
+	entry.shortcut = U"";
 	entry.desc = "Print timestamps";
 	entry.group = cInternalCmdCls;
 	cmds.push_back(entry);
@@ -759,9 +777,9 @@ bool RemoteCommanding::commandSort(const EntryHelp &cmdFirst, const EntryHelp &c
 	if (cmdFirst.group > cmdSecond.group)
 		return false;
 
-	if (cmdFirst.shortcut != "" && cmdSecond.shortcut == "")
+	if (cmdFirst.shortcut.size() && !cmdSecond.shortcut.size())
 		return true;
-	if (cmdFirst.shortcut == "" && cmdSecond.shortcut != "")
+	if (!cmdFirst.shortcut.size() && cmdSecond.shortcut.size())
 		return false;
 
 	if (cmdFirst.id < cmdSecond.id)
