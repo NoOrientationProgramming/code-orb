@@ -728,6 +728,9 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 		if (str == "infoHelp|||")
 			continue;
 
+		if (str == "levelLogSys|||")
+			continue;
+
 		//wrnLog("entry received: %s", str.c_str());
 
 		partsEntry = split(str, '|');
