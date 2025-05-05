@@ -36,7 +36,6 @@
 		gen(StTargetInit) \
 		gen(StTargetInitDoneWait) \
 		gen(StNextFlowDetermine) \
-		gen(StContentReceiveWait) \
 		gen(StCtrlManual) \
 
 #define dGenProcStateEnum(s) s,
@@ -61,7 +60,7 @@ dProcessStateStr(SwtState);
 
 using namespace std;
 
-#define dTimeoutTargetInitMs	65
+#define dTimeoutDataFromTarget	65
 
 const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
@@ -82,7 +81,8 @@ SingleWireScheduling::SingleWireScheduling()
 	, mTargetIsOnline(false)
 	, mContentProc("")
 	, mStateSwt(StSwtContentRcvWait)
-	, mStartMs(0)
+	, mDataReceivedMs(0)
+	, mStartInitMs(0)
 	, mRefUart(RefDeviceUartInvalid)
 	, mpBuf(NULL)
 	, mLenDone(0)
@@ -110,6 +110,7 @@ Success SingleWireScheduling::process()
 {
 	uint32_t curTimeMs = millis();
 	//uint32_t diffMs = curTimeMs - mStartMs;
+	uint32_t diffMs;
 	Success success;
 	bool ok;
 #if 0
@@ -182,10 +183,21 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
+		mDataReceivedMs = millis();
+
+		mStartInitMs = curTimeMs;
 		mState = StTargetInitDoneWait;
 
 		break;
 	case StTargetInitDoneWait:
+
+		diffMs = curTimeMs - mStartInitMs;
+		if ((!uartVirtual && diffMs > dTimeoutDataFromTarget) ||
+			(uartVirtual && uartVirtualTimeout))
+		{
+			mState = StTargetInit;
+			break;
+		}
 
 		success = dataReceive();
 		if (success == Pending)
@@ -208,10 +220,18 @@ Success SingleWireScheduling::process()
 						mResp.content.c_str());
 #endif
 		if (mResp.idContent != IdContentCmd)
+		{
+			responseReset();
 			break;
+		}
 
 		if (mResp.content != "Debug mode 1")
+		{
+			responseReset();
 			break;
+		}
+
+		responseReset();
 
 		targetOnlineSet();
 
@@ -223,6 +243,8 @@ Success SingleWireScheduling::process()
 		break;
 	case StNextFlowDetermine:
 
+		// internal
+
 		if (env.ctrlManual)
 		{
 			mState = StCtrlManual;
@@ -231,25 +253,18 @@ Success SingleWireScheduling::process()
 
 		commandsCheck(curTimeMs);
 
-		// flow determine
+		// communication to target
 
-		ok = cmdQueueCheck();
-		if (ok)
-			break;
+		cmdQueueConsume(); // optional send(cmd)
 
-		ok = dataRequest();
+		ok = dataRequest(); // always send(FlowTargetToSched)
 		if (!ok)
 		{
 			mState = StUartInit;
 			break;
 		}
 
-		mState = StContentReceiveWait;
-
-		break;
-	case StContentReceiveWait:
-
-		success = dataReceive();
+		success = contentDistribute(); // 0..N content messages
 		if (success == Pending)
 			break;
 
@@ -264,34 +279,6 @@ Success SingleWireScheduling::process()
 			mState = StTargetInit;
 			break;
 		}
-#if 0
-		if (mResp.idContent != IdContentNone)
-		{
-			procWrnLog("content received: %02X",
-						mResp.idContent);
-#if 0
-			procWrnLog("'%s'", mResp.content.c_str());
-#endif
-		}
-#endif
-		if (mResp.idContent == IdContentProc &&
-				mContentProc != mResp.content)
-		{
-			mTargetIsOfflineMarked = false;
-
-			mContentProc = mResp.content;
-			mContentProcChanged = true;
-		}
-
-		if (mResp.idContent == IdContentLog)
-			ppEntriesLog.commit(mResp.content);
-
-		if (mResp.idContent == IdContentCmd)
-			cmdResponseReceived(mResp.content);
-
-		responseReset();
-
-		mState = StNextFlowDetermine;
 
 		break;
 	case StCtrlManual:
@@ -317,10 +304,10 @@ bool SingleWireScheduling::contentProcChanged()
 	return tmp;
 }
 
-bool SingleWireScheduling::cmdQueueCheck()
+void SingleWireScheduling::cmdQueueConsume()
 {
 	if (mpListCmdCurrent)
-		return false;
+		return;
 
 	Guard lock(mtxRequests);
 
@@ -330,24 +317,19 @@ bool SingleWireScheduling::cmdQueueCheck()
 	if (requestsCmd[PrioSysLow].size())
 	{
 		if (mCntDelayPrioLow)
-			return false;
+			return;
 
 		mpListCmdCurrent = &requestsCmd[PrioSysLow];
 		mCntDelayPrioLow = 4;
 	}
 
 	if (!mpListCmdCurrent)
-		return false;
+		return;
 	mStartCmdMs = millis();
 
-	bool ok;
-
 	const CommandReqResp *pReq = &mpListCmdCurrent->front();
-	ok = cmdSend(pReq->str);
-	if (!ok)
-		return false;
 
-	return true;
+	(void)cmdSend(pReq->str);
 }
 
 void SingleWireScheduling::cmdResponseReceived(const string &resp)
@@ -427,8 +409,6 @@ bool SingleWireScheduling::cmdSend(const string &cmd)
 	if (failed)
 		return false;
 
-	mStartMs = millis();
-
 	//procWrnLog("cmd sent: %s", cmd.c_str());
 
 	return true;
@@ -442,8 +422,6 @@ bool SingleWireScheduling::dataRequest()
 	if (lenWritten < 0)
 		return false;
 
-	mStartMs = millis();
-
 	//procWrnLog("data requested");
 
 	if (mCntDelayPrioLow)
@@ -455,13 +433,52 @@ bool SingleWireScheduling::dataRequest()
 	return true;
 }
 
+Success SingleWireScheduling::contentDistribute()
+{
+	Success success;
+
+	while (1)
+	{
+		success = dataReceive();
+		if (success != Positive)
+			return success;
+#if 0
+		if (mResp.idContent != IdContentNone)
+		{
+			procWrnLog("content received: %02X",
+						mResp.idContent);
+#if 1
+			if (mResp.idContent != IdContentProc)
+#endif
+				procWrnLog("'%s'", mResp.content.c_str());
+		}
+#endif
+		if (mResp.idContent == IdContentProc &&
+				mContentProc != mResp.content)
+		{
+			mTargetIsOfflineMarked = false;
+
+			mContentProc = mResp.content;
+			mContentProcChanged = true;
+		}
+
+		if (mResp.idContent == IdContentLog)
+			ppEntriesLog.commit(mResp.content);
+
+		if (mResp.idContent == IdContentCmd)
+			cmdResponseReceived(mResp.content);
+
+		responseReset();
+	}
+}
+
 Success SingleWireScheduling::dataReceive()
 {
 	if (mLenDone > 0)
-		mStartMs = millis();
+		mDataReceivedMs = millis();
 
 	uint32_t curTimeMs = millis();
-	uint32_t diffMs = curTimeMs - mStartMs;
+	uint32_t diffMs = curTimeMs - mDataReceivedMs;
 	Success success;
 
 	while (mLenDone > 0)
@@ -475,9 +492,9 @@ Success SingleWireScheduling::dataReceive()
 			return Positive;
 	}
 
-	//procInfLog("diff: %u <=> %u", diffMs, dTimeoutTargetInitMs);
+	//procInfLog("diff: %u <=> %u", diffMs, dTimeoutDataFromTarget);
 
-	if ((!uartVirtual && diffMs > dTimeoutTargetInitMs) ||
+	if ((!uartVirtual && diffMs > dTimeoutDataFromTarget) ||
 		(uartVirtual && uartVirtualTimeout))
 	{
 		mFragments.clear();
@@ -500,7 +517,7 @@ Success SingleWireScheduling::dataReceive()
 
 	mpBuf = mBufRcv;
 
-	mStartMs = millis();
+	mDataReceivedMs = millis();
 
 	return Pending;
 }

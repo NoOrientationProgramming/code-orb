@@ -122,12 +122,13 @@ private:
 	void requestsCmdPrint(char * &pBuf, char *pBufEnd);
 	void responsesCmdPrint(char * &pBuf, char *pBufEnd);
 
-	bool cmdQueueCheck();
+	void cmdQueueConsume();
 	void cmdResponseReceived(const std::string &resp);
 	void commandsCheck(uint32_t curTimeMs);
 	void cmdResponsesClear(uint32_t curTimeMs);
 	bool cmdSend(const std::string &cmd);
 	bool dataRequest();
+	Success contentDistribute();
 	Success dataReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
@@ -138,7 +139,8 @@ private:
 
 	/* member variables */
 	uint32_t mStateSwt;
-	uint32_t mStartMs;
+	uint32_t mDataReceivedMs;
+	uint32_t mStartInitMs;
 	RefDeviceUart mRefUart;
 	char mBufRcv[13];
 	char *mpBuf;
