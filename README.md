@@ -4,7 +4,11 @@
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic&color=orange)
 ![GitHub Release](https://img.shields.io/github/v/release/NoOrientationProgramming/code-orb?style=plastic&color=orange)
 
-[![Windows](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml) [![Linux](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml) [![MacOS](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml) [![FreeBSD](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml) [![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml)
+[![Windows](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml)
+[![Linux](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml)
+[![MacOS](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml)
+[![FreeBSD](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml)
+[![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml)
 
 [![Discord](https://img.shields.io/discord/960639692213190719?style=plastic&color=purple&logo=discord)](https://discord.gg/FBVKJTaY)
 
