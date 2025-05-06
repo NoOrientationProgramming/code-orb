@@ -2,6 +2,7 @@
 <h2 id="codeorb-start" style="display:none;"></h2>
 
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic)
+![GitHub Release](https://img.shields.io/github/v/release/NoOrientationProgramming/code-orb)
 
 [![Windows](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/windows.yml) [![Linux](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/linux.yml) [![MacOS](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml/badge.svg)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/macos.yml) [![FreeBSD](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/freebsd.yml) [![Cross arm & mingw](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml/badge.svg?branch=main)](https://github.com/NoOrientationProgramming/code-orb/actions/workflows/cross.yml)
 
