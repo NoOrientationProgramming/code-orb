@@ -46,8 +46,6 @@ dProcessStateStr(ProcState);
 
 using namespace std;
 
-const uint32_t cTimeoutResponseMs = 300;
-
 // https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 #define dColorGreen		"\033[38;5;46m"
 #define dColorOrange	"\033[38;5;220m"
@@ -215,7 +213,7 @@ Success RemoteCommanding::process()
 		break;
 	case StResponseRcvdWait:
 
-		if (diffMs > cTimeoutResponseMs)
+		if (diffMs > cTimeoutCommandResponseMs)
 		{
 			string msg;
 

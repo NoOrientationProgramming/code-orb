@@ -55,8 +55,6 @@ InfoGathering::InfoGathering()
 	mState = StStart;
 }
 
-const uint32_t cTimeoutResponseMs = 700;
-
 /* member functions */
 
 Success InfoGathering::process()
@@ -91,7 +89,7 @@ Success InfoGathering::process()
 		break;
 	case StRespCmdWait:
 
-		if (diffMs > cTimeoutResponseMs)
+		if (diffMs > cTimeoutCommandResponseMs)
 		{
 			if (mCntFilt >= cCntFiltMax)
 				return procErrLog(-1, "timeout getting response");
