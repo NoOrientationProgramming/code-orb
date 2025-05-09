@@ -39,7 +39,7 @@ pCmdRemote <-- pGather
 pSwc <--> pSwt : "COM1 or\n/dev/ttyACM0"
 pSwc <-> pGather
 
-footer **Processing()** - Gateway overview and system levels\n(C) DSP-Crowd Electronics GmbH
+footer **CodeOrb** - System overview\n(C) DSP-Crowd Electronics GmbH
 
 @enduml
 
