@@ -3,36 +3,36 @@
 
 ' skinparam linetype ortho
 
-frame "CodeOrb" as pOrb {
+frame "SingleWireScheduling()" as pSched {
 
   frame "Client" as pClient
 
-  frame "Send" as pOrbSend
-  frame "Receive" as pOrbRcv
+  frame "Send" as pSchedSend
+  frame "Receive" as pSchedRcv
 
-  pClient <-- pOrbRcv
-  pClient --> pOrbSend
+  pClient <-- pSchedRcv
+  pClient --> pSchedSend
 
-  pOrbRcv -r[hidden]- pOrbSend
+  pSchedRcv -r[hidden]- pSchedSend
 }
 
-component "STM32" as pStm32 {
+frame "SingleWireTransfering()" as pTarget {
 
   frame "Application" as pApp
 
-  frame "Send" as pStm32Send
-  frame "Receive" as pStm32Rcv
+  frame "Send" as pTargetSend
+  frame "Receive" as pTargetRcv
 
   database "Command\nInput Buffer" as sBufCmd
 
-  pStm32Send <-- pApp
-  pStm32Rcv --> pApp
+  pTargetSend <-- pApp
+  pTargetRcv --> pApp
 
-  pStm32Rcv -> sBufCmd
+  pTargetRcv -> sBufCmd
 }
 
-pOrbSend --> pStm32Rcv
-pOrbRcv <-- pStm32Send
+pSchedSend --> pTargetRcv
+pSchedRcv <-- pTargetSend
 
 footer **CodeOrb** - Transfer Quad\n(C) DSP-Crowd Electronics GmbH
 
