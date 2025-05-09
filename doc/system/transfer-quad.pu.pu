@@ -1,0 +1,40 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+frame "CodeOrb" as pOrb {
+
+  frame "Client" as pClient
+
+  frame "Send" as pOrbSend
+  frame "Receive" as pOrbRcv
+
+  pClient <-- pOrbRcv
+  pClient --> pOrbSend
+
+  pOrbRcv -r[hidden]- pOrbSend
+}
+
+component "STM32" as pStm32 {
+
+  frame "Application" as pApp
+
+  frame "Send" as pStm32Send
+  frame "Receive" as pStm32Rcv
+
+  database "Command\nInput Buffer" as sBufCmd
+
+  pStm32Send <-- pApp
+  pStm32Rcv --> pApp
+
+  pStm32Rcv -> sBufCmd
+}
+
+pOrbSend --> pStm32Rcv
+pOrbRcv <-- pStm32Send
+
+footer **CodeOrb** - Transfer Quad\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
