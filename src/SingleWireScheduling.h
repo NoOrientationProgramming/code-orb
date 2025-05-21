@@ -88,6 +88,10 @@ public:
 		return new dNoThrow SingleWireScheduling;
 	}
 
+	// input
+	static bool monitoring;
+
+	// output
 	bool mDevUartIsOnline;
 	bool mTargetIsOnline;
 

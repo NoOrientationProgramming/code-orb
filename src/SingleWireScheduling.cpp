@@ -66,6 +66,7 @@ const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
 const uint32_t SingleWireScheduling::cTimeoutCmdReq = 5500;
 
+bool SingleWireScheduling::monitoring = true;
 uint8_t SingleWireScheduling::uartVirtualTimeout = 0;
 RefDeviceUart SingleWireScheduling::refUart;
 
@@ -635,6 +636,7 @@ Success SingleWireScheduling::shutdown()
 void SingleWireScheduling::processInfo(char *pBuf, char *pBufEnd)
 {
 	dInfo("Manual control\t\t%sabled\n", env.ctrlManual ? "En" : "Dis");
+	dInfo("Monitoring\t\t%sabled\n", monitoring ? "En" : "Dis");
 #if 1
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
