@@ -26,6 +26,9 @@ tar is {-}
 
 @+20
 ctrl is {-}
+tar is "0C"
+
+@+20
 tar is "12"
 
 @+20
