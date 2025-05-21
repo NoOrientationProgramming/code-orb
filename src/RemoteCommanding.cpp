@@ -310,6 +310,25 @@ Success RemoteCommanding::commandSend()
 		return Positive;
 	}
 
+	if (str == "monitoringToggle")
+	{
+		SingleWireScheduling::monitoring = !SingleWireScheduling::monitoring;
+
+		msg += dColorGrey;
+		msg += "<monitoring ";
+		msg += SingleWireScheduling::monitoring ? "en" : "dis";
+		msg += "abled>";
+		msg += dColorClear;
+
+		msg += "\r\n";
+
+		lineAck();
+		mpFilt->send(msg.c_str(), msg.size());
+		promptSend();
+
+		return Positive;
+	}
+
 	//procWrnLog("sending command: %s", str.c_str());
 
 	ok = SingleWireScheduling::commandSend(str, mIdReq);
@@ -766,6 +785,12 @@ void RemoteCommanding::listCommandsUpdate(const list<string> &listStr)
 	entry.id = U"levelLogSys";
 	entry.shortcut = U"";
 	entry.desc = "Set the log level";
+	entry.group = cInternalCmdCls;
+	cmds.push_back(entry);
+
+	entry.id = U"monitoringToggle";
+	entry.shortcut = U"";
+	entry.desc = "Cyclic check for new data";
 	entry.group = cInternalCmdCls;
 	cmds.push_back(entry);
 
