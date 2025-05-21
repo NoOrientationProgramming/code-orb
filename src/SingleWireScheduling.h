@@ -89,7 +89,7 @@ public:
 	}
 
 	// input
-	static bool monitoring;
+	static uint8_t monitoring;
 
 	// output
 	bool mDevUartIsOnline;
@@ -170,6 +170,7 @@ private:
 
 	// Manual Control
 	static void commandsRegister();
+	static void cmdMonitoringToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdDataUartSend(char *pArgs, char *pBuf, char *pBufEnd);
 	static void cmdStrUartSend(char *pArgs, char *pBuf, char *pBufEnd);

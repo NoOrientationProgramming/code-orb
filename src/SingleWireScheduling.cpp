@@ -66,7 +66,7 @@ const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
 const uint32_t SingleWireScheduling::cTimeoutCmdReq = 5500;
 
-bool SingleWireScheduling::monitoring = true;
+uint8_t SingleWireScheduling::monitoring = 1;
 uint8_t SingleWireScheduling::uartVirtualTimeout = 0;
 RefDeviceUart SingleWireScheduling::refUart;
 

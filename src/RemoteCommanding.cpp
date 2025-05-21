@@ -71,7 +71,7 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
-	, mTimestamps(true)
+	, mTimestamps(1)
 	// target online check
 	, mTargetIsOnline(false)
 	// command response measurement
@@ -293,7 +293,7 @@ Success RemoteCommanding::commandSend()
 
 	if (str == "timestampsToggle")
 	{
-		mTimestamps = !mTimestamps;
+		mTimestamps ^= 1;
 
 		msg += dColorGrey;
 		msg += "<timestamps ";
@@ -312,7 +312,7 @@ Success RemoteCommanding::commandSend()
 
 	if (str == "monitoringToggle")
 	{
-		SingleWireScheduling::monitoring = !SingleWireScheduling::monitoring;
+		SingleWireScheduling::monitoring ^= 1;
 
 		msg += dColorGrey;
 		msg += "<monitoring ";

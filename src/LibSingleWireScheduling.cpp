@@ -246,16 +246,25 @@ bool SingleWireScheduling::commandResponseGet(uint32_t idReq, string &resp)
 
 void SingleWireScheduling::commandsRegister()
 {
-	cmdReg("ctrlManualToggle", cmdCtrlManualToggle,      "",  "Toggle manual control",               "Manual Control");
-	cmdReg("dataUartSend",     cmdDataUartSend,          "",  "Send byte stream",                    "Manual Control");
-	cmdReg("strUartSend",      cmdStrUartSend,           "",  "Send string",                         "Manual Control");
-	cmdReg("dataUartRead",     cmdDataUartRead,          "",  "Read data",                           "Manual Control");
+	cmdReg("monitoringToggle", cmdMonitoringToggle,      "",  "Cyclic check for new data",           "Scheduling");
+	cmdReg("ctrlManualToggle", cmdCtrlManualToggle,      "",  "Toggle manual control",               "Scheduling");
+	cmdReg("dataUartSend",     cmdDataUartSend,          "",  "Send byte stream",                    "Scheduling");
+	cmdReg("strUartSend",      cmdStrUartSend,           "",  "Send string",                         "Scheduling");
+	cmdReg("dataUartRead",     cmdDataUartRead,          "",  "Read data",                           "Scheduling");
 	cmdReg("modeUartVirtSet",  cmdModeUartVirtSet,       "",  "Mode: uart, swart (default)",         "Virtual UART");
 	cmdReg("uartVirtToggle",   cmdUartVirtToggle,        "",  "Enable/Disable virtual UART",         "Virtual UART");
 	cmdReg("mountedToggle",    cmdMountedUartVirtToggle, "m", "Mount/Unmount virtual UART",          "Virtual UART");
 	cmdReg("timeoutToggle",    cmdTimeoutUartVirtToggle, "t", "Enable/Disable virtual UART timeout", "Virtual UART");
 	cmdReg("dataUartRcv",      cmdDataUartRcv,           "",  "Receive byte stream",                 "Virtual UART");
 	cmdReg("strUartRcv",       cmdStrUartRcv,            "",  "Receive string",                      "Virtual UART");
+}
+
+void SingleWireScheduling::cmdMonitoringToggle(char *pArgs, char *pBuf, char *pBufEnd)
+{
+	(void)pArgs;
+
+	monitoring ^= 1;
+	dInfo("Monitoring %sabled", env.ctrlManual ? "en" : "dis");
 }
 
 void SingleWireScheduling::cmdCtrlManualToggle(char *pArgs, char *pBuf, char *pBufEnd)
