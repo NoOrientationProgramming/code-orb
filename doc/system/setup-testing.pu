@@ -1,0 +1,52 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+component PC as pPc {
+	node "Linux" as pLin {
+		frame "Terminal" as pTermLin
+		frame "CodeOrb" as pOrbLin
+	}
+	rectangle "Virtual Box" as pVirt {
+		node "Windows" as pWin {
+			frame "CodeOrb" as pOrbWin
+		}
+		node "FreeBSD" as pBsd {
+			frame "CodeOrb" as pOrbBsd
+		}
+	}
+}
+
+component "Raspberry Pi" as pRPi {
+	node "Debian" as pRaspbian {
+		frame "CodeOrb" as pOrbRasp
+	}
+}
+
+component "VisionFive 2" as pVision {
+	node "Ubuntu" as pUbuntu {
+		frame "CodeOrb" as pOrbVision
+	}
+}
+
+component "ESP32" as pEsp {
+	frame "App" as pAppEsp
+}
+
+component "STM32" as pStm {
+	frame "App" as pAppStm
+}
+
+pTermLin <-> pOrbLin
+pOrbLin <--> pAppStm
+
+pTermLin <--> pAppEsp
+
+pOrbBsd -[hidden]- pOrbVision
+pOrbWin -[hidden]- pOrbRasp
+
+footer **CodeOrb** - Testing setup\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
