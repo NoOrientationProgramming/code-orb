@@ -58,6 +58,7 @@ struct SingleWireResponse
 {
 	uint8_t idContent;
 	std::string content;
+	bool unsolicited;
 };
 
 typedef ssize_t (*FuncUartSend)(RefDeviceUart refUart, const void *pBuf, size_t lenReq);
@@ -156,6 +157,7 @@ private:
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
+	uint8_t mByteLast;
 	std::list<CommandReqResp> *mpListCmdCurrent;
 	uint8_t mCntDelayPrioLow;
 	uint32_t mStartCmdMs;

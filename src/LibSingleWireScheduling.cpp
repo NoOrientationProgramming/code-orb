@@ -56,6 +56,7 @@ void SingleWireScheduling::responseReset(uint8_t idContent)
 {
 	mResp.idContent = idContent;
 	mResp.content = "";
+	mResp.unsolicited = false;
 }
 
 void SingleWireScheduling::fragmentAppend(uint8_t ch)

@@ -94,6 +94,7 @@ SingleWireScheduling::SingleWireScheduling()
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
 	, mContentIgnore(false)
+	, mByteLast(0)
 	, mpListCmdCurrent(NULL)
 	, mCntDelayPrioLow(0)
 	, mStartCmdMs(0)
@@ -494,6 +495,7 @@ Success SingleWireScheduling::dataReceive()
 	while (mLenDone > 0)
 	{
 		success = byteProcess((uint8_t)*mpBuf, curTimeMs);
+		mByteLast = *mpBuf;
 
 		++mpBuf;
 		--mLenDone;
@@ -560,6 +562,12 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 
 		responseReset(ch);
 		mContentIgnore = false;
+
+		if (mByteLast == FlowTargetToSched)
+		{
+			//procWrnLog("got unsolicited. type: %02X", mResp.idContent);
+			mResp.unsolicited = true;
+		}
 
 		if (ch != IdContentProc)
 		{
