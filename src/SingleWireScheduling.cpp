@@ -35,7 +35,9 @@
 		gen(StDevUartInit) \
 		gen(StTargetInit) \
 		gen(StTargetInitDoneWait) \
-		gen(StNextFlowDetermine) \
+		gen(StMain) \
+		gen(StDataRequest) \
+		gen(StTargetRespWait) \
 		gen(StCtrlManual) \
 
 #define dGenProcStateEnum(s) s,
@@ -60,11 +62,11 @@ dProcessStateStr(SwtState);
 
 using namespace std;
 
-#define dTimeoutDataFromTarget	65
+#define dDebugCommand	0
 
 const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
-const uint32_t SingleWireScheduling::cTimeoutCmduC = 100;
-const uint32_t SingleWireScheduling::cTimeoutCmdReq = 5500;
+const uint32_t SingleWireScheduling::cTimeoutRespMs = 330;
+const uint32_t SingleWireScheduling::cTimeoutDequeueMs = 5500;
 
 uint8_t SingleWireScheduling::monitoring = 1;
 uint8_t SingleWireScheduling::uartVirtualTimeout = 0;
@@ -82,8 +84,7 @@ SingleWireScheduling::SingleWireScheduling()
 	, mTargetIsOnline(false)
 	, mContentProc("")
 	, mStateSwt(StSwtContentRcvWait)
-	, mDataReceivedMs(0)
-	, mStartInitMs(0)
+	, mStartMs(0)
 	, mRefUart(RefDeviceUartInvalid)
 	, mpBuf(NULL)
 	, mLenDone(0)
@@ -95,10 +96,11 @@ SingleWireScheduling::SingleWireScheduling()
 	, mTargetIsOnlineOld(true)
 	, mTargetIsOfflineMarked(false)
 	, mContentIgnore(false)
+	, mCmdExpected(false)
 	, mByteLast(0)
 	, mpListCmdCurrent(NULL)
 	, mCntDelayPrioLow(0)
-	, mStartCmdMs(0)
+	, mCntRerequest(0)
 {
 	responseReset();
 	mBufRcv[0] = 0;
@@ -111,8 +113,7 @@ SingleWireScheduling::SingleWireScheduling()
 Success SingleWireScheduling::process()
 {
 	uint32_t curTimeMs = millis();
-	//uint32_t diffMs = curTimeMs - mStartMs;
-	uint32_t diffMs;
+	uint32_t diffMs = curTimeMs - mStartMs;
 	Success success;
 	bool ok;
 #if 0
@@ -185,16 +186,16 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
-		mDataReceivedMs = millis();
+		mFragments.clear();
+		mStateSwt = StSwtContentRcvWait;
 
-		mStartInitMs = curTimeMs;
+		mStartMs = curTimeMs;
 		mState = StTargetInitDoneWait;
 
 		break;
 	case StTargetInitDoneWait:
 
-		diffMs = curTimeMs - mStartInitMs;
-		if ((!uartVirtual && diffMs > dTimeoutDataFromTarget) ||
+		if ((!uartVirtual && diffMs > cTimeoutRespMs) ||
 			(uartVirtual && uartVirtualTimeout))
 		{
 			mState = StTargetInit;
@@ -205,15 +206,9 @@ Success SingleWireScheduling::process()
 		if (success == Pending)
 			break;
 
-		if (success == SwtErrRcvNoUart)
+		if (success != Positive)
 		{
 			mState = StUartInit;
-			break;
-		}
-
-		if (success == SwtErrRcvNoTarget)
-		{
-			mState = StTargetInit;
 			break;
 		}
 #if 0
@@ -248,12 +243,11 @@ Success SingleWireScheduling::process()
 		}
 
 		mpListCmdCurrent = NULL;
-		mStartCmdMs = 0;
 
-		mState = StNextFlowDetermine;
+		mState = StMain;
 
 		break;
-	case StNextFlowDetermine:
+	case StMain:
 
 		// internal
 
@@ -263,34 +257,99 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
-		commandsCheck(curTimeMs);
+		cmdResponsesClear(curTimeMs);
 
 		// communication to target
 
-		cmdQueueConsume(); // optional send(cmd)
+		success = contentDistribute();
+		if (success != Pending && success != Positive)
+		{
+			mState = StUartInit;
+			break;
+		}
 
-		ok = dataRequest(); // always send(FlowTargetToSched)
+		responseReset();
+
+		success = cmdQueueConsume();
+		if (success == Positive)
+		{
+			mCmdExpected = true;
+
+			mStartMs = curTimeMs;
+			mState = StDataRequest;
+			break;
+		}
+
+		if (success != Pending)
+		{
+			mState = StUartInit;
+			break;
+		}
+
+		if (monitoring)
+		{
+			mCmdExpected = false;
+
+			mStartMs = curTimeMs;
+			mState = StDataRequest;
+			break;
+		}
+
+		break;
+	case StDataRequest:
+
+		ok = dataRequest();
 		if (!ok)
 		{
 			mState = StUartInit;
 			break;
 		}
 
-		success = contentDistribute(); // 0..N content messages
+		mState = StTargetRespWait;
+
+		break;
+	case StTargetRespWait:
+
+		if ((!uartVirtual && diffMs > cTimeoutRespMs) ||
+			(uartVirtual && uartVirtualTimeout))
+		{
+			//procErrLog(-1, "response timeout");
+			mState = StTargetInit;
+			break;
+		}
+
+		success = contentDistribute();
 		if (success == Pending)
 			break;
 
-		if (success == SwtErrRcvNoUart)
+		if (success != Positive)
 		{
 			mState = StUartInit;
 			break;
 		}
 
-		if (success == SwtErrRcvNoTarget)
+		if (mCmdExpected && mResp.idContent != IdContentCmd)
 		{
-			mState = StTargetInit;
+			//procErrLog(-1, "re-request");
+
+			++mCntRerequest;
+			if (mCntRerequest > 1)
+			{
+				mpListCmdCurrent->pop_front();
+				mCntRerequest = 0;
+			}
+
+			mpListCmdCurrent = NULL;
+			responseReset();
+
+			mState = StMain;
 			break;
 		}
+		mCmdExpected = false;
+
+		responseReset();
+
+		mState = StMain;
 
 		break;
 	case StCtrlManual:
@@ -316,10 +375,10 @@ bool SingleWireScheduling::contentProcChanged()
 	return tmp;
 }
 
-void SingleWireScheduling::cmdQueueConsume()
+Success SingleWireScheduling::cmdQueueConsume()
 {
 	if (mpListCmdCurrent)
-		return;
+		return Pending;
 
 	Guard lock(mtxRequests);
 
@@ -328,20 +387,27 @@ void SingleWireScheduling::cmdQueueConsume()
 	else
 	if (requestsCmd[PrioSysLow].size())
 	{
-		if (mCntDelayPrioLow)
-			return;
+		if (monitoring && mCntDelayPrioLow)
+			return Pending;
 
 		mpListCmdCurrent = &requestsCmd[PrioSysLow];
 		mCntDelayPrioLow = 4;
 	}
 
 	if (!mpListCmdCurrent)
-		return;
-	mStartCmdMs = millis();
+		return Pending;
 
 	const CommandReqResp *pReq = &mpListCmdCurrent->front();
+	bool ok;
 
-	(void)cmdSend(pReq->str);
+	ok = cmdSend(pReq->str);
+	if (!ok)
+	{
+		mpListCmdCurrent = NULL;
+		return -1;
+	}
+
+	return Positive;
 }
 
 void SingleWireScheduling::cmdResponseReceived(const string &resp)
@@ -370,19 +436,6 @@ void SingleWireScheduling::cmdResponseReceived(const string &resp)
 	}
 }
 
-void SingleWireScheduling::commandsCheck(uint32_t curTimeMs)
-{
-	cmdResponsesClear(curTimeMs);
-
-	if (!mpListCmdCurrent)
-		return;
-
-	uint32_t diffMs = curTimeMs - mStartCmdMs;
-
-	if (diffMs > cTimeoutCmduC)
-		mpListCmdCurrent = NULL;
-}
-
 void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 {
 	Guard lock(mtxResponses);
@@ -395,13 +448,13 @@ void SingleWireScheduling::cmdResponsesClear(uint32_t curTimeMs)
 	{
 		diffMs = curTimeMs - iter->startMs;
 
-		if (diffMs < cTimeoutCmdReq)
+		if (diffMs < cTimeoutDequeueMs)
 		{
 			++iter;
 			continue;
 		}
 #if 0
-		procWrnLog("response timeout for: %u",
+		procWrnLog("dequeue timeout for: %u",
 					iter->idReq);
 #endif
 		iter = responsesCmd.erase(iter);
@@ -420,9 +473,9 @@ bool SingleWireScheduling::cmdSend(const string &cmd)
 
 	if (failed)
 		return false;
-
-	//procWrnLog("cmd sent: %s", cmd.c_str());
-
+#if dDebugCommand
+	procWrnLog("cmd sent: %s", cmd.c_str());
+#endif
 	return true;
 }
 
@@ -452,17 +505,21 @@ Success SingleWireScheduling::contentDistribute()
 	while (1)
 	{
 		success = dataReceive();
+		if (success == Pending)
+			return Pending;
+
 		if (success != Positive)
 			return success;
-#if 0
+#if dDebugCommand
 		if (mResp.idContent != IdContentNone)
 		{
-			procWrnLog("content received: %02X",
-						mResp.idContent);
+			procWrnLog("content received: %02X%s",
+								mResp.idContent,
+								mResp.unsolicited ? " (unsolicited)" : "");
 #if 1
 			if (mResp.idContent != IdContentProc)
 #endif
-				procWrnLog("'%s'", mResp.content.c_str());
+				procWrnLog("  '%s'", mResp.content.c_str());
 		}
 #endif
 		if (mResp.idContent == IdContentProc &&
@@ -480,17 +537,18 @@ Success SingleWireScheduling::contentDistribute()
 		if (mResp.idContent == IdContentCmd)
 			cmdResponseReceived(mResp.content);
 
+		if (!mResp.unsolicited)
+			return Positive;
+
 		responseReset();
 	}
+
+	return Pending;
 }
 
 Success SingleWireScheduling::dataReceive()
 {
-	if (mLenDone > 0)
-		mDataReceivedMs = millis();
-
 	uint32_t curTimeMs = millis();
-	uint32_t diffMs = curTimeMs - mDataReceivedMs;
 	Success success;
 
 	while (mLenDone > 0)
@@ -505,17 +563,6 @@ Success SingleWireScheduling::dataReceive()
 			return Positive;
 	}
 
-	//procInfLog("diff: %u <=> %u", diffMs, dTimeoutDataFromTarget);
-
-	if ((!uartVirtual && diffMs > dTimeoutDataFromTarget) ||
-		(uartVirtual && uartVirtualTimeout))
-	{
-		mFragments.clear();
-		mStateSwt = StSwtContentRcvWait;
-
-		return SwtErrRcvNoTarget;
-	}
-
 	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
 	if (!mLenDone)
 		return Pending;
@@ -525,12 +572,10 @@ Success SingleWireScheduling::dataReceive()
 		mFragments.clear();
 		mStateSwt = StSwtContentRcvWait;
 
-		return SwtErrRcvNoUart;
+		return -1;
 	}
 
 	mpBuf = mBufRcv;
-
-	mDataReceivedMs = millis();
 
 	return Pending;
 }

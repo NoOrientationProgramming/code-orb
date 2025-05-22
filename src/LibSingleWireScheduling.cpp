@@ -161,8 +161,8 @@ void SingleWireScheduling::requestsCmdPrint(char * &pBuf, char *pBufEnd)
 		{
 			diffMs = curTimeMs - iter->startMs;
 
-			if (diffMs > cTimeoutCmdReq)
-				diffMs = cTimeoutCmdReq;
+			if (diffMs > cTimeoutDequeueMs)
+				diffMs = cTimeoutDequeueMs;
 
 			dInfo("  Req %u: %s (%u)\n",
 					iter->idReq,
@@ -186,8 +186,8 @@ void SingleWireScheduling::responsesCmdPrint(char * &pBuf, char *pBufEnd)
 	{
 		diffMs = curTimeMs - iter->startMs;
 
-		if (diffMs > cTimeoutCmdReq)
-			diffMs = cTimeoutCmdReq;
+		if (diffMs > cTimeoutDequeueMs)
+			diffMs = cTimeoutDequeueMs;
 
 		dInfo("  Resp %u: %s (%u)\n",
 				iter->idReq,

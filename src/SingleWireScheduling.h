@@ -41,12 +41,6 @@ enum SwtContentId
 	IdContentCmd,
 };
 
-enum SwtErrRcv
-{
-	SwtErrRcvNoUart = -3,
-	SwtErrRcvNoTarget,
-};
-
 enum PrioCmd
 {
 	PrioSysHigh = 0,
@@ -129,9 +123,8 @@ private:
 	void requestsCmdPrint(char * &pBuf, char *pBufEnd);
 	void responsesCmdPrint(char * &pBuf, char *pBufEnd);
 
-	void cmdQueueConsume();
+	Success cmdQueueConsume();
 	void cmdResponseReceived(const std::string &resp);
-	void commandsCheck(uint32_t curTimeMs);
 	void cmdResponsesClear(uint32_t curTimeMs);
 	bool cmdSend(const std::string &cmd);
 	bool dataRequest();
@@ -146,8 +139,7 @@ private:
 
 	/* member variables */
 	uint32_t mStateSwt;
-	uint32_t mDataReceivedMs;
-	uint32_t mStartInitMs;
+	uint32_t mStartMs;
 	RefDeviceUart mRefUart;
 	char mBufRcv[13];
 	char *mpBuf;
@@ -161,10 +153,11 @@ private:
 	bool mTargetIsOnlineOld;
 	bool mTargetIsOfflineMarked;
 	bool mContentIgnore;
+	bool mCmdExpected;
 	uint8_t mByteLast;
 	std::list<CommandReqResp> *mpListCmdCurrent;
 	uint8_t mCntDelayPrioLow;
-	uint32_t mStartCmdMs;
+	uint8_t mCntRerequest;
 
 	/* static functions */
 
@@ -200,8 +193,8 @@ private:
 
 	/* constants */
 	static const size_t cSizeFragmentMax;
-	static const uint32_t cTimeoutCmduC;
-	static const uint32_t cTimeoutCmdReq;
+	static const uint32_t cTimeoutRespMs;
+	static const uint32_t cTimeoutDequeueMs;
 
 };
 
