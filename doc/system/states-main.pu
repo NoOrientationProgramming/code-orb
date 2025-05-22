@@ -1,0 +1,25 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+frame "SingleWireScheduling()" as pRcv {
+
+  database "Main" as sMain
+  database "Command send" as sSend
+  database "Data request" as sReq
+  database "Response wait" as sWait
+
+}
+
+sMain -> sSend
+sMain --> sReq
+sMain <-- sWait
+
+sSend --> sReq
+sWait <- sReq
+
+footer **SingleWireScheduling()** - Main States\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+

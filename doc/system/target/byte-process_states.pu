@@ -1,0 +1,23 @@
+
+@startuml
+
+' skinparam linetype ortho
+
+frame "byteProcess()" as pRcv {
+
+  database "Start" as sStart
+  database "ContentId" as sId
+  database "ContentData" as sData
+}
+
+sStart -> sStart
+sId <- sStart : ID_S2T
+sId -> sStart : " "
+
+sStart <-- sData
+sId --> sData : ID_Cmd
+
+footer **dataReceive()** - States on Target\n(C) DSP-Crowd Electronics GmbH
+
+@enduml
+
