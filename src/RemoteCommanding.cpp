@@ -39,7 +39,7 @@
 #define dGenProcStateEnum(s) s,
 dProcessStateEnum(ProcState);
 
-#if 1
+#if 0
 #define dGenProcStateString(s) #s,
 dProcessStateStr(ProcState);
 #endif
@@ -685,7 +685,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 
 void RemoteCommanding::processInfo(char *pBuf, char *pBufEnd)
 {
-#if 1
+#if 0
 	dInfo("State\t\t\t%s\n", ProcStateString[mState]);
 #endif
 	string str;
