@@ -631,7 +631,7 @@ void RemoteCommanding::cmdHelpPrint(char *pArgs, char *pBuf, char *pBufEnd)
 	EntryHelp cmd;
 	string group = "";
 	string str;
-	size_t szColCmd = 0;
+	size_t szColCmd;
 
 	(void)pArgs;
 
