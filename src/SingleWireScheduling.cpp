@@ -274,6 +274,7 @@ Success SingleWireScheduling::process()
 		if (success == Positive)
 		{
 			mCmdExpected = true;
+			mCntRerequest = 0;
 
 			mStartMs = curTimeMs;
 			mState = StDataRequest;
@@ -336,15 +337,17 @@ Success SingleWireScheduling::process()
 		{
 			//procErrLog(-1, "re-request");
 
+			responseReset();
+
 			++mCntRerequest;
-			if (mCntRerequest > 1)
+			if (mCntRerequest < 4)
 			{
-				mpListCmdCurrent->pop_front();
-				mCntRerequest = 0;
+				mState = StDataRequest;
+				break;
 			}
 
+			mpListCmdCurrent->pop_front();
 			mpListCmdCurrent = NULL;
-			responseReset();
 
 			mState = StMain;
 			break;
