@@ -268,7 +268,8 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
-		responseReset();
+		if (success == Positive)
+			responseReset();
 
 		success = cmdQueueConsume();
 		if (success == Positive)
