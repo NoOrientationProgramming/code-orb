@@ -548,6 +548,7 @@ Success SingleWireScheduling::contentDistribute()
 		if (!mResp.unsolicited)
 			return Positive;
 
+		mStartMs = millis();
 		responseReset();
 	}
 
