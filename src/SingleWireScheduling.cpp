@@ -212,7 +212,7 @@ Success SingleWireScheduling::process()
 			break;
 		}
 #if 0
-		procWrnLog("content received: %02X > '%s'",
+		procWrnLog("content received: 0x%02X > '%s'",
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
@@ -327,7 +327,11 @@ Success SingleWireScheduling::process()
 			mState = StUartInit;
 			break;
 		}
-
+#if 0
+		procWrnLog("content received: 0x%02X%s",
+							mResp.idContent,
+							mResp.unsolicited ? " (unsolicited)" : "");
+#endif
 		if (mCmdExpected && mResp.idContent != IdContentCmd)
 		{
 			//procErrLog(-1, "re-request");
@@ -513,7 +517,7 @@ Success SingleWireScheduling::contentDistribute()
 #if dDebugCommand
 		if (mResp.idContent != IdContentNone)
 		{
-			procWrnLog("content received: %02X%s",
+			procWrnLog("content received: 0x%02X%s",
 								mResp.idContent,
 								mResp.unsolicited ? " (unsolicited)" : "");
 #if 1
@@ -611,7 +615,7 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 
 		if (mByteLast == FlowTargetToSched)
 		{
-			//procWrnLog("got unsolicited. type: %02X", mResp.idContent);
+			//procWrnLog("got unsolicited. type: 0x%02X", mResp.idContent);
 			mResp.unsolicited = true;
 		}
 
