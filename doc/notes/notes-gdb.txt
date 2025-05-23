@@ -1,0 +1,15 @@
+
+tbreak SingleWireTransfering.cpp:169
+enable 1
+disable 1
+b SingleWireTransfering.cpp:169
+b SingleWireTransfering.cpp:250
+b SingleWireTransfering.cpp:255 // dataInTerminate() => !ok
+b SingleWireTransfering.cpp:329 // byteProcess() => Buffer exceeded
+print mIdxBufDataWrite
+print mBufInCmd
+x/8bx mBufInCmd
+x/2bx mBufId
+x/1bx &mValidBuf
+set {char[6]}mBufInCmd = {'f', 'o', 'o', 'o', 'p', 0}
+
