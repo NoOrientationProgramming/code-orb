@@ -513,7 +513,7 @@ Success SingleWireScheduling::contentDistribute()
 	{
 		success = dataReceive();
 		if (success == Pending)
-			return Pending;
+			break;
 
 		if (success != Positive)
 			return success;
