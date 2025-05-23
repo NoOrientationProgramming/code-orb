@@ -526,7 +526,7 @@ Success SingleWireScheduling::contentDistribute()
 #if 1
 			if (mResp.idContent != IdContentProc)
 #endif
-				procWrnLog("  '%s'", mResp.content.c_str());
+				printf("%s\n", mResp.content.c_str());
 		}
 #endif
 		if (mResp.idContent == IdContentProc &&
