@@ -19,7 +19,7 @@ ctrl is "0C"
 
 @+20
 ctrl is {-}
-tar is "0C"
+tar is "05"
 
 @+20
 tar is "12"
