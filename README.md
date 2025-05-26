@@ -35,11 +35,6 @@ The task viewer provides a detailed insight into the entire system, whereas the 
   - Log
   - Command Interface
 
-## Status
-
-- Beta
-- ETA: June 2025
-
 ## How To Use
 
 ### Topology
