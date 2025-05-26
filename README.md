@@ -3,6 +3,7 @@
 
 ![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic&color=orange)
 ![GitHub Release](https://img.shields.io/github/v/release/NoOrientationProgramming/code-orb?color=orange&style=plastic)
+
 ![Windows](https://img.shields.io/github/actions/workflow/status/NoOrientationProgramming/code-orb/windows.yml?style=plastic&logo=github&label=Windows)
 ![Linux](https://img.shields.io/github/actions/workflow/status/NoOrientationProgramming/code-orb/linux.yml?style=plastic&logo=linux&logoColor=white&label=Linux)
 ![MacOS](https://img.shields.io/github/actions/workflow/status/NoOrientationProgramming/code-orb/macos.yml?style=plastic&logo=apple&label=MacOS)
