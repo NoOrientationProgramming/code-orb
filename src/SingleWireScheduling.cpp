@@ -618,7 +618,7 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 		responseReset(ch);
 		mContentIgnore = false;
 
-		if (mByteLast == FlowTargetToSched)
+		if (mByteLast == IdContentUnsolicited)
 		{
 			//procWrnLog("got unsolicited. type: 0x%02X", mResp.idContent);
 			mResp.unsolicited = true;
