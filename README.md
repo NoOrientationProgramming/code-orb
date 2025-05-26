@@ -56,7 +56,7 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
 
 <p align="center">
   <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-04-08%2022-40-02.png" style="width: 700px; max-width:100%"/>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-05-26%2022-25-18.png" style="width: 700px; max-width:100%"/>
   </kbd>
 </p>
 
