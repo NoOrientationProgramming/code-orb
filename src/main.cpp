@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 	AppHelpOutput aho;
 #if 1
 	aho.package = dPackageName;
-	aho.version = dVersion;
+	aho.versionApp = dVersion;
 	aho.nameApp = dAppName;
 	aho.copyright = " © 2025 DSP-Crowd Electronics GmbH";
 #endif
