@@ -102,7 +102,7 @@ Test CodeOrb on UNIX systems
 The output should look like this
 ```
 CodeOrb - Microcontroller Debugging
-Version: CodeOrb-1-25.04-1
+Version: CodeOrb-v1.25.4.1
 
 Usage: codeorb [OPTION]
 
