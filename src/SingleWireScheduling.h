@@ -70,7 +70,7 @@ struct CommandReqResp
 	uint32_t startMs;
 };
 
-const uint32_t cTimeoutCommandResponseMs = 700;
+const uint32_t cTimeoutCommandResponseMs = 1500;
 
 class SingleWireScheduling : public Processing
 {
