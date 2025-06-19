@@ -35,9 +35,9 @@ The channels can then be viewed on the PC or over the network using a Telnet cli
 - Full control over target
 - Crystal-clear insight into the system
 - Through three dedicated channels
-  - **Process Tree** on TCP port 3000
-  - **Log** on TCP port 3002
-  - **Interactive Command Interface** on TCP port 3004
+  - Process Tree
+  - Log
+  - Command Interface
 
 ## How To Use
 
