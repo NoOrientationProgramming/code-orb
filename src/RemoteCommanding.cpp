@@ -31,7 +31,12 @@
 
 #define dForEach_ProcState(gen) \
 		gen(StStart) \
-		gen(StSendReadyWait) \
+		gen(StTransCreate) \
+		gen(StTransSendReadyWait) \
+		gen(StCmdAutoReceiveWait) \
+		gen(StCmdAutoDoneWait) \
+		gen(StFiltCreate) \
+		gen(StFiltSendReadyWait) \
 		gen(StWelcomeSend) \
 		gen(StMain) \
 		gen(StResponseRcvdWait) \
@@ -60,6 +65,7 @@ const string cWelcomeMsg = "\r\n" dPackageName "\r\n" \
 
 const string cInternalCmdCls = "dbg";
 const size_t cSizeColCmdMax = 22;
+const uint32_t cTmoCmdAuto = 200;
 
 list<EntryHelp> RemoteCommanding::cmds;
 
@@ -67,7 +73,9 @@ RemoteCommanding::RemoteCommanding(SOCKET fd)
 	: Processing("RemoteCommanding")
 	, mpTargetIsOnline(NULL)
 	, mStartMs(0)
+	, mModeAuto(false)
 	, mFdSocket(fd)
+	, mpTrans(NULL)
 	, mpFilt(NULL)
 	, mTxtPrompt()
 	, mIdReq(0)
@@ -113,6 +121,79 @@ Success RemoteCommanding::process()
 		if (!mpTargetIsOnline)
 			return procErrLog(-1, "target online pointer not set");
 
+		if (mModeAuto)
+		{
+			mState = StTransCreate;
+			break;
+		}
+
+		mState = StFiltCreate;
+
+		break;
+	case StTransCreate:
+
+		mpTrans = TcpTransfering::create(mFdSocket);
+		if (!mpTrans)
+			return procErrLog(-1, "could not create process");
+
+		mpTrans->procTreeDisplaySet(false);
+		start(mpTrans);
+
+		mState = StTransSendReadyWait;
+
+		break;
+	case StTransSendReadyWait:
+
+		success = mpTrans->success();
+		if (success != Pending)
+			return success;
+
+		if (!mpTrans->mSendReady)
+			break;
+
+		mStartMs = curTimeMs;
+		mState = StCmdAutoReceiveWait;
+
+		break;
+	case StCmdAutoReceiveWait:
+
+		if (diffMs > cTmoCmdAuto)
+			return procErrLog(-1, "timeout receiving command");
+
+		success = autoCommandReceive();
+		if (success == Pending)
+			break;
+
+		if (success != Positive)
+			return procErrLog(-1, "could not receive auto command");
+
+		mStartMs = curTimeMs;
+		mState = StCmdAutoDoneWait;
+
+		break;
+	case StCmdAutoDoneWait:
+
+		if (diffMs > cTimeoutCommandResponseMs)
+		{
+			string str;
+
+			str = "<command response timeout>\r\n";
+			mpTrans->send(str.c_str(), str.size());
+
+			return Positive;
+		}
+
+		success = responseReceive();
+		if (success == Pending)
+			break;
+
+		//procWrnLog("auto mode done");
+
+		return Positive;
+
+		break;
+	case StFiltCreate:
+
 		mpFilt = TelnetFiltering::create(mFdSocket);
 		if (!mpFilt)
 			return procErrLog(-1, "could not create process");
@@ -122,10 +203,10 @@ Success RemoteCommanding::process()
 		mpFilt->procTreeDisplaySet(false);
 		start(mpFilt);
 
-		mState = StSendReadyWait;
+		mState = StFiltSendReadyWait;
 
 		break;
-	case StSendReadyWait:
+	case StFiltSendReadyWait:
 
 		success = mpFilt->success();
 		if (success != Pending)
@@ -243,6 +324,45 @@ Success RemoteCommanding::process()
 	return Pending;
 }
 
+Success RemoteCommanding::autoCommandReceive()
+{
+	ssize_t lenReq, lenDone;
+	char *pBufIn = mBufOut;
+	string str;
+	bool ok;
+
+	lenReq = sizeof(mBufOut) - 1;
+
+	lenDone = mpTrans->read(pBufIn, lenReq);
+	if (!lenDone)
+		return Pending;
+
+	if (lenDone < 0)
+		return procErrLog(-1, "could not receive command");
+
+	// remove newline
+
+	if (pBufIn[lenDone - 1] == '\n')
+		pBufIn[--lenDone] = 0;
+
+	if (pBufIn[lenDone - 1] == '\r')
+		pBufIn[--lenDone] = 0;
+#if 0
+	procInfLog("auto bytes received    %d", lenDone);
+	procInfLog("auto command received  '%s'", pBufIn);
+
+	for (ssize_t i = 0; i < lenDone; ++i)
+		procInfLog("byte: %3u %02x '%c'", pBufIn[i], pBufIn[i], pBufIn[i]);
+#endif
+	str = string(pBufIn);
+
+	ok = SingleWireScheduling::commandSend(str, mIdReq);
+	if (!ok)
+		return procErrLog(-1, "could not send command");
+
+	return Positive;
+}
+
 bool RemoteCommanding::stateOnlineChanged()
 {
 	if (*mpTargetIsOnline == mTargetIsOnline)
@@ -347,7 +467,19 @@ Success RemoteCommanding::responseReceive()
 	if (!ok)
 		return Pending;
 
-	//procWrnLog("response received: %s", resp.c_str());
+	//procWrnLog("response received: '%s'", resp.c_str());
+
+	if (mModeAuto)
+	{
+		lfToCrLf(resp.data(), str);
+
+		if (str.size() && str.back() != '\n')
+			str += "\r\n";
+
+		mpTrans->send(str.c_str(), str.size());
+
+		return Positive;
+	}
 
 	if (mTimestamps)
 	{
