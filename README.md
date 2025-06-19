@@ -51,7 +51,44 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
   </kbd>
 </p>
 
+### Start CodeOrb
+
+On Windows
+```
+.\CodeOrb.exe -d COM1
+```
+
+On UNIX systems
+```
+./codeorb -d /dev/ttyACM0
+```
+
+The output should look like this
+<p align="center">
+  <kbd>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-06-19%2022-29-20.png" style="width: 700px; max-width:100%"/>
+  </kbd>
+</p>
+
+
 ### User Interface
+
+As soon as the multiplexing service CodeOrb has been started you can connect to the channels via Telnet. You can use IPv4 or IPv6
+
+For the **Process Tree**
+```
+telnet :: 3000
+```
+
+For the **Log**
+```
+telnet :: 3002
+```
+
+For the **Interactive Command Interface**
+```
+telnet :: 3004
+```
 
 <p align="center">
   <kbd>
@@ -87,22 +124,3 @@ Build the application
 ```
 ninja -C build-native
 ```
-
-## Start CodeOrb
-
-On Windows
-```
-.\build-native\CodeOrb.exe -d COM1
-```
-
-On UNIX systems
-```
-./build-native/codeorb -d /dev/ttyACM0
-```
-
-The output should look like this
-<p align="center">
-  <kbd>
-    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-06-19%2022-29-20.png" style="width: 700px; max-width:100%"/>
-  </kbd>
-</p>
