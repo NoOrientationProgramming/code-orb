@@ -53,7 +53,9 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
 
 ### Integrate the SystemCore into the target
 
-TODO: Separate README file.
+TODO: Separate README file
+
+Meanwhile: Check out the [example for STM32](https://github.com/NoOrientationProgramming/hello-world-stm32)
 
 ### Start CodeOrb on the PC
 
