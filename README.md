@@ -27,14 +27,17 @@ With [CodeOrb](https://github.com/NoOrientationProgramming/code-orb#codeorb-star
 we have two additional channels: a task viewer and a command interface.
 The task viewer provides a detailed insight into the entire system, whereas the command interface gives full control over the microcontroller.
 
+CodeOrb is essentially a multiplexer service running on the PC that transmits and receives these three channels of information via UART to and from the microcontroller.
+The channels can then be viewed on the PC or over the network using a Telnet client such as PuTTY.
+
 ## Features
 
 - Full control over target
 - Crystal-clear insight into the system
 - Through three dedicated channels
-  - Process Tree
-  - Log
-  - Command Interface
+  - **Process Tree** on TCP port 3000
+  - **Log** on TCP port 3002
+  - **Interactive Command Interface** on TCP port 3004
 
 ## How To Use
 
