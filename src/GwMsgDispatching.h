@@ -80,6 +80,7 @@ private:
 	void onlinePrint(bool online = true);
 	bool servicesStart();
 	void peerListUpdate();
+	void commandAutoProcess();
 	void contentDistribute();
 	void contentSend(const std::string &str, RemotePeerType typePeer);
 	bool disconnectRequestedCheck(TcpTransfering *pTrans);
@@ -95,6 +96,7 @@ private:
 	TcpListening *mpLstProc;
 	TcpListening *mpLstLog;
 	TcpListening *mpLstCmd;
+	TcpListening *mpLstCmdAuto;
 	SingleWireScheduling *mpSched;
 	InfoGathering *mpGather;
 	bool mCursorVisible;

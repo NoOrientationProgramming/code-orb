@@ -67,6 +67,7 @@ GwMsgDispatching::GwMsgDispatching()
 	, mpLstProc(NULL)
 	, mpLstLog(NULL)
 	, mpLstCmd(NULL)
+	, mpLstCmdAuto(NULL)
 	, mpSched(NULL)
 	, mpGather(NULL)
 	, mCursorVisible(true)
@@ -132,6 +133,7 @@ Success GwMsgDispatching::process()
 
 		stateOnlineCheckAndPrint();
 		peerListUpdate();
+		commandAutoProcess();
 		contentDistribute();
 
 		if (!mTargetIsOnline)
@@ -165,6 +167,7 @@ Success GwMsgDispatching::process()
 
 		stateOnlineCheckAndPrint();
 		peerListUpdate();
+		commandAutoProcess();
 		contentDistribute();
 
 		if (!mTargetIsOnline)
@@ -284,6 +287,17 @@ bool GwMsgDispatching::servicesStart()
 	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
 
+	mpLstCmdAuto = TcpListening::create();
+	if (!mpLstCmdAuto)
+		return procErrLog(-1, "could not create process");
+
+	mpLstCmdAuto->portSet(mPortStart + 6, mListenLocal);
+	mpLstCmdAuto->maxConnSet(4);
+
+	mpLstCmdAuto->procTreeDisplaySet(false);
+	start(mpLstCmdAuto);
+
+	// thread pool
 	ThreadPooling *pPool;
 
 	pPool = ThreadPooling::create();
@@ -309,6 +323,31 @@ void GwMsgDispatching::peerListUpdate()
 	peerAdd(mpLstLog, RemotePeerLog, "log");
 #endif
 	peerAdd(mpLstCmd, RemotePeerCmd, "command");
+}
+
+void GwMsgDispatching::commandAutoProcess()
+{
+	PipeEntry<SOCKET> peerFd;
+	RemoteCommanding *pCmd;
+
+	while (1)
+	{
+		if (mpLstCmdAuto->ppPeerFd.get(peerFd) < 1)
+			break;
+
+		pCmd = RemoteCommanding::create(peerFd.particle);
+		if (!pCmd)
+		{
+			procErrLog(-1, "could not create process");
+			continue;
+		}
+
+		pCmd->mpTargetIsOnline = &mTargetIsOnline;
+		pCmd->modeAutoSet();
+
+		pCmd->procTreeDisplaySet(false);
+		whenFinishedRepel(start(pCmd));
+	}
 }
 
 void GwMsgDispatching::contentDistribute()
