@@ -55,7 +55,7 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
 
 TODO: Separate README file.
 
-### Start CodeOrb
+### Start CodeOrb on the PC
 
 On Windows
 ```
