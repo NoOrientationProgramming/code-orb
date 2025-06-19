@@ -55,6 +55,8 @@ public:
 
 	static void listCommandsUpdate(const std::list<std::string> &listStr);
 
+	void modeAutoSet() { mModeAuto = true; }
+
 protected:
 
 	RemoteCommanding(SOCKET fd);
@@ -75,6 +77,7 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
+	Success autoCommandReceive();
 	bool stateOnlineChanged();
 
 	Success commandSend();
@@ -90,7 +93,9 @@ private:
 
 	/* member variables */
 	uint32_t mStartMs;
+	bool mModeAuto;
 	SOCKET mFdSocket;
+	TcpTransfering *mpTrans;
 	TelnetFiltering *mpFilt;
 	TextBox mTxtPrompt;
 	uint32_t mIdReq;
