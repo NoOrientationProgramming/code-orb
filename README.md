@@ -51,6 +51,10 @@ This repository provides `CodeOrb` the microcontroller debugger highlighted in o
   </kbd>
 </p>
 
+### Integrate the SystemCore into the target
+
+TODO: Separate README file.
+
 ### Start CodeOrb
 
 On Windows
