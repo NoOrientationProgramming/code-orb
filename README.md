@@ -88,41 +88,21 @@ Build the application
 ninja -C build-native
 ```
 
-Test CodeOrb on Windows
+## Start CodeOrb
+
+On Windows
 ```
-.\build-native\CodeOrb.exe --help
+.\build-native\CodeOrb.exe -d COM1
 ```
 
-Test CodeOrb on UNIX systems
+On UNIX systems
 ```
-./build-native/codeorb --help
+./build-native/codeorb -d /dev/ttyACM0
 ```
 
 The output should look like this
-```
-CodeOrb - Microcontroller Debugging
-Version: CodeOrb-v1.25.4.1
-
-Usage: codeorb [OPTION]
-
-Required
-
-None
-
-Optional
-
-  -d,  --device <string>             Device used for UART communication. Default: /dev/ttyACM0
-  -c,  --code <string>               Code used for UART initialization. Default: aaaaa
-  -v,  --verbosity <uint8>           Verbosity: high => more output
-  --,  --ignore_rest                 Ignores the rest of the labeled arguments following this flag.
-  -h,  --help                        Displays usage information and exits.
-       --start-ports-target <uint16> Start of 3-port interface for the target. Default: 3000
-       --start-ports-orb <uint16>    Start of 3-port interface for CodeOrb. Default: 2000
-       --refresh-rate <uint16>       Refresh rate of process tree in [ms]
-       --ctrl-manual                 Use manual control (automatic control disabled)
-       --core-dump                   Enable core dumps
-       --version                     Displays version information and exits.
-
- © 2025 DSP-Crowd Electronics GmbH
-
-```
+<p align="center">
+  <kbd>
+    <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-06-19%2022-29-20.png" style="width: 700px; max-width:100%"/>
+  </kbd>
+</p>
