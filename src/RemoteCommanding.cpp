@@ -473,7 +473,7 @@ Success RemoteCommanding::responseReceive()
 	{
 		lfToCrLf(resp.data(), str);
 
-		if (str.size() && str.back() != '\n')
+		if (!str.size() || str.back() != '\n')
 			str += "\r\n";
 
 		mpTrans->send(str.c_str(), str.size());
