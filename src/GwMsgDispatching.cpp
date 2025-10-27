@@ -282,7 +282,7 @@ bool GwMsgDispatching::servicesStart()
 		return procErrLog(-1, "could not create process");
 
 	mpLstCmd->portSet(mPortStart + 4, mListenLocal);
-	mpLstCmd->maxConnSet(4);
+	mpLstCmd->maxConnQueuedSet(4);
 
 	mpLstCmd->procTreeDisplaySet(false);
 	start(mpLstCmd);
@@ -292,7 +292,7 @@ bool GwMsgDispatching::servicesStart()
 		return procErrLog(-1, "could not create process");
 
 	mpLstCmdAuto->portSet(mPortStart + 6, mListenLocal);
-	mpLstCmdAuto->maxConnSet(4);
+	mpLstCmdAuto->maxConnQueuedSet(4);
 
 	mpLstCmdAuto->procTreeDisplaySet(false);
 	start(mpLstCmdAuto);
