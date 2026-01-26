@@ -110,16 +110,16 @@ Success GwMsgDispatching::process()
 #else
 		start(mpSched, DrivenByNewInternalDriver);
 #endif
-		userInfLog("%s\n", dVersion);
-		userInfLog("Using device: %s\n", env.deviceUart.c_str());
+		fprintf(stdout, "%s\n", dVersion);
+		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
 
-		userInfLog("Listening on: %u, %u, %u\n",
+		fprintf(stdout, "Listening on: %u, %u, %u\n",
 								mPortStart,
 								(uint16_t)(mPortStart + 2),
 								(uint16_t)(mPortStart + 4));
 
 		if (env.ctrlManual)
-			userInfLog("Manual control enabled\n");
+			fprintf(stdout, "Manual control enabled\n");
 
 		if (!env.verbosity)
 			cursorShow(false);
@@ -220,11 +220,11 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 	if (env.verbosity)
 		return;
 
-	userInfLog("\rUART [ ");
+	fprintf(stdout, "\rUART [ ");
 	onlinePrint(mDevUartIsOnline);
-	userInfLog(" ] - Target [ ");
+	fprintf(stdout, " ] - Target [ ");
 	onlinePrint(mTargetIsOnline);
-	userInfLog(" ]  ");
+	fprintf(stdout, " ]  ");
 
 	fflush(stdout);
 }
@@ -242,15 +242,15 @@ void GwMsgDispatching::onlinePrint(bool online)
 #ifdef _WIN32
 	SetConsoleTextAttribute(hConsole, idColor);
 #else
-	userInfLog("%s", pColor);
+	fprintf(stdout, "%s", pColor);
 #endif
 
-	userInfLog("%sline", pContent);
+	fprintf(stdout, "%sline", pContent);
 
 #ifdef _WIN32
 	SetConsoleTextAttribute(hConsole, 7);
 #else
-	userInfLog("%s", dColorClear);
+	fprintf(stdout, "%s", dColorClear);
 #endif
 }
 
@@ -568,7 +568,7 @@ void GwMsgDispatching::cursorShow(bool val)
 	infoCursor.bVisible = val ? TRUE : FALSE;
 	SetConsoleCursorInfo(hOut, &infoCursor);
 #else
-	userInfLog(val ? dCursorShow : dCursorHide);
+	fprintf(stdout, val ? dCursorShow : dCursorHide);
 	fflush(stdout);
 #endif
 	mCursorVisible = val;
