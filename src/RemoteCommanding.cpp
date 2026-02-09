@@ -342,6 +342,8 @@ Success RemoteCommanding::autoCommandReceive()
 
 	// remove newline
 
+	pBufIn[lenDone] = 0;
+
 	if (pBufIn[lenDone - 1] == '\n')
 		pBufIn[--lenDone] = 0;
 
