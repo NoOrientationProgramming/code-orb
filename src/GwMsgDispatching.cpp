@@ -214,6 +214,9 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 			mpSched->mTargetIsOnline == mTargetIsOnline)
 		return;
 
+	if (env.verbosity && mTargetIsOnline && !mpSched->mTargetIsOnline)
+		procDbgLog("Target connection lost");
+
 	mDevUartIsOnline = mpSched->mDevUartIsOnline;
 	mTargetIsOnline = mpSched->mTargetIsOnline;
 
