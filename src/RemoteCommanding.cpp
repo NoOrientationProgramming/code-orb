@@ -158,14 +158,18 @@ Success RemoteCommanding::process()
 	case StCmdAutoReceiveWait:
 
 		if (diffMs > cTmoCmdAuto)
+		{
+			string str = "<timeout receiving command>\r\n";
+			mpTrans->send(str.c_str(), str.size());
 			return procErrLog(-1, "timeout receiving command");
+		}
 
-		success = autoCommandReceive();
+		success = autoCommandProcess();
 		if (success == Pending)
 			break;
 
 		if (success != Positive)
-			return procErrLog(-1, "could not receive auto command");
+			return procErrLog(-1, "could not process auto command");
 
 		mStartMs = curTimeMs;
 		mState = StCmdAutoDoneWait;
@@ -175,11 +179,8 @@ Success RemoteCommanding::process()
 
 		if (diffMs > cTimeoutCommandResponseMs)
 		{
-			string str;
-
-			str = "<command response timeout>\r\n";
+			string str = "<command response timeout>\r\n";
 			mpTrans->send(str.c_str(), str.size());
-
 			return Positive;
 		}
 
@@ -324,7 +325,7 @@ Success RemoteCommanding::process()
 	return Pending;
 }
 
-Success RemoteCommanding::autoCommandReceive()
+Success RemoteCommanding::autoCommandProcess()
 {
 	ssize_t lenReq, lenDone;
 	char *pBufIn = mBufOut;
@@ -338,7 +339,11 @@ Success RemoteCommanding::autoCommandReceive()
 		return Pending;
 
 	if (lenDone < 0)
+	{
+		str = "<could not receive command>\r\n";
+		mpTrans->send(str.c_str(), str.size());
 		return procErrLog(-1, "could not receive command");
+	}
 
 	pBufIn[lenDone] = 0;
 
@@ -352,8 +357,12 @@ Success RemoteCommanding::autoCommandReceive()
 
 	for (ssize_t i = 0; i < lenDone; ++i)
 	{
-		if (SingleWireScheduling::isCtrl(pBufIn[i]))
-			return procErrLog(-1, "command contains protocol control byte");
+		if (!SingleWireScheduling::isCtrl(pBufIn[i]))
+			continue;
+
+		str = "<command contains protocol control byte>\r\n";
+		mpTrans->send(str.c_str(), str.size());
+		return procErrLog(-1, "command contains protocol control byte");
 	}
 #if 0
 	procInfLog("auto bytes received    %d", lenDone);
@@ -366,7 +375,11 @@ Success RemoteCommanding::autoCommandReceive()
 
 	ok = SingleWireScheduling::commandSend(str, mIdReq);
 	if (!ok)
+	{
+		str = "<could not send command>\r\n";
+		mpTrans->send(str.c_str(), str.size());
 		return procErrLog(-1, "could not send command");
+	}
 
 	return Positive;
 }

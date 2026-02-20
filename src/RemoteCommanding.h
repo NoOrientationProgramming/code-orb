@@ -77,7 +77,7 @@ private:
 	Success process();
 	void processInfo(char *pBuf, char *pBufEnd);
 
-	Success autoCommandReceive();
+	Success autoCommandProcess();
 	bool stateOnlineChanged();
 
 	Success commandSend();
