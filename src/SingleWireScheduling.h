@@ -31,15 +31,8 @@
 
 #include "Processing.h"
 #include "Pipe.h"
+#include "SingleWire.h"
 #include "LibUart.h"
-
-enum SwtContentId
-{
-	IdContentNone = 0x15,
-	IdContentProc = 0x11,
-	IdContentLog,
-	IdContentCmd,
-};
 
 enum PrioCmd
 {
@@ -132,7 +125,7 @@ private:
 	Success dataReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
-	void responseReset(uint8_t idContent = IdContentNone);
+	void responseReset(uint8_t idContent = IdContentTaToScNone);
 	void fragmentAppend(uint8_t ch);
 	void fragmentFinish();
 	void fragmentDelete();

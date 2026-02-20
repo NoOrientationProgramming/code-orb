@@ -216,7 +216,7 @@ Success SingleWireScheduling::process()
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
-		if (mResp.idContent != IdContentCmd)
+		if (mResp.idContent != IdContentTaToScCmd)
 		{
 			responseReset();
 			break;
@@ -334,7 +334,7 @@ Success SingleWireScheduling::process()
 							mResp.idContent,
 							mResp.unsolicited ? " (unsolicited)" : "");
 #endif
-		if (mCmdExpected && mResp.idContent != IdContentCmd)
+		if (mCmdExpected && mResp.idContent != IdContentTaToScCmd)
 		{
 			//procErrLog(-1, "re-request");
 
@@ -519,18 +519,18 @@ Success SingleWireScheduling::contentDistribute()
 		if (success != Positive)
 			return success;
 #if dDebugCommand
-		if (mResp.idContent != IdContentNone)
+		if (mResp.idContent != IdContentTaToScNone)
 		{
 			procWrnLog("content received: 0x%02X%s",
 								mResp.idContent,
 								mResp.unsolicited ? " (unsolicited)" : "");
 #if 1
-			if (mResp.idContent != IdContentProc)
+			if (mResp.idContent != IdContentTaToScProc)
 #endif
 				procWrnLog("%s\n", mResp.content.c_str());
 		}
 #endif
-		if (mResp.idContent == IdContentProc &&
+		if (mResp.idContent == IdContentTaToScProc &&
 				mContentProc != mResp.content)
 		{
 			mTargetIsOfflineMarked = false;
@@ -539,10 +539,10 @@ Success SingleWireScheduling::contentDistribute()
 			mContentProcChanged = true;
 		}
 
-		if (mResp.idContent == IdContentLog)
+		if (mResp.idContent == IdContentTaToScLog)
 			ppEntriesLog.commit(mResp.content);
 
-		if (mResp.idContent == IdContentCmd)
+		if (mResp.idContent == IdContentTaToScCmd)
 			cmdResponseReceived(mResp.content);
 
 		if (!mResp.unsolicited)
@@ -602,9 +602,9 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 	{
 	case StSwtContentRcvWait:
 
-		if (ch == IdContentNone)
+		if (ch == IdContentTaToScNone)
 		{
-			//procWrnLog("received IdContentNone");
+			//procWrnLog("received IdContentTaToScNone");
 			++mCntContentNoneRcvd;
 
 			responseReset();
@@ -612,7 +612,7 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 			return Positive;
 		}
 
-		if (ch < IdContentProc || ch > IdContentCmd)
+		if (ch < IdContentTaToScProc || ch > IdContentTaToScCmd)
 			break;
 
 		responseReset(ch);
@@ -624,7 +624,7 @@ Success SingleWireScheduling::byteProcess(uint8_t ch, uint32_t curTimeMs)
 			mResp.unsolicited = true;
 		}
 
-		if (ch != IdContentProc)
+		if (ch != IdContentTaToScProc)
 		{
 			mStateSwt = StSwtDataReceive;
 			break;
@@ -704,7 +704,7 @@ void SingleWireScheduling::processInfo(char *pBuf, char *pBufEnd)
 			mDevUartIsOnline ? "On" : "Off");
 	dInfo("Target\t\t\t%sline\n", mTargetIsOnline ? "On" : "Off");
 	dInfo("Bytes received\t\t%zu\n", mCntBytesRcvd);
-	dInfo("IdContentNone received\t%zu\n", mCntContentNoneRcvd);
+	dInfo("Content 'none' received\t%zu\n", mCntContentNoneRcvd);
 #if 0
 	fragmentsPrint(pBuf, pBufEnd);
 #endif
