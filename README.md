@@ -96,6 +96,12 @@ For the **Interactive Command Interface**
 telnet :: 3004
 ```
 
+For the **Automatic Command Interface**
+```
+echo "toggle" | nc :: 3006
+external Twitch jobs enabled
+```
+
 <p align="center">
   <kbd>
     <img src="https://raw.githubusercontent.com/NoOrientationProgramming/code-orb/main/doc/screenshots/Screenshot%20from%202025-05-26%2022-25-18.png" style="width: 700px; max-width:100%"/>
