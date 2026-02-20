@@ -340,9 +340,9 @@ Success RemoteCommanding::autoCommandReceive()
 	if (lenDone < 0)
 		return procErrLog(-1, "could not receive command");
 
-	// remove newline
-
 	pBufIn[lenDone] = 0;
+
+	// remove newline
 
 	if (pBufIn[lenDone - 1] == '\n')
 		pBufIn[--lenDone] = 0;
