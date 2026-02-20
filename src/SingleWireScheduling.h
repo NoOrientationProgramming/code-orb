@@ -92,6 +92,8 @@ public:
 					PrioCmd prio = PrioUser);
 	static bool commandResponseGet(uint32_t idReq, std::string &resp);
 
+	static bool isCtrl(char ch);
+
 protected:
 
 	SingleWireScheduling();

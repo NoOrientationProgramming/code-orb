@@ -244,6 +244,25 @@ bool SingleWireScheduling::commandResponseGet(uint32_t idReq, string &resp)
 	return false;
 }
 
+bool SingleWireScheduling::isCtrl(char ch)
+{
+	if (ch == FlowSchedToTarget || ch == FlowTargetToSched)
+		return true;
+
+	if (ch == IdContentScToTaCmd)
+		return true;
+
+	if (ch == IdContentTaToScNone || ch == IdContentTaToScProc ||
+		ch == IdContentTaToScLog || ch == IdContentTaToScCmd)
+		return true;
+
+	if (ch == IdContentUnsolicited || ch == IdContentCut ||
+		ch == IdContentEnd)
+		return true;
+
+	return false;
+}
+
 void SingleWireScheduling::commandsRegister()
 {
 	cmdReg("monitoringToggle", cmdMonitoringToggle,      "",  "Cyclic check for new data",           "Scheduling");
