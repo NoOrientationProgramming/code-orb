@@ -349,6 +349,12 @@ Success RemoteCommanding::autoCommandReceive()
 
 	if (pBufIn[lenDone - 1] == '\r')
 		pBufIn[--lenDone] = 0;
+
+	for (ssize_t i = 0; i < lenDone; ++i)
+	{
+		if (SingleWireScheduling::isCtrl(pBufIn[i]))
+			return procErrLog(-1, "command contains protocol control byte");
+	}
 #if 0
 	procInfLog("auto bytes received    %d", lenDone);
 	procInfLog("auto command received  '%s'", pBufIn);
