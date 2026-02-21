@@ -113,11 +113,15 @@ Success GwMsgDispatching::process()
 		fprintf(stdout, "%s\n", dVersion);
 		fprintf(stdout, "Using device: %s\n", env.deviceUart.c_str());
 
-		fprintf(stdout, "Listening on: %u, %u, %u, %u\n",
-								mPortStart,
-								(uint16_t)(mPortStart + 2),
-								(uint16_t)(mPortStart + 4),
-								(uint16_t)(mPortStart + 6));
+		fprintf(stdout, "Listening on\n"
+					"  %u .. Process tree\n"
+					"  %u .. Log\n"
+					"  %u .. Command Interface: Interactive\n"
+					"  %u .. Command Interface: Automatic\n",
+					mPortStart,
+					(uint16_t)(mPortStart + 2),
+					(uint16_t)(mPortStart + 4),
+					(uint16_t)(mPortStart + 6));
 		if (env.ctrlManual)
 			fprintf(stdout, "Manual control enabled\n");
 
