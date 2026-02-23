@@ -141,7 +141,7 @@ Success InfoGathering::entryNewGet()
 	if (!ok)
 		return Pending;
 
-	//procWrnLog("response received: %s", resp.c_str());
+	procDbgLog("response received: %s", resp.c_str());
 	mCntFilt = 0;
 
 	ok = entryFound(resp);
