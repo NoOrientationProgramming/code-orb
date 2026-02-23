@@ -136,7 +136,7 @@ private:
 	uint32_t mStateSwt;
 	uint32_t mStartMs;
 	RefDeviceUart mRefUart;
-	char mBufRcv[13];
+	char mBufRcv[211];
 	char *mpBuf;
 	ssize_t mLenDone;
 	std::map<int, std::string> mFragments;
