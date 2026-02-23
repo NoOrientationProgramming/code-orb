@@ -327,9 +327,10 @@ void SingleWireScheduling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEn
 	}
 
 	ssize_t lenDone;
-	char buf[55];
+	char buf[33];
+	ssize_t lenReq = sizeof(buf) - 1;
 
-	lenDone = uartRead(refUart, buf, sizeof(buf));
+	lenDone = uartRead(refUart, buf, lenReq);
 	if (!lenDone)
 	{
 		dInfo("No data");
@@ -342,10 +343,9 @@ void SingleWireScheduling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEn
 		return;
 	}
 
-	ssize_t lenMax = 32;
-	ssize_t lenReq = PMIN(lenMax, lenDone);
+	buf[lenDone] = 0;
 
-	hexDumpPrint(pBuf, pBufEnd, buf, lenReq, NULL, 8);
+	hexDumpPrint(pBuf, pBufEnd, buf, lenDone, NULL, 8);
 }
 
 void SingleWireScheduling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)
