@@ -332,7 +332,7 @@ Success SingleWireScheduling::process()
 
 		if (mCmdExpected && mResp.idContent != IdContentTaToScCmd)
 		{
-			//procErrLog(-1, "re-request");
+			procWrnLog("re-request");
 
 			responseReset();
 
