@@ -62,7 +62,7 @@ dProcessStateStr(SwtState);
 
 using namespace std;
 
-#define dDebugCommand	0
+#define dDebugCommand	1
 
 const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutRespMs = 330;
@@ -211,8 +211,8 @@ Success SingleWireScheduling::process()
 			mState = StUartInit;
 			break;
 		}
-#if 0
-		procWrnLog("content received: 0x%02X > '%s'",
+#if 1
+		procDbgLog("content received: 0x%02X > '%s'",
 						mResp.idContent,
 						mResp.content.c_str());
 #endif
@@ -329,11 +329,7 @@ Success SingleWireScheduling::process()
 			mState = StUartInit;
 			break;
 		}
-#if 0
-		procWrnLog("content received: 0x%02X%s",
-							mResp.idContent,
-							mResp.unsolicited ? " (unsolicited)" : "");
-#endif
+
 		if (mCmdExpected && mResp.idContent != IdContentTaToScCmd)
 		{
 			//procErrLog(-1, "re-request");
@@ -482,7 +478,7 @@ bool SingleWireScheduling::cmdSend(const string &cmd)
 	if (failed)
 		return false;
 #if dDebugCommand
-	procWrnLog("cmd sent: %s", cmd.c_str());
+	procDbgLog("cmd sent: %s", cmd.c_str());
 #endif
 	return true;
 }
@@ -521,13 +517,13 @@ Success SingleWireScheduling::contentDistribute()
 #if dDebugCommand
 		if (mResp.idContent != IdContentTaToScNone)
 		{
-			procWrnLog("content received: 0x%02X%s",
+			procDbgLog("content received: 0x%02X%s",
 								mResp.idContent,
 								mResp.unsolicited ? " (unsolicited)" : "");
 #if 1
 			if (mResp.idContent != IdContentTaToScProc)
 #endif
-				procWrnLog("%s\n", mResp.content.c_str());
+				procDbgLog("%s", mResp.content.c_str());
 		}
 #endif
 		if (mResp.idContent == IdContentTaToScProc &&

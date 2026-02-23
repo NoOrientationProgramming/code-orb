@@ -217,6 +217,8 @@ bool SingleWireScheduling::commandSend(const string &cmd, uint32_t &idReq, PrioC
 
 	pList->emplace_back(cmd, idReq, millis());
 
+	dbgLog("command queued: %s", cmd.c_str());
+
 	return true;
 }
 
