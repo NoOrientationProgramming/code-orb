@@ -62,7 +62,7 @@ dProcessStateStr(SwtState);
 
 using namespace std;
 
-#define dDebugCommand	1
+#define dDebugCommand	0
 
 const size_t SingleWireScheduling::cSizeFragmentMax = 4095;
 const uint32_t SingleWireScheduling::cTimeoutRespMs = 330;
@@ -477,9 +477,9 @@ bool SingleWireScheduling::cmdSend(const string &cmd)
 
 	if (failed)
 		return false;
-#if dDebugCommand
+
 	procDbgLog("cmd sent: %s", cmd.c_str());
-#endif
+
 	return true;
 }
 
