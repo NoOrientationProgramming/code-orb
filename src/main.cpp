@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	aho.package = dPackageName;
 	aho.versionApp = dVersion;
 	aho.nameApp = dAppName;
-	aho.copyright = " © 2025 DSP-Crowd Electronics GmbH";
+	aho.copyright = " (C) 2025 DSP-Crowd Electronics GmbH";
 #endif
 	cmd.setOutput(&aho);
 
