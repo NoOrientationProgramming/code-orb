@@ -144,6 +144,20 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 		success = -1;
 		goto errInit;
 	}
+
+	GetCommState(refUart, &dcbSerialParams);
+	dbgLog("Baud %lu, ByteSize %d, StopBits %d, Parity %d",
+		dcbSerialParams.BaudRate,
+		dcbSerialParams.ByteSize,
+		dcbSerialParams.StopBits,
+		dcbSerialParams.Parity);
+
+	GetCommTimeouts(refUart, &timeouts);
+	dbgLog("ReadIntervalTimeout          %lu ms", timeouts.ReadIntervalTimeout);
+	dbgLog("ReadTotalTimeoutMultiplier   %lu ms/Byte", timeouts.ReadTotalTimeoutMultiplier);
+	dbgLog("ReadTotalTimeoutConstant     %lu ms", timeouts.ReadTotalTimeoutConstant);
+	dbgLog("WriteTotalTimeoutMultiplier  %lu ms/Byte", timeouts.WriteTotalTimeoutMultiplier);
+	dbgLog("WriteTotalTimeoutConstant    %lu ms", timeouts.WriteTotalTimeoutConstant);
 #else
 	struct termios toOld, toNew;
 	int res;
