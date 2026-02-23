@@ -271,6 +271,9 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 		return -1;
 
 	lenWritten = (size_t)lenWrittenWin;
+
+	ok = FlushFileBuffers(refUart);
+	(void)ok;
 #else
 	lenWritten = write(refUart, pBuf, lenReq);
 #endif
