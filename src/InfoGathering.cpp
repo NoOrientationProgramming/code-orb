@@ -49,6 +49,7 @@ InfoGathering::InfoGathering()
 	: Processing("InfoGathering")
 	, mEntriesReceived()
 	, mStartMs(0)
+	, mStartAllMs(0)
 	, mIdReq(0)
 	, mCntFilt(0)
 {
@@ -72,6 +73,7 @@ Success InfoGathering::process()
 
 		mEntriesReceived.clear();
 
+		mStartAllMs = curTimeMs;
 		mState = StCmdSend;
 
 		break;
@@ -111,9 +113,10 @@ Success InfoGathering::process()
 			mState = StCmdSend;
 			break;
 		}
-#if 0
-		procWrnLog("gathered information");
 
+		diffMs = curTimeMs - mStartAllMs;
+		procDbgLog("gathered information in %u ms", diffMs);
+#if 0
 		{
 			list<string>::iterator iter;
 

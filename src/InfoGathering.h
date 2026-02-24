@@ -67,6 +67,7 @@ private:
 
 	/* member variables */
 	uint32_t mStartMs;
+	uint32_t mStartAllMs;
 	uint32_t mIdReq;
 	std::string mResp;
 	uint8_t mCntFilt;
