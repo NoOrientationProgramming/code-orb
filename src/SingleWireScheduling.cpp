@@ -556,31 +556,39 @@ Success SingleWireScheduling::dataReceive()
 	uint32_t curTimeMs = millis();
 	Success success;
 
-	while (mLenDone > 0)
+	while (1)
 	{
-		success = byteProcess((uint8_t)*mpBuf, curTimeMs);
-		mByteLast = *mpBuf;
+		if (!mLenDone) // !
+		{
+			mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
+			mpBuf = mBufRcv;
+		}
 
-		++mpBuf;
-		--mLenDone;
+		if (!mLenDone)
+			return Pending;
 
-		if (success == Positive)
-			return Positive;
+		if (mLenDone < 0)
+		{
+			mLenDone = 0; // !
+
+			mFragments.clear();
+			mStateSwt = StSwtContentRcvWait;
+
+			return -1;
+		}
+
+		while (mLenDone > 0)
+		{
+			success = byteProcess((uint8_t)*mpBuf, curTimeMs);
+			mByteLast = *mpBuf;
+
+			++mpBuf;
+			--mLenDone;
+
+			if (success == Positive)
+				return Positive;
+		}
 	}
-
-	mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
-	if (!mLenDone)
-		return Pending;
-
-	if (mLenDone < 0)
-	{
-		mFragments.clear();
-		mStateSwt = StSwtContentRcvWait;
-
-		return -1;
-	}
-
-	mpBuf = mBufRcv;
 
 	return Pending;
 }
