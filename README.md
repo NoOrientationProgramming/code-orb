@@ -38,6 +38,8 @@ The channels can then be viewed on the PC or over the network using a Telnet cli
   - Process Tree
   - Log
   - Command Interface
+    - Interactive
+    - Automatic
 
 ## How To Use
 
