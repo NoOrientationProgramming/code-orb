@@ -27,7 +27,7 @@ component "Microcontroller" {
 	frame "<<SystemDebugging()>>" as pSysDbg
 	frame "<<Application>>" as pApp
 
-	pSysDbg <--> pApp
+	pSysDbg <-[thickness=2]-> pApp
 }
 
 pGw <--> pSysDbg : "COM1 or\n  /dev/ttyACM0"
