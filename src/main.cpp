@@ -254,10 +254,10 @@ int main(int argc, char *argv[])
 
 	while (1)
 	{
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < 12; ++i)
 			pApp->treeTick();
 
-		this_thread::sleep_for(chrono::milliseconds(5));
+		this_thread::sleep_for(chrono::milliseconds(15));
 
 		if (pApp->progress())
 			continue;
