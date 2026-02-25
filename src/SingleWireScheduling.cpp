@@ -202,7 +202,7 @@ Success SingleWireScheduling::process()
 			break;
 		}
 
-		success = dataReceive();
+		success = contentReceive();
 		if (success == Pending)
 			break;
 
@@ -508,7 +508,7 @@ Success SingleWireScheduling::contentDistribute()
 
 	while (1)
 	{
-		success = dataReceive();
+		success = contentReceive();
 		if (success == Pending)
 			break;
 
@@ -551,7 +551,7 @@ Success SingleWireScheduling::contentDistribute()
 	return Pending;
 }
 
-Success SingleWireScheduling::dataReceive()
+Success SingleWireScheduling::contentReceive()
 {
 	uint32_t curTimeMs = millis();
 	Success success;

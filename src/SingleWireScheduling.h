@@ -124,7 +124,7 @@ private:
 	bool cmdSend(const std::string &cmd);
 	bool dataRequest();
 	Success contentDistribute();
-	Success dataReceive();
+	Success contentReceive();
 	Success byteProcess(uint8_t ch, uint32_t curTimeMs);
 	void targetOnlineSet(bool online = true);
 	void responseReset(uint8_t idContent = IdContentTaToScNone);
