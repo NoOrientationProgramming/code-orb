@@ -9,7 +9,7 @@ component PC as pPc {
 	frame "Debugger" as pDbg
 	frame "Application" as pApp
 
-	pDbg <-[thickness=2]-> pApp
+	pDbg <-[thickness=2]-> pApp : "  GDB\n  Logs\n  IPC"
 }
 
 component "Microcontroller" {
@@ -17,7 +17,7 @@ component "Microcontroller" {
 	frame "<<Application>>" as pAppUc
 }
 
-pDbg <-> pAppUc : "COM1 or\n  /dev/ttyACM0"
+pDbg <-> pAppUc : "    (GDB), UART (Logs)  \nGPIO"
 
 footer **CodeOrb** - Motivation\n(C) DSP-Crowd Electronics GmbH
 
