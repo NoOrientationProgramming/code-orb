@@ -34,30 +34,30 @@ echo "\e[36m2026-02-25  20:52:46.100 +0.000  COR  process               0x5d96c7
 
 echo
 
-echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:160mERR\e[0m  I am a log entry"
+echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:1mERR\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:134                      \e[0m\e[38:5:3mWRN\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:135                      \e[0m\e[38:5:7mINF\e[0m  I am a log entry"
-echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:136                      \e[0m\e[38:5:30mDBG\e[0m  I am a log entry"
+echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:136                      \e[0m\e[38:5:6mDBG\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:137                      \e[0m\e[38:5:91mCOR\e[0m  I am a log entry"
 
-echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:133       \e[0m\e[38:5:160mERR\e[0m  I am a log entry"
+echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:133       \e[0m\e[38:5:1mERR\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:134       \e[0m\e[38:5:3mWRN\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:135       \e[0m\e[38:5:7mINF\e[0m  I am a log entry"
-echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:136       \e[0m\e[38:5:30mDBG\e[0m  I am a log entry"
+echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:136       \e[0m\e[38:5:6mDBG\e[0m  I am a log entry"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:137       \e[0m\e[38:5:91mCOR\e[0m  I am a log entry"
 
 echo
 
-echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:160mERR\e[0m  I am a log entry"
+echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:1mERR\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:134                      \e[0m\e[38:5:3mWRN\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:135                      \e[0m\e[38:5:7mINF\e[0m  I am a log entry"
-echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:136                      \e[0m\e[38:5:30mDBG\e[0m  I am a log entry"
+echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:136                      \e[0m\e[38:5:6mDBG\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:137                      \e[0m\e[38:5:91mCOR\e[0m  I am a log entry"
 
-echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:133       \e[0m\e[38:5:160mERR\e[0m  I am a log entry"
+echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:133       \e[0m\e[38:5:1mERR\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:134       \e[0m\e[38:5:3mWRN\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:135       \e[0m\e[38:5:7mINF\e[0m  I am a log entry"
-echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:136       \e[0m\e[38:5:30mDBG\e[0m  I am a log entry"
+echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:136       \e[0m\e[38:5:6mDBG\e[0m  I am a log entry"
 echo "\e[38:5:7m2026-02-25  20:52:46.099 +0.000  process               0x5d96c7699220 GwMsgDispatching.cpp:137       \e[0m\e[38:5:91mCOR\e[0m  I am a log entry"
 
 echo
