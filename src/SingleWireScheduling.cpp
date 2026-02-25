@@ -558,6 +558,7 @@ Success SingleWireScheduling::contentReceive()
 
 	while (1)
 	{
+		// Optional fetch
 		if (!mLenDone) // !
 		{
 			mLenDone = uartRead(mRefUart, mBufRcv, sizeof(mBufRcv));
@@ -577,6 +578,7 @@ Success SingleWireScheduling::contentReceive()
 			return -1;
 		}
 
+		// Process data
 		while (mLenDone > 0)
 		{
 			success = byteProcess((uint8_t)*mpBuf, curTimeMs);
