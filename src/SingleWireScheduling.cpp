@@ -582,8 +582,8 @@ Success SingleWireScheduling::dataReceive()
 			success = byteProcess((uint8_t)*mpBuf, curTimeMs);
 			mByteLast = *mpBuf;
 
-			++mpBuf;
 			--mLenDone;
+			++mpBuf;
 
 			if (success == Positive)
 				return Positive;
