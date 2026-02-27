@@ -18,6 +18,11 @@
 #2026-02-25  20:52:46.099 +0.000  INF  process               0x5d96c7699220 GwMsgDispatching.cpp:140       I am a log entry
 #2026-02-25  20:52:46.100 +0.000  DBG  process               0x5d96c7699220 GwMsgDispatching.cpp:141       I am a log entry
 
+#WHEN                             WHERE                                                               WHAT
+#2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      ERR  removing SystemDebugging from child list: done
+#                        |       |                                                                   |    |                                             |
+#                        25      8                                                                   68   5                                             46
+
 echo
 
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:1mERR  I am a log entry\e[0m"
@@ -64,7 +69,7 @@ echo "\e[36m2026-02-25  20:52:46.100 +0.000  COR  process               0x5d96c7
 
 echo
 
-echo "NEW"
+echo "NEW Concept"
 echo
 echo "WHEN                             WHERE                                                               WHAT"
 echo "\e[38:5:245m2026-02-25  20:52:46.099 +0.000  process               GwMsgDispatching.cpp:133                      \e[0m\e[38:5:1mERR\e[0m  I am a log entry"
