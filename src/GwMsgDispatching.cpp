@@ -394,7 +394,7 @@ void GwMsgDispatching::contentDistribute()
 			break;
 
 		msg += dColorGrey;
-		msg += nowToStr("%Y-%m-%d  %H:%M:%S  ");
+		msg += nowToStr("%Y-%m-%d  %H:%M:%S   ");
 		msg += dColorClear;
 
 		msg += entryLog.particle;
