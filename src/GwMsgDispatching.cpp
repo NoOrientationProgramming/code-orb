@@ -81,6 +81,14 @@ GwMsgDispatching::GwMsgDispatching()
 
 /* member functions */
 
+#define DBG_TIME_CNT	1
+
+#if DBG_TIME_CNT
+uint32_t cntTimeCreate()
+{
+	return -1;
+}
+#endif
 Success GwMsgDispatching::process()
 {
 	//uint32_t curTimeMs = millis();
@@ -100,6 +108,9 @@ Success GwMsgDispatching::process()
 		if (!ok)
 			return procErrLog(-1, "could not start services");
 
+#if DBG_TIME_CNT
+		cntTimeCreateSet(cntTimeCreate);
+#endif
 		mpSched = SingleWireScheduling::create();
 		if (!mpSched)
 			return procErrLog(-1, "could not create process");

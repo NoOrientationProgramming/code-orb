@@ -211,7 +211,7 @@ Success SingleWireScheduling::process()
 			mState = StUartInit;
 			break;
 		}
-#if 1
+#if 0
 		procDbgLog("content received: 0x%02X > '%s'",
 						mResp.idContent,
 						mResp.content.c_str());
