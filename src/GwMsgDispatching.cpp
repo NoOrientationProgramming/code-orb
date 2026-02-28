@@ -81,7 +81,7 @@ GwMsgDispatching::GwMsgDispatching()
 
 /* member functions */
 
-#define DBG_TIME_CNT	1
+#define DBG_TIME_CNT	0
 
 #if DBG_TIME_CNT
 uint32_t cntTimeCreate()
