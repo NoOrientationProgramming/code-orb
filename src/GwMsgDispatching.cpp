@@ -227,11 +227,11 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 			mpSched->mTargetIsOnline == mTargetIsOnline)
 		return;
 
-	procDbgLog("target is %sline",
-			mTargetIsOnline ? "on" : "off");
-
 	mDevUartIsOnline = mpSched->mDevUartIsOnline;
 	mTargetIsOnline = mpSched->mTargetIsOnline;
+
+	procDbgLog("target is %sline",
+			mTargetIsOnline ? "on" : "off");
 
 	if (env.verbosity)
 		return;
