@@ -154,8 +154,6 @@ Success GwMsgDispatching::process()
 		if (!mTargetIsOnline)
 			break;
 
-		//procWrnLog("target is online");
-
 		if (mpGather)
 		{
 			mState = StTargetOnline;
@@ -229,8 +227,8 @@ void GwMsgDispatching::stateOnlineCheckAndPrint()
 			mpSched->mTargetIsOnline == mTargetIsOnline)
 		return;
 
-	if (env.verbosity && mTargetIsOnline && !mpSched->mTargetIsOnline)
-		procDbgLog("Target connection lost");
+	procDbgLog("target is %sline",
+			mTargetIsOnline ? "on" : "off");
 
 	mDevUartIsOnline = mpSched->mDevUartIsOnline;
 	mTargetIsOnline = mpSched->mTargetIsOnline;
