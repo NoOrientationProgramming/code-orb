@@ -566,7 +566,7 @@ Success SingleWireScheduling::contentReceive()
 		}
 
 		if (!mLenDone)
-			return Pending;
+			break;
 
 		if (mLenDone < 0)
 		{
