@@ -1,7 +1,7 @@
 
 <h2 id="codeorb-start" style="display:none;"></h2>
 
-![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic&color=orange)
+[![GitHub](https://img.shields.io/github/license/NoOrientationProgramming/code-orb?style=plastic&color=orange)](https://en.wikipedia.org/wiki/GNU_General_Public_License#Version_3)
 [![GitHub Release](https://img.shields.io/github/v/release/NoOrientationProgramming/code-orb?color=orange&style=plastic)](https://github.com/NoOrientationProgramming/code-orb/releases)
 
 ![Windows](https://img.shields.io/github/actions/workflow/status/NoOrientationProgramming/code-orb/windows.yml?style=plastic&logo=github&label=Windows)
