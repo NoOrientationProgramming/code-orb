@@ -257,12 +257,10 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < 12; ++i)
 			pApp->treeTick();
 
+		if (!pApp->progress())
+			break;
+
 		this_thread::sleep_for(chrono::milliseconds(15));
-
-		if (pApp->progress())
-			continue;
-
-		break;
 	}
 
 	Success success = pApp->success();
