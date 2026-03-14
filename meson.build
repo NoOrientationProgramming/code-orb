@@ -52,7 +52,7 @@ args = [
 ]
 
 # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-warningsLinux = [
+warningsGcc = [
 	'-Wall',
 	'-Wextra',
 	'-Wpedantic',
@@ -136,7 +136,7 @@ endif
 if cxx.get_id() == 'msvc'
 	args += '/std:c++17'
 elif cxx.get_id() == 'gcc'
-	args += warningsLinux
+	args += warningsGcc
 elif cxx.get_id() == 'clang'
 	args += warningsClang
 endif
