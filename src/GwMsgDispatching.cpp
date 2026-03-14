@@ -320,7 +320,7 @@ bool GwMsgDispatching::servicesStart()
 	if (!pPool)
 		return procErrLog(-1, "could not create process");
 
-	pPool->workerCntSet(3);
+	pPool->cntWorkerSet(3);
 
 	pPool->procTreeDisplaySet(false);
 	start(pPool);
