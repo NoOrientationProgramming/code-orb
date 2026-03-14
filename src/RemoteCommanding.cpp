@@ -327,7 +327,8 @@ Success RemoteCommanding::process()
 
 Success RemoteCommanding::autoCommandProcess()
 {
-	ssize_t lenReq, lenDone;
+	size_t lenReq;
+	ssize_t lenDone;
 	char *pBufIn = mBufOut;
 	string str;
 	bool ok;
@@ -1018,7 +1019,7 @@ void RemoteCommanding::lfToCrLf(const char *pBuf, string &str)
 			continue;
 		}
 
-		str += string(pBufLineStart, pBufIter - pBufLineStart);
+		str += string(pBufLineStart, (size_t)(pBufIter - pBufLineStart));
 		str += "\r\n";
 
 		++pBufIter;

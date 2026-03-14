@@ -90,6 +90,21 @@ warningsClang = [
 	'-Wpedantic',
 	'-Werror',
 	'-Wno-gnu-zero-variadic-macro-arguments',
+	'-Wshadow',
+	'-Wsign-conversion',
+	'-Wnull-dereference',
+	'-Wdouble-promotion',
+	'-Wimplicit-fallthrough',
+	'-Wcast-qual',
+	'-Wcast-align',
+	'-Wnon-virtual-dtor',
+	'-Woverloaded-virtual',
+	'-Wfloat-equal',
+	'-Wswitch-enum',
+	'-Wmissing-declarations',
+	'-Wunreachable-code',
+	'-Wdocumentation',
+	'-Wthread-safety',
 ]
 
 if host_machine.system() == 'windows'

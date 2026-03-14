@@ -174,16 +174,16 @@ Success devUartInit(const string &deviceUart, RefDeviceUart &refUart)
 	toNew = toOld;
 
 	// Disable CR to NL translation
-	toNew.c_iflag &= ~ICRNL;
+	toNew.c_iflag &= ~(tcflag_t)ICRNL;
 
 	// Disable flow control
-	toNew.c_iflag &= ~(IXON | IXOFF | IXANY);
+	toNew.c_iflag &= ~(tcflag_t)(IXON | IXOFF | IXANY);
 
 	// Disable NL to CR translation
-	toNew.c_oflag &= ~ONLCR;
+	toNew.c_oflag &= ~(tcflag_t)ONLCR;
 
 	// Disable echo and canonical mode
-	toNew.c_lflag &= ~(ECHO | ICANON);
+	toNew.c_lflag &= ~(tcflag_t)(ECHO | ICANON);
 
 	// Set baud rate to 115200
 	cfsetispeed(&toNew, B115200);
@@ -243,18 +243,18 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 		if (!uartVirtualMounted)
 			return -1;
 
-		size_t lenAttemted = PMIN(lenReq, sizeof(bufVirtual));
+		size_t lenPlanned = PMIN(lenReq, sizeof(bufVirtual));
 		*bufVirtual = 0;
 
 		if (uartVirtualMode) // mode = uart: TX not connected to RX
-			return lenAttemted;
+			return (ssize_t)lenPlanned;
 
-		lenWritten = lenAttemted;
+		lenWritten = lenPlanned;
 		pBufVirt = bufVirtual;
 
 		memcpy(pBufVirt, pBuf, lenWritten);
 
-		return lenWritten;
+		return (ssize_t)lenWritten;
 	}
 
 	if (refUart == RefDeviceUartInvalid)
@@ -275,9 +275,15 @@ ssize_t uartSend(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 	ok = FlushFileBuffers(refUart);
 	(void)ok;
 #else
-	lenWritten = write(refUart, pBuf, lenReq);
+	ssize_t lenDone;
+
+	lenDone = write(refUart, pBuf, lenReq);
+	if (lenDone < 0)
+		return -1;
+
+	lenWritten = (size_t)lenDone;
 #endif
-	return lenWritten;
+	return (ssize_t)lenWritten;
 }
 
 ssize_t uartSend(RefDeviceUart refUart, uint8_t ch)
@@ -315,7 +321,7 @@ ssize_t uartRead(RefDeviceUart refUart, void *pBuf, size_t lenReq)
 		lenWritten -= lenReadVirt;
 		pBufVirt += lenReadVirt;
 
-		return lenReadVirt;
+		return (ssize_t)lenReadVirt;
 	}
 
 	if (refUart == RefDeviceUartInvalid)
@@ -373,6 +379,6 @@ ssize_t uartVirtRcv(RefDeviceUart refUart, const void *pBuf, size_t lenReq)
 
 	memcpy(pBufVirt, pBuf, lenWritten);
 
-	return lenWritten;
+	return (ssize_t)lenWritten;
 }
 

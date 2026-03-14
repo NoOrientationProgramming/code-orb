@@ -582,7 +582,7 @@ Success SingleWireScheduling::contentReceive()
 		while (mLenDone > 0)
 		{
 			success = byteProcess((uint8_t)*mpBuf, curTimeMs);
-			mByteLast = *mpBuf;
+			mByteLast = (uint8_t)*mpBuf;
 
 			--mLenDone;
 			++mpBuf;

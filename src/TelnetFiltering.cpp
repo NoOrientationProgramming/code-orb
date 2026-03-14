@@ -268,8 +268,8 @@ ssize_t TelnetFiltering::send(const void *pData, size_t len)
 Success TelnetFiltering::dataProcess()
 {
 	ssize_t numBytesRead;
-	char buf[8];
-	const char *pKey;
+	unsigned char buf[8];
+	const unsigned char *pKey;
 	Success success;
 
 	numBytesRead = mpConn->read(buf, sizeof(buf) - 1);
@@ -361,7 +361,7 @@ Success TelnetFiltering::keyGet(uint8_t key)
 			if ((key & 0xF8) == 0xF0) mCntFragment = 4;
 
 			mFragmentUtf.clear();
-			mFragmentUtf.push_back(key);
+			mFragmentUtf.push_back((char)key);
 
 			mStateKey = StKeyUnicode;
 			break;
@@ -379,7 +379,7 @@ Success TelnetFiltering::keyGet(uint8_t key)
 
 		if ((key & 0xC0) == 0x80)
 		{
-			mFragmentUtf.push_back(key);
+			mFragmentUtf.push_back((char)key);
 
 			if (mFragmentUtf.size() < mCntFragment)
 				break;

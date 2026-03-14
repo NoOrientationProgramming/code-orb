@@ -173,14 +173,14 @@ int main(int argc, char *argv[])
 	ValueArg<string> argDevUart("d", "device", "Device used for UART communication. Default: " dDeviceUartDefault,
 								false, env.deviceUart, "string");
 	cmd.add(argDevUart);
-	ValueArg<int> argRateRefreshMs("", "refresh-rate", "Refresh rate of process tree in [ms]",
+	ValueArg<uint32_t> argRateRefreshMs("", "refresh-rate", "Refresh rate of process tree in [ms]",
 								false, env.rateRefreshMs, "uint16");
 	cmd.add(argRateRefreshMs);
 
-	ValueArg<int> argStartPortOrb("", "start-ports-orb", "Start of 3-port interface for CodeOrb. Default: " dStartPortsOrbDefault,
+	ValueArg<uint16_t> argStartPortOrb("", "start-ports-orb", "Start of 3-port interface for CodeOrb. Default: " dStartPortsOrbDefault,
 								false, env.startPortsOrb, "uint16");
 	cmd.add(argStartPortOrb);
-	ValueArg<int> argStartPortTarget("", "start-ports-target", "Start of 3-port interface for the target. Default: " dStartPortsTargetDefault,
+	ValueArg<uint16_t> argStartPortTarget("", "start-ports-target", "Start of 3-port interface for the target. Default: " dStartPortsTargetDefault,
 								false, env.startPortsTarget, "uint16");
 	cmd.add(argStartPortTarget);
 
@@ -199,10 +199,10 @@ int main(int argc, char *argv[])
 	env.codeUart = argCodeUart.getValue();
 	env.deviceUart = argDevUart.getValue();
 
-	res = argRateRefreshMs.getValue();
-	if (res > cRateRefreshMinMs &&
-			res <= cRateRefreshMaxMs)
-		env.rateRefreshMs = res;
+	uint32_t ures = argRateRefreshMs.getValue();
+	if (ures > cRateRefreshMinMs &&
+			ures <= cRateRefreshMaxMs)
+		env.rateRefreshMs = ures;
 
 	res = argStartPortOrb.getValue();
 	if (res > 0 && res <= cPortMax)

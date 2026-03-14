@@ -70,7 +70,7 @@ void SingleWireScheduling::fragmentAppend(uint8_t ch)
 
 	if (!fragmentFound)
 	{
-		mFragments[idContent] = string(1, ch);
+		mFragments[idContent] = string(1, (char)ch);
 		return;
 	}
 
@@ -79,7 +79,7 @@ void SingleWireScheduling::fragmentAppend(uint8_t ch)
 	if (str.size() > cSizeFragmentMax)
 		return;
 
-	mFragments[idContent] += string(1, ch);
+	mFragments[idContent] += string(1, (char)ch);
 
 	return;
 }
@@ -328,9 +328,9 @@ void SingleWireScheduling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEn
 		return;
 	}
 
-	ssize_t lenDone;
 	char buf[33];
-	ssize_t lenReq = sizeof(buf) - 1;
+	size_t lenReq = sizeof(buf) - 1;
+	ssize_t lenDone;
 
 	lenDone = uartRead(refUart, buf, lenReq);
 	if (!lenDone)
@@ -347,7 +347,7 @@ void SingleWireScheduling::cmdDataUartRead(char *pArgs, char *pBuf, char *pBufEn
 
 	buf[lenDone] = 0;
 
-	hexDumpPrint(pBuf, pBufEnd, buf, lenDone, NULL, 8);
+	hexDumpPrint(pBuf, pBufEnd, buf, (size_t)lenDone, NULL, 8);
 }
 
 void SingleWireScheduling::cmdModeUartVirtSet(char *pArgs, char *pBuf, char *pBufEnd)
