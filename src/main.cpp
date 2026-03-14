@@ -142,8 +142,8 @@ int main(int argc, char *argv[])
 	env.deviceUart = dDeviceUartDefault;
 	env.rateRefreshMs = cRateRefreshDefaultMs;
 
-	env.startPortsOrb = stoi(dStartPortsOrbDefault);
-	env.startPortsTarget = stoi(dStartPortsTargetDefault);
+	env.startPortsOrb = atoi(dStartPortsOrbDefault);
+	env.startPortsTarget = atoi(dStartPortsTargetDefault);
 
 #if APP_HAS_TCLAP
 	int res;
